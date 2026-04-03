@@ -3,7 +3,7 @@ import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
-const DEFAULT_PACKAGE_NAME = "skilly-hand";
+const DEFAULT_PACKAGE_NAME = "@skilly-hand/skilly-hand";
 
 const UNRELEASED_TEMPLATE = `### Added
 - _None._
@@ -137,7 +137,7 @@ Flags:
   --date <YYYY-MM-DD>             Override release date (defaults to today's UTC date)
   --changelog <path>              Changelog file path (defaults to ./CHANGELOG.md)
   --package-json <path>           package.json path (defaults to ./package.json)
-  --package-name <name>           npm package name for release link (defaults to skilly-hand)
+  --package-name <name>           npm package name for release link (defaults to @skilly-hand/skilly-hand)
   --no-stage                      Do not run git add CHANGELOG.md
   --help, -h                      Show this help output
 `);

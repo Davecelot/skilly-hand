@@ -1,3 +1,5 @@
 node_modules
 .skilly-hand
 catalog/catalog-index.json
+.npm-cache
+source/

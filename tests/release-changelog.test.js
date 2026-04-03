@@ -22,7 +22,7 @@ All notable changes to this project are documented in this file.
 - _None._
 
 ## [0.1.0] - 2026-04-01
-[View on npm](https://www.npmjs.com/package/skilly-hand/v/0.1.0)
+[View on npm](https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.1.0)
 
 ### Added
 - Initial release.
@@ -48,7 +48,7 @@ test("inserts npm release link for the new version", () => {
     date: "2026-04-03"
   });
 
-  assert.match(output, /\[View on npm\]\(https:\/\/www\.npmjs\.com\/package\/skilly-hand\/v\/0\.2\.0\)/);
+  assert.match(output, /\[View on npm\]\(https:\/\/www\.npmjs\.com\/package\/@skilly-hand\/skilly-hand\/v\/0\.2\.0\)/);
 });
 
 test("resets Unreleased section template after rotation", () => {
