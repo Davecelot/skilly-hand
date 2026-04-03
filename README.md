@@ -58,7 +58,8 @@ npx skilly-hand
 4. Run publish gate: `npm run verify:publish`.
 5. Inspect package payload: `npm pack --dry-run --json`.
 6. Bump version intentionally: `npm version patch|minor|major` (this auto-rotates `CHANGELOG.md`, creates a dated release section, and inserts a version-specific npm link).
-7. Publish the root package: `npm publish` (or `npm publish --tag next` for prereleases).
+7. Publish with assisted 2FA flow: `npm run publish:otp` (or `npm run publish:next` for prereleases).
+   - The script runs the publish gate, asks for OTP with hidden input, and if left blank lets npm trigger your default security method.
 8. Smoke test after publish: `npx @skilly-hand/skilly-hand@<version> --help`.
 9. Verify npm metadata (README render, changelog, license, executable bin).
 
