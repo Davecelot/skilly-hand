@@ -1,9 +1,13 @@
 #!/usr/bin/env node
 import path from "node:path";
+import { createRequire } from "node:module";
 import { loadAllSkills } from "../../catalog/src/index.js";
 import { installProject, runDoctor, uninstallProject } from "../../core/src/index.js";
 import { createTerminalRenderer } from "../../core/src/terminal.js";
 import { detectProject } from "../../detectors/src/index.js";
+
+const require = createRequire(import.meta.url);
+const { version } = require("../../../package.json");
 
 const renderer = createTerminalRenderer();
 
@@ -79,55 +83,11 @@ function buildHelpText() {
   ], { bullet: "-" }));
 
   return renderer.joinBlocks([
-    renderer.status("info", "skilly-hand", "Portable AI skill orchestration for coding assistants."),
+    renderer.banner(version),
     usage,
     flags,
     examples
   ]);
-}
-
-function detectionRows(detections) {
-  return detections.map((item) => ({
-    technology: item.technology,
-    confidence: item.confidence.toFixed(2),
-    reasons: item.reasons.join("; "),
-    recommended: item.recommendedSkillIds.join(", ")
-  }));
-}
-
-function renderDetections(detections) {
-  if (detections.length === 0) {
-    return renderer.status("warn", "No technology signals were detected.", "Only core skills will be selected.");
-  }
-
-  return renderer.table(
-    [
-      { key: "technology", header: "Technology" },
-      { key: "confidence", header: "Confidence" },
-      { key: "reasons", header: "Reasons" },
-      { key: "recommended", header: "Recommended Skills" }
-    ],
-    detectionRows(detections)
-  );
-}
-
-function renderSkillTable(skills) {
-  if (skills.length === 0) {
-    return renderer.status("warn", "No skills selected.");
-  }
-
-  return renderer.table(
-    [
-      { key: "id", header: "Skill ID" },
-      { key: "title", header: "Title" },
-      { key: "tags", header: "Tags" }
-    ],
-    skills.map((skill) => ({
-      id: skill.id,
-      title: skill.title,
-      tags: skill.tags.join(", ")
-    }))
-  );
 }
 
 function printInstallResult(result, flags) {
@@ -144,8 +104,30 @@ function printInstallResult(result, flags) {
     ])
   );
 
-  const detections = renderer.section("Detected Technologies", renderDetections(result.plan.detections));
-  const skills = renderer.section("Skill Plan", renderSkillTable(result.plan.skills));
+  const detections = renderer.section(
+    "Detected Technologies",
+    result.plan.detections.length > 0
+      ? renderer.detectionGrid(result.plan.detections)
+      : renderer.status("warn", "No technology signals were detected.", "Only core skills will be selected.")
+  );
+
+  const skills = renderer.section(
+    "Skill Plan",
+    result.plan.skills.length > 0
+      ? renderer.table(
+          [
+            { key: "id", header: "Skill ID" },
+            { key: "title", header: "Title" },
+            { key: "tags", header: "Tags" }
+          ],
+          result.plan.skills.map((skill) => ({
+            id: skill.id,
+            title: skill.title,
+            tags: skill.tags.join(", ")
+          }))
+        )
+      : renderer.status("warn", "No skills selected.")
+  );
 
   const status = result.applied
     ? renderer.status("success", "Installation completed.", "Managed files and symlinks are in place.")
@@ -162,7 +144,7 @@ function printInstallResult(result, flags) {
       "Adjust `--include` and `--exclude` tags to tune skill selection."
     ]);
 
-  renderer.write(renderer.joinBlocks([preflight, detections, skills, status, nextSteps]));
+  renderer.write(renderer.joinBlocks([renderer.banner(version), preflight, detections, skills, status, nextSteps]));
 }
 
 function printDetectResult(cwd, detections) {
@@ -174,8 +156,14 @@ function printDetectResult(cwd, detections) {
     ])
   );
 
-  const details = renderer.section("Findings", renderDetections(detections));
-  renderer.write(renderer.joinBlocks([summary, details]));
+  const findings = renderer.section(
+    "Findings",
+    detections.length > 0
+      ? renderer.detectionGrid(detections)
+      : renderer.status("warn", "No technology signals were detected.", "Only core skills will be selected.")
+  );
+
+  renderer.write(renderer.joinBlocks([summary, findings]));
 }
 
 function printListResult(skills) {
@@ -206,9 +194,7 @@ function printListResult(skills) {
 }
 
 function printDoctorResult(result) {
-  const health = result.installed
-    ? renderer.status("success", "Installation detected.")
-    : renderer.status("warn", "No installation detected.");
+  const badge = renderer.healthBadge(result.installed);
 
   const summary = renderer.section(
     "Doctor Summary",
@@ -250,7 +236,7 @@ function printDoctorResult(result) {
     )
   );
 
-  renderer.write(renderer.joinBlocks([health, summary, lock, issues, probes]));
+  renderer.write(renderer.joinBlocks([badge, summary, lock, issues, probes]));
 }
 
 function printUninstallResult(result) {

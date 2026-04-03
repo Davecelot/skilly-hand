@@ -3,3 +3,4 @@ node_modules
 catalog/catalog-index.json
 .npm-cache
 /source/
+/sandbox

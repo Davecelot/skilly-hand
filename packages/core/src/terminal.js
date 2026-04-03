@@ -1,3 +1,5 @@
+import { detectColorLevel, createTheme, createLayout } from "./ui/index.js";
+
 const ANSI_PATTERN = /\x1b\[[0-9;]*m/g;
 
 function asString(value) {
@@ -22,6 +24,7 @@ function normalizeBooleanEnv(value) {
   return true;
 }
 
+// Kept as exported API (tests import these directly)
 export function detectColorSupport({ env = process.env, stream = process.stdout } = {}) {
   const noColor = normalizeBooleanEnv(env.NO_COLOR);
   if (noColor) return false;
@@ -45,63 +48,19 @@ export function detectUnicodeSupport({ env = process.env, stream = process.stdou
   return true;
 }
 
-function createStyler(enabled) {
-  if (!enabled) {
-    const passthrough = (value) => asString(value);
-    return {
-      reset: passthrough,
-      bold: passthrough,
-      dim: passthrough,
-      cyan: passthrough,
-      green: passthrough,
-      yellow: passthrough,
-      red: passthrough,
-      magenta: passthrough
-    };
-  }
-
-  const wrap = (code) => (value) => `\u001b[${code}m${asString(value)}\u001b[0m`;
-  return {
-    reset: wrap("0"),
-    bold: wrap("1"),
-    dim: wrap("2"),
-    cyan: wrap("36"),
-    green: wrap("32"),
-    yellow: wrap("33"),
-    red: wrap("31"),
-    magenta: wrap("35")
-  };
-}
-
-function renderKeyValue(entries, style) {
-  if (!entries || entries.length === 0) return "";
-  const normalized = entries.map(([key, value]) => [asString(key), asString(value)]);
-  const width = normalized.reduce((max, [key]) => Math.max(max, key.length), 0);
-  return normalized
-    .map(([key, value]) => `${style.dim(padEndAnsi(key, width))} : ${value}`)
-    .join("\n");
-}
-
-function renderList(items, { bullet }) {
-  if (!items || items.length === 0) return "";
-  return items.map((item) => `${bullet} ${asString(item)}`).join("\n");
-}
-
-function renderTable(columns, rows) {
+function renderPlainTable(columns, rows) {
   if (!columns || columns.length === 0) return "";
-  const header = columns.map((column) => column.header);
-  const matrix = [header, ...rows.map((row) => columns.map((column) => asString(row[column.key] ?? "")))];
-  const widths = header.map((_, index) =>
-    matrix.reduce((max, line) => Math.max(max, stripAnsi(line[index]).length), 0)
+  const header = columns.map((c) => c.header);
+  const matrix = [header, ...rows.map((row) => columns.map((c) => asString(row[c.key] ?? "")))];
+  const widths = header.map((_, i) =>
+    matrix.reduce((max, line) => Math.max(max, stripAnsi(line[i]).length), 0)
   );
-
-  const headerLine = header.map((value, index) => padEndAnsi(value, widths[index])).join("  ");
-  const separatorLine = widths.map((width) => "-".repeat(Math.max(3, width))).join("  ");
+  const headerLine = header.map((v, i) => padEndAnsi(v, widths[i])).join("  ");
+  const sepLine = widths.map((w) => "-".repeat(Math.max(3, w))).join("  ");
   const body = rows.map((row) =>
-    columns.map((column, index) => padEndAnsi(asString(row[column.key] ?? ""), widths[index])).join("  ")
+    columns.map((c, i) => padEndAnsi(asString(row[c.key] ?? ""), widths[i])).join("  ")
   );
-
-  return [headerLine, separatorLine, ...body].join("\n");
+  return [headerLine, sepLine, ...body].join("\n");
 }
 
 function joinBlocks(blocks) {
@@ -116,66 +75,114 @@ export function createTerminalRenderer({
   env = process.env,
   platform = process.platform
 } = {}) {
-  const colorEnabled = detectColorSupport({ env, stream: stdout });
+  const colorLevel = detectColorLevel({ env, stream: stdout });
+  const colorEnabled = colorLevel > 0;
   const unicodeEnabled = detectUnicodeSupport({ env, stream: stdout, platform });
-  const style = createStyler(colorEnabled);
+
+  const theme = createTheme(colorLevel);
+  const layout = createLayout(theme, unicodeEnabled);
+
+  // Backward-compat style object (callers in tests may use renderer.style.*)
+  const style = {
+    reset:   (v) => asString(v),
+    bold:    theme.bold,
+    dim:     theme.dim,
+    cyan:    theme.primary,
+    green:   theme.success,
+    yellow:  theme.warn,
+    red:     theme.error,
+    magenta: theme.magenta,
+  };
+
   const symbols = unicodeEnabled
     ? { info: "i", success: "✓", warn: "!", error: "x", bullet: "•", section: "■" }
     : { info: "i", success: "+", warn: "!", error: "x", bullet: "-", section: "#" };
 
   const statusStyles = {
-    info: style.cyan,
-    success: style.green,
-    warn: style.yellow,
-    error: style.red
+    info:    theme.info,
+    success: theme.success,
+    warn:    theme.warn,
+    error:   theme.error,
   };
 
   const renderer = {
     colorEnabled,
+    colorLevel,
     unicodeEnabled,
     symbols,
     style,
+    theme,
+
     json(value) {
       return JSON.stringify(value, null, 2);
     },
+
     section(title, body = "") {
-      const heading = `${style.cyan(symbols.section)} ${style.bold(asString(title))}`;
+      const heading = layout.sectionHeader(title);
       const bodyText = asString(body).trimEnd();
       return bodyText ? `${heading}\n${bodyText}` : heading;
     },
+
     kv(entries) {
-      return renderKeyValue(entries, style);
+      return layout.kvPanel(entries);
     },
+
     list(items, options = {}) {
-      return renderList(items, { bullet: options.bullet || symbols.bullet });
+      if (!items || items.length === 0) return "";
+      const bullet = options.bullet || symbols.bullet;
+      return items.map((item) => `${bullet} ${asString(item)}`).join("\n");
     },
+
     table(columns, rows) {
-      return renderTable(columns, rows);
+      // Use bordered table when unicode is on; fall back to plain
+      if (unicodeEnabled) {
+        return layout.borderedTable(columns, rows);
+      }
+      return renderPlainTable(columns, rows);
     },
+
     status(level, message, detail = "") {
-      const applied = statusStyles[level] || ((value) => value);
+      const applied = statusStyles[level] || ((v) => v);
       const icon = symbols[level] || symbols.info;
       const main = `${applied(icon)} ${asString(message)}`;
       if (!detail) return main;
-      return `${main}\n${style.dim("  " + asString(detail))}`;
+      return `${main}\n${theme.dim("  " + asString(detail))}`;
     },
+
     summary(title, items = []) {
       return renderer.section(title, renderer.list(items));
     },
+
     nextSteps(steps = []) {
       if (!steps.length) return "";
       return renderer.section("Next Steps", renderer.list(steps));
     },
+
     error({ what = "Command failed", why = "", hint = "", exitCode = 1 } = {}) {
       const blocks = [
         renderer.status("error", what),
-        why ? renderer.kv([["Why", why]]) : "",
-        hint ? renderer.kv([["How to recover", hint]]) : "",
+        why  ? renderer.kv([["Why", why]])                : "",
+        hint ? renderer.kv([["How to recover", hint]])   : "",
         renderer.kv([["Exit code", asString(exitCode)]])
       ];
       return joinBlocks(blocks);
     },
-    joinBlocks
+
+    // ── New visual methods ─────────────────────────────────────────────────
+
+    banner(version) {
+      return layout.banner(version);
+    },
+
+    detectionGrid(detections) {
+      return layout.detectionGrid(detections);
+    },
+
+    healthBadge(installed) {
+      return layout.healthBadge(installed);
+    },
+
+    joinBlocks,
   };
 
   return {
@@ -191,6 +198,6 @@ export function createTerminalRenderer({
     },
     writeErrorJson(value) {
       stderr.write(`${renderer.json(value)}\n`);
-    }
+    },
   };
 }

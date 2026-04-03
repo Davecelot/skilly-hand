@@ -16,6 +16,21 @@ All notable changes to this project are documented in this file.
 ### Removed
 - _None._
 
+## [0.4.0] - 2026-04-03
+[View on npm](https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.4.0)
+
+### Added
+
+- `feat(core)`: Extract UI rendering into modular system — `ui/theme.js`, `ui/layout.js`, `ui/brand.js` — with a clean `ui/index.js` barrel export.
+- `feat(core)`: Multi-level color detection (`detectColorLevel`) supporting no-color, basic (16), 256-color, and truecolor environments.
+- `feat(cli)`: New renderer methods `banner()`, `detectionGrid()`, and `healthBadge()` built on the new UI modules.
+
+### Changed
+
+- `refactor(core)`: `terminal.js` restructured to delegate rendering to the new `ui/` modules; backward-compatible `style` object retained for existing tests.
+- `refactor(cli)`: `bin.js` simplified by extracting inline rendering into the new renderer methods.
+- `chore`: Added `/sandbox` to `.gitignore`.
+
 ## [0.3.0] - 2026-04-03
 [View on npm](https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.3.0)
 
