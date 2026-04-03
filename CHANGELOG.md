@@ -16,6 +16,24 @@ All notable changes to this project are documented in this file.
 ### Removed
 - _None._
 
+## [0.5.0] - 2026-04-03
+[View on npm](https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.5.0)
+
+### Added
+- Interactive command launcher when running `npx skilly-hand` in a TTY, including install skill/agent selection flow.
+- New `selectedSkillIds` install path for explicitly choosing portable skills.
+- Comprehensive CLI interaction tests in `tests/interactive-cli.test.js`.
+
+### Changed
+- Help, docs, and install/uninstall confirmation messaging now reflect current behavior and naming (`skilly-hand` branding).
+- CLI bin execution mode and command routing were refactored into testable `runCli`/service helpers.
+
+### Fixed
+- Non-interactive invocation without a command now defaults to install output instead of opening prompts.
+
+### Removed
+- _None._
+
 ## [0.4.0] - 2026-04-03
 [View on npm](https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.4.0)
 

@@ -3,7 +3,12 @@ import assert from "node:assert/strict";
 import os from "node:os";
 import path from "node:path";
 import { cp, mkdtemp, readFile, realpath } from "node:fs/promises";
-import { installProject, runDoctor, uninstallProject } from "../packages/core/src/index.js";
+import {
+  installProject,
+  resolveSkillSelectionByIds,
+  runDoctor,
+  uninstallProject
+} from "../packages/core/src/index.js";
 
 const fixturesDir = path.resolve("tests/fixtures");
 
@@ -71,4 +76,40 @@ test("install creates managed files, symlinks, and restores originals on uninsta
 
   const restoredAgents = await readFile(path.join(projectDir, "AGENTS.md"), "utf8");
   assert.equal(restoredAgents, originalAgents);
+});
+
+test("selectedSkillIds overrides automatic selection during install", async () => {
+  const projectDir = await makeFixtureCopy("react-vite");
+  const result = await installProject({
+    cwd: projectDir,
+    dryRun: true,
+    selectedSkillIds: ["token-optimizer", "spec-driven-development"]
+  });
+  const ids = result.plan.skills.map((skill) => skill.id);
+
+  assert.deepEqual(ids, ["spec-driven-development", "token-optimizer"]);
+});
+
+test("install rejects unknown selectedSkillIds", async () => {
+  const projectDir = await makeFixtureCopy("react-vite");
+  await assert.rejects(
+    installProject({
+      cwd: projectDir,
+      dryRun: true,
+      selectedSkillIds: ["does-not-exist"]
+    }),
+    /Unknown skill id: does-not-exist/
+  );
+});
+
+test("resolveSkillSelectionByIds rejects non-portable skills", () => {
+  const catalog = [
+    { id: "portable-skill", portable: true },
+    { id: "internal-skill", portable: false }
+  ];
+
+  assert.throws(
+    () => resolveSkillSelectionByIds({ catalog, selectedSkillIds: ["internal-skill"] }),
+    /Skill is not portable: internal-skill/
+  );
 });

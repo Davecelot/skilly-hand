@@ -20,6 +20,8 @@ test("help output is structured and includes JSON mode", () => {
   assert.match(result.stdout, /Usage/);
   assert.match(result.stdout, /Flags/);
   assert.match(result.stdout, /--json/);
+  assert.match(result.stdout, /skilly-hand/);
+  assert.doesNotMatch(result.stdout, /autoskills/);
 });
 
 test("detect command supports --json output", () => {
@@ -38,6 +40,13 @@ test("install dry-run provides structured text output", () => {
   assert.match(result.stdout, /Install Preflight/);
   assert.match(result.stdout, /Skill Plan/);
   assert.match(result.stdout, /Dry run complete/);
+});
+
+test("non-interactive no-command invocation defaults to install output", () => {
+  const result = runCli(["--dry-run", "--cwd", path.join(fixturesDir, "react-vite")]);
+  assert.equal(result.status, 0);
+  assert.match(result.stdout, /Install Preflight/);
+  assert.doesNotMatch(result.stdout, /Select a command/);
 });
 
 test("doctor defaults to human-readable output", () => {

@@ -20,7 +20,7 @@ const LOGO_ASCII = [
 
 export function getBrand() {
   return {
-    name: "autoskills",
+    name: "skilly-hand",
     tagline: "portable AI skill orchestration",
     hint: "npx skilly-hand --help",
     logo: {

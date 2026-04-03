@@ -3,7 +3,7 @@ import path from "node:path";
 import { copySkillTo, loadAllSkills, renderAgentsMarkdown, verifyCatalogFiles } from "../../catalog/src/index.js";
 import { detectProject, inspectProjectFiles } from "../../detectors/src/index.js";
 
-const DEFAULT_AGENTS = ["codex", "claude", "cursor", "gemini", "copilot"];
+export const DEFAULT_AGENTS = ["codex", "claude", "cursor", "gemini", "copilot"];
 const MANAGED_MARKER = "<!-- Managed by skilly-hand.";
 
 function uniq(values) {
@@ -42,6 +42,37 @@ function normalizeAgentList(agents) {
 
 function parseTags(input) {
   return uniq((input || []).flatMap((value) => String(value).split(",")).map((value) => value.trim()).filter(Boolean));
+}
+
+function parseSkillIds(input) {
+  return uniq((input || []).flatMap((value) => String(value).split(",")).map((value) => value.trim()).filter(Boolean));
+}
+
+export function resolveSkillSelectionByIds({ catalog, selectedSkillIds = [] }) {
+  const ids = parseSkillIds(selectedSkillIds);
+  const portableById = new Map(
+    catalog
+      .filter((skill) => skill.portable)
+      .map((skill) => [skill.id, skill])
+  );
+  const allById = new Map(catalog.map((skill) => [skill.id, skill]));
+
+  const invalid = [];
+  for (const id of ids) {
+    if (!allById.has(id)) {
+      invalid.push(`Unknown skill id: ${id}`);
+      continue;
+    }
+    if (!portableById.has(id)) {
+      invalid.push(`Skill is not portable: ${id}`);
+    }
+  }
+
+  if (invalid.length > 0) {
+    throw new Error(invalid.join("; "));
+  }
+
+  return ids.map((id) => portableById.get(id)).sort((a, b) => a.id.localeCompare(b.id));
 }
 
 export function resolveSkillSelection({ catalog, detections, includeTags = [], excludeTags = [] }) {
@@ -168,17 +199,20 @@ export async function installProject({
   agents,
   dryRun = false,
   includeTags = [],
-  excludeTags = []
+  excludeTags = [],
+  selectedSkillIds
 }) {
   const selectedAgents = normalizeAgentList(agents);
   const catalog = await loadAllSkills();
   const detections = await detectProject(cwd);
-  const skills = resolveSkillSelection({
-    catalog,
-    detections,
-    includeTags: parseTags(includeTags),
-    excludeTags: parseTags(excludeTags)
-  });
+  const skills = selectedSkillIds !== undefined && selectedSkillIds !== null
+    ? resolveSkillSelectionByIds({ catalog, selectedSkillIds })
+    : resolveSkillSelection({
+        catalog,
+        detections,
+        includeTags: parseTags(includeTags),
+        excludeTags: parseTags(excludeTags)
+      });
   const plan = buildInstallPlan({ cwd, detections, skills, agents: selectedAgents });
 
   if (dryRun) {

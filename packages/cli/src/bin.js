@@ -1,17 +1,28 @@
 #!/usr/bin/env node
 import path from "node:path";
 import { createRequire } from "node:module";
+import { pathToFileURL } from "node:url";
+import { checkbox as inquirerCheckbox, confirm as inquirerConfirm, select as inquirerSelect } from "@inquirer/prompts";
 import { loadAllSkills } from "../../catalog/src/index.js";
-import { installProject, runDoctor, uninstallProject } from "../../core/src/index.js";
+import {
+  DEFAULT_AGENTS,
+  installProject,
+  resolveSkillSelection,
+  runDoctor,
+  uninstallProject
+} from "../../core/src/index.js";
 import { createTerminalRenderer } from "../../core/src/terminal.js";
 import { detectProject } from "../../detectors/src/index.js";
 
 const require = createRequire(import.meta.url);
 const { version } = require("../../../package.json");
 
-const renderer = createTerminalRenderer();
+function isExecutedDirectly(metaUrl, argv1) {
+  if (!argv1) return false;
+  return metaUrl === pathToFileURL(argv1).href;
+}
 
-function parseArgs(argv) {
+export function parseArgs(argv) {
   const args = [...argv];
   const positional = [];
   const flags = {
@@ -54,9 +65,10 @@ function parseArgs(argv) {
   return { command: positional[0], flags };
 }
 
-function buildHelpText() {
+function buildHelpText(renderer, appVersion) {
   const usage = renderer.section("Usage", renderer.list([
-    "npx skilly-hand [install]",
+    "npx skilly-hand                  # interactive launcher when running in a TTY",
+    "npx skilly-hand install",
     "npx skilly-hand detect",
     "npx skilly-hand list",
     "npx skilly-hand doctor",
@@ -66,7 +78,7 @@ function buildHelpText() {
   const flags = renderer.section("Flags", renderer.list([
     "--dry-run                     Show install plan without writing files",
     "--json                        Emit stable JSON output for automation",
-    "--yes, -y                     Reserved for future non-interactive confirmations",
+    "--yes, -y                     Skip install/uninstall confirmations",
     "--verbose, -v                 Reserved for future debug detail",
     "--agent, -a <name>            codex|claude|cursor|gemini|copilot (repeatable)",
     "--cwd <path>                  Project root (defaults to current directory)",
@@ -76,21 +88,22 @@ function buildHelpText() {
   ], { bullet: "-" }));
 
   const examples = renderer.section("Examples", renderer.list([
+    "npx skilly-hand",
     "npx skilly-hand install --dry-run",
     "npx skilly-hand detect --json",
     "npx skilly-hand install --agent codex --agent claude",
-    "npx skilly-hand list --include workflow"
+    "npx skilly-hand uninstall --yes"
   ], { bullet: "-" }));
 
   return renderer.joinBlocks([
-    renderer.banner(version),
+    renderer.banner(appVersion),
     usage,
     flags,
     examples
   ]);
 }
 
-function printInstallResult(result, flags) {
+function printInstallResult(renderer, appVersion, result, flags) {
   const mode = flags.dryRun ? "dry-run" : "apply";
   const preflight = renderer.section(
     "Install Preflight",
@@ -135,19 +148,19 @@ function printInstallResult(result, flags) {
 
   const nextSteps = result.applied
     ? renderer.nextSteps([
-      "Review generated AGENTS and assistant instruction files.",
-      "Run `npx skilly-hand doctor` to validate installation health.",
-      "Use `npx skilly-hand uninstall` to restore backed-up files if needed."
-    ])
+        "Review generated AGENTS and assistant instruction files.",
+        "Run `npx skilly-hand doctor` to validate installation health.",
+        "Use `npx skilly-hand uninstall` to restore backed-up files if needed."
+      ])
     : renderer.nextSteps([
-      "Run `npx skilly-hand install` to apply this plan.",
-      "Adjust `--include` and `--exclude` tags to tune skill selection."
-    ]);
+        "Run `npx skilly-hand install` to apply this plan.",
+        "Adjust `--include` and `--exclude` tags to tune skill selection."
+      ]);
 
-  renderer.write(renderer.joinBlocks([renderer.banner(version), preflight, detections, skills, status, nextSteps]));
+  renderer.write(renderer.joinBlocks([renderer.banner(appVersion), preflight, detections, skills, status, nextSteps]));
 }
 
-function printDetectResult(cwd, detections) {
+function printDetectResult(renderer, cwd, detections) {
   const summary = renderer.section(
     "Detection Summary",
     renderer.kv([
@@ -166,7 +179,7 @@ function printDetectResult(cwd, detections) {
   renderer.write(renderer.joinBlocks([summary, findings]));
 }
 
-function printListResult(skills) {
+function printListResult(renderer, skills) {
   const summary = renderer.section(
     "Catalog Summary",
     renderer.kv([["Skills available", String(skills.length)]])
@@ -193,7 +206,7 @@ function printListResult(skills) {
   renderer.write(renderer.joinBlocks([summary, table]));
 }
 
-function printDoctorResult(result) {
+function printDoctorResult(renderer, result) {
   const badge = renderer.healthBadge(result.installed);
 
   const summary = renderer.section(
@@ -239,7 +252,7 @@ function printDoctorResult(result) {
   renderer.write(renderer.joinBlocks([badge, summary, lock, issues, probes]));
 }
 
-function printUninstallResult(result) {
+function printUninstallResult(renderer, result) {
   if (result.removed) {
     renderer.write(
       renderer.joinBlocks([
@@ -261,34 +274,193 @@ function printUninstallResult(result) {
   );
 }
 
-async function main() {
-  const { command, flags } = parseArgs(process.argv.slice(2));
+export function buildErrorHint(message) {
+  if (message.startsWith("Unknown command:")) {
+    return "Run `npx skilly-hand --help` to see available commands.";
+  }
+  if (message.startsWith("Unknown flag:") || message.startsWith("Missing value")) {
+    return "Check command flags with `npx skilly-hand --help`.";
+  }
+  return "Retry with `--verbose` for expanded context if needed.";
+}
 
-  if (flags.help) {
-    if (flags.json) {
-      renderer.writeJson({
-        command: command || "install",
-        help: true,
-        usage: [
-          "npx skilly-hand [install]",
-          "npx skilly-hand detect",
-          "npx skilly-hand list",
-          "npx skilly-hand doctor",
-          "npx skilly-hand uninstall"
-        ]
-      });
-      return;
-    }
+export function createPromptAdapter({ selectImpl, checkboxImpl, confirmImpl } = {}) {
+  return {
+    select: selectImpl || inquirerSelect,
+    checkbox: checkboxImpl || inquirerCheckbox,
+    confirm: confirmImpl || inquirerConfirm
+  };
+}
 
-    renderer.write(buildHelpText());
+function createServices(overrides = {}) {
+  return {
+    loadAllSkills,
+    installProject,
+    resolveSkillSelection,
+    runDoctor,
+    uninstallProject,
+    detectProject,
+    defaultAgents: DEFAULT_AGENTS,
+    ...overrides
+  };
+}
+
+function isInteractiveLauncherMode({ command, flags, stdout }) {
+  return !command && !flags.json && Boolean(stdout?.isTTY);
+}
+
+async function runInteractiveInstall({
+  cwd,
+  renderer,
+  prompt,
+  services,
+  appVersion
+}) {
+  const [catalog, detections] = await Promise.all([
+    services.loadAllSkills(),
+    services.detectProject(cwd)
+  ]);
+  const portableCatalog = catalog.filter((skill) => skill.portable).sort((a, b) => a.id.localeCompare(b.id));
+  const preselected = new Set(
+    services
+      .resolveSkillSelection({ catalog, detections, includeTags: [], excludeTags: [] })
+      .map((skill) => skill.id)
+  );
+
+  const selectedSkillIds = await prompt.checkbox({
+    message: "Select skills to install",
+    choices: portableCatalog.map((skill) => ({
+      value: skill.id,
+      name: `${skill.id} - ${skill.title}`,
+      checked: preselected.has(skill.id)
+    }))
+  });
+
+  const selectedAgents = await prompt.checkbox({
+    message: "Select AI assistants to configure",
+    choices: services.defaultAgents.map((agent) => ({
+      value: agent,
+      name: agent,
+      checked: true
+    }))
+  });
+
+  const preview = await services.installProject({
+    cwd,
+    agents: selectedAgents,
+    dryRun: true,
+    selectedSkillIds
+  });
+
+  printInstallResult(renderer, appVersion, preview, {
+    dryRun: true,
+    include: [],
+    exclude: []
+  });
+
+  const shouldApply = await prompt.confirm({
+    message: "Apply installation changes now?",
+    default: true
+  });
+
+  if (!shouldApply) {
+    renderer.write(renderer.status("info", "Installation cancelled.", "No files were written."));
     return;
   }
 
-  const cwd = path.resolve(flags.cwd || process.cwd());
-  const effectiveCommand = command || "install";
+  const applied = await services.installProject({
+    cwd,
+    agents: selectedAgents,
+    dryRun: false,
+    selectedSkillIds
+  });
 
-  if (effectiveCommand === "detect") {
-    const detections = await detectProject(cwd);
+  printInstallResult(renderer, appVersion, applied, {
+    dryRun: false,
+    include: [],
+    exclude: []
+  });
+}
+
+async function runInteractiveSession({
+  cwd,
+  renderer,
+  prompt,
+  services,
+  appVersion
+}) {
+  renderer.write(renderer.banner(appVersion));
+
+  while (true) {
+    const selection = await prompt.select({
+      message: "Select a command",
+      choices: [
+        { value: "install", name: "Install" },
+        { value: "detect", name: "Detect" },
+        { value: "list", name: "List" },
+        { value: "doctor", name: "Doctor" },
+        { value: "uninstall", name: "Uninstall" },
+        { value: "exit", name: "Exit" }
+      ]
+    });
+
+    if (selection === "exit") {
+      renderer.write(renderer.status("info", "Exited skilly-hand interactive mode."));
+      return;
+    }
+
+    if (selection === "install") {
+      await runInteractiveInstall({ cwd, renderer, prompt, services, appVersion });
+      continue;
+    }
+
+    if (selection === "detect") {
+      const detections = await services.detectProject(cwd);
+      printDetectResult(renderer, cwd, detections);
+      continue;
+    }
+
+    if (selection === "list") {
+      const skills = await services.loadAllSkills();
+      printListResult(renderer, skills);
+      continue;
+    }
+
+    if (selection === "doctor") {
+      const result = await services.runDoctor(cwd);
+      printDoctorResult(renderer, result);
+      continue;
+    }
+
+    if (selection === "uninstall") {
+      const confirmed = await prompt.confirm({
+        message: "Remove the skilly-hand installation from this project?",
+        default: false
+      });
+
+      if (!confirmed) {
+        renderer.write(renderer.status("info", "Uninstall cancelled."));
+        continue;
+      }
+
+      const result = await services.uninstallProject(cwd);
+      printUninstallResult(renderer, result);
+    }
+  }
+}
+
+async function runCommand({
+  command,
+  flags,
+  cwd,
+  stdout,
+  renderer,
+  prompt,
+  services,
+  appVersion
+}) {
+  if (command === "detect") {
+    const detections = await services.detectProject(cwd);
     if (flags.json) {
       renderer.writeJson({
         command: "detect",
@@ -298,12 +470,12 @@ async function main() {
       });
       return;
     }
-    printDetectResult(cwd, detections);
+    printDetectResult(renderer, cwd, detections);
     return;
   }
 
-  if (effectiveCommand === "list") {
-    const skills = await loadAllSkills();
+  if (command === "list") {
+    const skills = await services.loadAllSkills();
     if (flags.json) {
       renderer.writeJson({
         command: "list",
@@ -312,12 +484,12 @@ async function main() {
       });
       return;
     }
-    printListResult(skills);
+    printListResult(renderer, skills);
     return;
   }
 
-  if (effectiveCommand === "doctor") {
-    const result = await runDoctor(cwd);
+  if (command === "doctor") {
+    const result = await services.runDoctor(cwd);
     if (flags.json) {
       renderer.writeJson({
         command: "doctor",
@@ -325,12 +497,23 @@ async function main() {
       });
       return;
     }
-    printDoctorResult(result);
+    printDoctorResult(renderer, result);
     return;
   }
 
-  if (effectiveCommand === "uninstall") {
-    const result = await uninstallProject(cwd);
+  if (command === "uninstall") {
+    if (!flags.json && !flags.yes && Boolean(stdout?.isTTY)) {
+      const confirmed = await prompt.confirm({
+        message: "Remove the skilly-hand installation from this project?",
+        default: false
+      });
+      if (!confirmed) {
+        renderer.write(renderer.status("info", "Uninstall cancelled."));
+        return;
+      }
+    }
+
+    const result = await services.uninstallProject(cwd);
     if (flags.json) {
       renderer.writeJson({
         command: "uninstall",
@@ -338,12 +521,23 @@ async function main() {
       });
       return;
     }
-    printUninstallResult(result);
+    printUninstallResult(renderer, result);
     return;
   }
 
-  if (effectiveCommand === "install") {
-    const result = await installProject({
+  if (command === "install") {
+    if (!flags.dryRun && !flags.json && !flags.yes && Boolean(stdout?.isTTY)) {
+      const confirmed = await prompt.confirm({
+        message: "Apply installation changes to this project?",
+        default: true
+      });
+      if (!confirmed) {
+        renderer.write(renderer.status("info", "Installation cancelled.", "No files were written."));
+        return;
+      }
+    }
+
+    const result = await services.installProject({
       cwd,
       agents: flags.agents,
       dryRun: flags.dryRun,
@@ -361,43 +555,109 @@ async function main() {
       return;
     }
 
-    printInstallResult(result, flags);
+    printInstallResult(renderer, appVersion, result, flags);
     return;
   }
 
-  throw new Error(`Unknown command: ${effectiveCommand}`);
+  throw new Error(`Unknown command: ${command}`);
 }
 
-const jsonRequested = process.argv.includes("--json");
+export async function runCli({
+  argv = process.argv.slice(2),
+  stdout = process.stdout,
+  stderr = process.stderr,
+  env = process.env,
+  platform = process.platform,
+  prompt = createPromptAdapter(),
+  services: providedServices = {},
+  appVersion = version,
+  cwdResolver = process.cwd
+} = {}) {
+  const renderer = createTerminalRenderer({ stdout, stderr, env, platform });
+  const services = createServices(providedServices);
+  const { command, flags } = parseArgs(argv);
 
-main().catch((error) => {
-  const hint =
-    error.message.startsWith("Unknown command:")
-      ? "Run `npx skilly-hand --help` to see available commands."
-      : error.message.startsWith("Unknown flag:") || error.message.startsWith("Missing value")
-      ? "Check command flags with `npx skilly-hand --help`."
-      : "Retry with `--verbose` for expanded context if needed.";
+  if (flags.help) {
+    if (flags.json) {
+      renderer.writeJson({
+        command: command || "install",
+        help: true,
+        usage: [
+          "npx skilly-hand",
+          "npx skilly-hand install",
+          "npx skilly-hand detect",
+          "npx skilly-hand list",
+          "npx skilly-hand doctor",
+          "npx skilly-hand uninstall"
+        ]
+      });
+      return;
+    }
 
-  if (jsonRequested) {
-    renderer.writeErrorJson({
-      ok: false,
-      error: {
-        what: "skilly-hand command failed",
-        why: error.message,
-        hint
-      }
-    });
-    process.exitCode = 1;
+    renderer.write(buildHelpText(renderer, appVersion));
     return;
   }
 
-  renderer.writeError(
-    renderer.error({
-      what: "skilly-hand command failed",
-      why: error.message,
-      hint,
-      exitCode: 1
-    })
-  );
-  process.exitCode = 1;
-});
+  const cwd = path.resolve(flags.cwd || cwdResolver());
+
+  if (isInteractiveLauncherMode({ command, flags, stdout })) {
+    try {
+      await runInteractiveSession({
+        cwd,
+        renderer,
+        prompt,
+        services,
+        appVersion
+      });
+      return;
+    } catch (error) {
+      if (error?.name === "ExitPromptError") {
+        renderer.write(renderer.status("info", "Interactive session cancelled."));
+        return;
+      }
+      throw error;
+    }
+  }
+
+  const effectiveCommand = command || "install";
+  await runCommand({
+    command: effectiveCommand,
+    flags,
+    cwd,
+    stdout,
+    renderer,
+    prompt,
+    services,
+    appVersion
+  });
+}
+
+if (isExecutedDirectly(import.meta.url, process.argv[1])) {
+  const jsonRequested = process.argv.includes("--json");
+  const renderer = createTerminalRenderer();
+
+  runCli().catch((error) => {
+    if (jsonRequested) {
+      renderer.writeErrorJson({
+        ok: false,
+        error: {
+          what: "skilly-hand command failed",
+          why: error.message,
+          hint: buildErrorHint(error.message)
+        }
+      });
+      process.exitCode = 1;
+      return;
+    }
+
+    renderer.writeError(
+      renderer.error({
+        what: "skilly-hand command failed",
+        why: error.message,
+        hint: buildErrorHint(error.message),
+        exitCode: 1
+      })
+    );
+    process.exitCode = 1;
+  });
+}

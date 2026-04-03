@@ -37,6 +37,8 @@ npm install
 npx skilly-hand
 ```
 
+`npx skilly-hand` opens an interactive command launcher when running in a TTY.
+
 ---
 
 ## Commands
@@ -48,6 +50,14 @@ npx skilly-hand
 | `npx skilly-hand list` | List all available skills in the catalog |
 | `npx skilly-hand doctor` | Diagnose installation and configuration issues |
 | `npx skilly-hand uninstall` | Remove installed skills |
+
+### Common Flags
+
+| Flag | Description |
+| ---- | ----------- |
+| `--json` | Emit machine-readable output and disable interactive prompts |
+| `--yes`, `-y` | Skip confirmation prompts for mutating commands (`install`, `uninstall`) |
+| `--dry-run` | Preview install plan without writing files |
 
 ---
 
