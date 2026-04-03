@@ -66,6 +66,7 @@ npx skilly-hand
 The catalog currently includes:
 
 - `agents-root-orchestrator`
+- `angular-guidelines`
 - `figma-mcp-0to1`
 - `skill-creator`
 - `spec-driven-development`

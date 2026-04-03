@@ -39,6 +39,21 @@ test("dry run includes core skills even for no-stack projects", async () => {
   assert.deepEqual(ids, ["agents-root-orchestrator", "skill-creator", "spec-driven-development", "token-optimizer"]);
 });
 
+test("dry run includes angular-guidelines for angular projects", async () => {
+  const projectDir = await makeFixtureCopy("angular-app");
+  const result = await installProject({ cwd: projectDir, dryRun: true });
+  const ids = result.plan.skills.map((skill) => skill.id);
+
+  assert.equal(result.applied, false);
+  assert.deepEqual(ids, [
+    "agents-root-orchestrator",
+    "angular-guidelines",
+    "skill-creator",
+    "spec-driven-development",
+    "token-optimizer"
+  ]);
+});
+
 test("install creates managed files, symlinks, and restores originals on uninstall", async () => {
   const projectDir = await makeFixtureCopy("node-basic");
   const originalAgents = await readFile(path.join(projectDir, "AGENTS.md"), "utf8");

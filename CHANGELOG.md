@@ -5,7 +5,7 @@ All notable changes to this project are documented in this file.
 ## [Unreleased]
 
 ### Added
-- _None._
+- Added portable skill `angular-guidelines` for Angular-only generation/review workflows, including mandatory latest-stable preflight checks and modern Angular best-practice defaults.
 
 ### Changed
 - _None._

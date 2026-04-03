@@ -7,9 +7,10 @@ test("catalog manifests are portable and complete", async () => {
   const issues = await verifyCatalogFiles();
   const ids = skills.map((skill) => skill.id);
 
-  assert.equal(skills.length, 5);
+  assert.equal(skills.length, 6);
   assert.deepEqual(ids, [
     "agents-root-orchestrator",
+    "angular-guidelines",
     "figma-mcp-0to1",
     "skill-creator",
     "spec-driven-development",

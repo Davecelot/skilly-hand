@@ -33,6 +33,31 @@ Recommended task size:
 
 ---
 
+## OpenSpec Complementary Support
+
+Default execution SHOULD remain the local `.sdd` workflow.
+
+Recur to OpenSpec support when the task needs complementary structure for:
+
+- Multi-session continuity where planning context must persist across chats.
+- Shareable planning artifacts for review before implementation.
+- Requirement-delta clarity that benefits from explicit change proposals.
+
+Routing rules:
+
+- Keep the local `.sdd/active/<feature-name>/spec.md` as the execution source of truth unless the team explicitly standardizes on OpenSpec paths.
+- If OpenSpec is unavailable, continue in `.sdd` and document assumptions directly in the active spec.
+
+| Use local SDD only | Use OpenSpec support |
+| --- | --- |
+| Single-session or straightforward work with clear requirements | Work spans multiple sessions and needs persistent planning context |
+| Existing `.sdd` artifacts already provide enough review clarity | Team needs proposal/design/tasks artifacts for async review |
+| Requirement changes are small and easy to track in-place | Requirement deltas are complex and need explicit change framing |
+
+Reference (informational): [https://openspec.dev/](https://openspec.dev/)
+
+---
+
 ## Spec Structure
 
 A practical spec includes:
