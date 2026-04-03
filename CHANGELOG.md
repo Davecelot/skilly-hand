@@ -14,4 +14,4 @@ All notable changes to this project are documented in this file.
 - _None._
 
 ### Removed
-- _None._
+- Removed `source/legacy/` directory containing the old skills and agentic structure superseded by the catalog.
