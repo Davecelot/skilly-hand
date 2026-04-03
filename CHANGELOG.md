@@ -5,13 +5,14 @@ All notable changes to this project are documented in this file.
 ## [Unreleased]
 
 ### Added
-- _None._
+- Added portable skill `figma-mcp-0to1` with setup, tool-selection, first-canvas, and troubleshooting documentation.
 
 ### Changed
-- _None._
+- Synced generated documentation outputs in `AGENTS.md` and `catalog/README.md` to include the current 5-skill registry.
+- Refreshed root documentation to reflect current catalog composition and release/doc sync workflow.
 
 ### Fixed
-- _None._
+- Updated catalog manifest test expectations for the 5-skill portable catalog.
 
 ### Removed
 - _None._

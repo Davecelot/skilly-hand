@@ -1,0 +1,42 @@
+{
+  "id": "figma-mcp-0to1",
+  "title": "Figma MCP 0-to-1 Guide",
+  "description": "Guide users from Figma MCP installation and authentication through first canvas creation, with function-level tool coverage and operational recovery patterns.",
+  "portable": true,
+  "tags": ["figma", "mcp", "workflow", "design"],
+  "detectors": ["always"],
+  "detectionTriggers": ["manual"],
+  "installsFor": ["all"],
+  "agentSupport": ["codex", "claude", "cursor", "gemini", "copilot"],
+  "skillMetadata": {
+    "author": "skilly-hand",
+    "last-edit": "2026-04-03",
+    "license": "Apache-2.0",
+    "version": "1.0.0",
+    "changelog": "Added a complete Figma MCP setup-to-canvas guide with orchestrator subskills and full official tool matrix coverage; reduces onboarding ambiguity and improves first-run success rates; affects Figma MCP setup, tool selection, and troubleshooting workflows",
+    "auto-invoke": "Installing, configuring, or using Figma MCP from setup through first canvas creation",
+    "allowed-tools": [
+      "Read",
+      "Edit",
+      "Write",
+      "Glob",
+      "Grep",
+      "Bash",
+      "WebFetch",
+      "WebSearch",
+      "Task",
+      "SubAgent"
+    ]
+  },
+  "files": [
+    { "path": "SKILL.md", "kind": "instruction" },
+    { "path": "agents/install-auth.md", "kind": "instruction" },
+    { "path": "agents/tool-function-catalog.md", "kind": "instruction" },
+    { "path": "agents/canvas-creation-playbook.md", "kind": "instruction" },
+    { "path": "agents/troubleshooting-ops.md", "kind": "instruction" },
+    { "path": "assets/client-config-snippets.md", "kind": "asset" },
+    { "path": "assets/prompt-recipes.md", "kind": "asset" },
+    { "path": "references/official-tools-matrix.md", "kind": "reference" }
+  ],
+  "dependencies": []
+}

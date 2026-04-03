@@ -25,6 +25,7 @@
 - **Installs portable AI agent skills** into your project from a curated catalog
 - **Auto-detects your stack** and recommends relevant skills automatically
 - **Supports every major coding assistant** — Claude Code, OpenCode, Cursor, Copilot, Gemini, and Codex — from a single command
+- **Ships a curated core skill set** including orchestration, SDD workflow, and Figma MCP onboarding
 - **Preserves original agentic structures** in `source/legacy/` as a migration reference
 
 ---
@@ -50,11 +51,25 @@ npx skilly-hand
 
 ---
 
+## Current Portable Catalog
+
+The catalog currently includes:
+
+- `agents-root-orchestrator`
+- `figma-mcp-0to1`
+- `skill-creator`
+- `spec-driven-development`
+- `token-optimizer`
+
+See [catalog/README.md](./catalog/README.md) for generated skill metadata.
+
+---
+
 ## Release Workflow (npm)
 
 1. Confirm session: `npm whoami` (or `npm login`).
 2. Keep `CHANGELOG.md` up to date under `## [Unreleased]` as work lands.
-3. Regenerate derived catalog files when needed: `npm run build && npm run catalog:sync`.
+3. Regenerate derived files when needed: `npm run build && npm run catalog:sync && npm run agentic:self:sync`.
 4. Run publish gate: `npm run verify:publish`.
 5. Inspect package payload: `npm pack --dry-run --json`.
 6. Bump version intentionally: `npm version patch|minor|major` (this auto-rotates `CHANGELOG.md`, creates a dated release section, and inserts a version-specific npm link).
