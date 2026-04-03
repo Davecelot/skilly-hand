@@ -1,0 +1,34 @@
+{
+  "id": "agents-root-orchestrator",
+  "title": "AGENTS Root Orchestrator",
+  "description": "Author root AGENTS.md as a Where/What/When orchestrator that routes tasks and skill invocation clearly.",
+  "portable": true,
+  "tags": ["core", "workflow", "orchestration"],
+  "detectors": ["always"],
+  "detectionTriggers": ["always"],
+  "installsFor": ["all"],
+  "agentSupport": ["codex", "claude", "cursor", "gemini", "copilot"],
+  "skillMetadata": {
+    "author": "skilly-hand",
+    "last-edit": "2026-04-03",
+    "license": "Apache-2.0",
+    "version": "1.0.0",
+    "changelog": "Added root AGENTS orchestration guidance around Where/What/When structure; improves AI task routing clarity and trigger recognition; affects root AGENTS authoring workflow",
+    "auto-invoke": "Creating or updating root AGENTS.md orchestration guidance",
+    "allowed-tools": [
+      "Read",
+      "Edit",
+      "Write",
+      "Glob",
+      "Grep",
+      "Bash",
+      "Task",
+      "SubAgent"
+    ]
+  },
+  "files": [
+    { "path": "SKILL.md", "kind": "instruction" },
+    { "path": "assets/AGENTS-ROOT-TEMPLATE.md", "kind": "asset" }
+  ],
+  "dependencies": []
+}

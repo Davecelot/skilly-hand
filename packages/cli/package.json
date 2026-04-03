@@ -1,0 +1,9 @@
+{
+  "name": "@skilly-hand/cli",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "skilly-hand": "./src/bin.js"
+  }
+}

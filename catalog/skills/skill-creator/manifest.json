@@ -1,0 +1,36 @@
+{
+  "id": "skill-creator",
+  "title": "Skill Creator",
+  "description": "Create and standardize AI skills with reusable structure, metadata rules, and templates.",
+  "portable": true,
+  "tags": ["core", "workflow", "authoring"],
+  "detectors": ["always"],
+  "detectionTriggers": ["always"],
+  "installsFor": ["all"],
+  "agentSupport": ["codex", "claude", "cursor", "gemini", "copilot"],
+  "skillMetadata": {
+    "author": "skilly-hand",
+    "last-edit": "2026-03-27",
+    "license": "Apache-2.0",
+    "version": "1.2.3",
+    "changelog": "Metadata updated to ensure compliance with current standards; maintains skill integrity and version tracking; affects metadata section",
+    "auto-invoke": "Creating a new skill",
+    "allowed-tools": [
+      "Read",
+      "Edit",
+      "Write",
+      "Glob",
+      "Grep",
+      "Bash",
+      "WebFetch",
+      "WebSearch",
+      "Task",
+      "SubAgent"
+    ]
+  },
+  "files": [
+    { "path": "SKILL.md", "kind": "instruction" },
+    { "path": "assets/SKILL-TEMPLATE.md", "kind": "asset" }
+  ],
+  "dependencies": []
+}

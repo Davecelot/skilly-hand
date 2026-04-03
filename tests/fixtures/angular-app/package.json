@@ -1,0 +1,12 @@
+{
+  "name": "angular-app",
+  "private": true,
+  "version": "1.0.0",
+  "dependencies": {
+    "@angular/core": "^20.0.0"
+  },
+  "devDependencies": {
+    "vitest": "^3.0.0",
+    "@storybook/angular": "^8.0.0"
+  }
+}

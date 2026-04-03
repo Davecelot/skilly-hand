@@ -1,0 +1,41 @@
+{
+  "id": "spec-driven-development",
+  "title": "Spec-Driven Development",
+  "description": "Plan, execute, and verify multi-step work through versioned specs with small, testable tasks.",
+  "portable": true,
+  "tags": ["core", "workflow", "planning"],
+  "detectors": ["always"],
+  "detectionTriggers": ["always"],
+  "installsFor": ["all"],
+  "agentSupport": ["codex", "claude", "cursor", "gemini", "copilot"],
+  "skillMetadata": {
+    "author": "skilly-hand",
+    "last-edit": "2026-04-03",
+    "license": "Apache-2.0",
+    "version": "1.0.1",
+    "changelog": "Added explicit delta/full guidance, archive rules, task sizing decision tree, and common mistakes section; improves planning clarity and reduces execution ambiguity; affects spec-driven-development SKILL.md usage guidance",
+    "auto-invoke": "Planning or executing feature work, bug fixes, and multi-phase implementation",
+    "allowed-tools": [
+      "Read",
+      "Edit",
+      "Write",
+      "Glob",
+      "Grep",
+      "Bash",
+      "Task",
+      "SubAgent"
+    ]
+  },
+  "files": [
+    { "path": "SKILL.md", "kind": "instruction" },
+    { "path": "agents/plan.md", "kind": "instruction" },
+    { "path": "agents/apply.md", "kind": "instruction" },
+    { "path": "agents/verify.md", "kind": "instruction" },
+    { "path": "agents/orchestrate.md", "kind": "instruction" },
+    { "path": "assets/spec-template.md", "kind": "asset" },
+    { "path": "assets/delta-spec-template.md", "kind": "asset" },
+    { "path": "assets/design-template.md", "kind": "asset" },
+    { "path": "assets/validation-checklist.md", "kind": "asset" }
+  ],
+  "dependencies": []
+}
