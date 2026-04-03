@@ -5,6 +5,21 @@ All notable changes to this project are documented in this file.
 ## [Unreleased]
 
 ### Added
+- _None._
+
+### Changed
+- _None._
+
+### Fixed
+- _None._
+
+### Removed
+- _None._
+
+## [0.6.0] - 2026-04-03
+[View on npm](https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.6.0)
+
+### Added
 - Added portable skill `angular-guidelines` for Angular-only generation/review workflows, including mandatory latest-stable preflight checks and modern Angular best-practice defaults.
 
 ### Changed
