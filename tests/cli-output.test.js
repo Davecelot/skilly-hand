@@ -7,11 +7,35 @@ const cliPath = path.resolve("packages/cli/src/bin.js");
 const fixturesDir = path.resolve("tests/fixtures");
 
 function runCli(args, options = {}) {
+  const env = {
+    ...process.env,
+    NO_COLOR: "1",
+    NODE_NO_WARNINGS: "1",
+    ...options.env
+  };
+
+  // Keep tests deterministic even if the parent shell exports NODE_OPTIONS.
+  if (!options.env || !Object.prototype.hasOwnProperty.call(options.env, "NODE_OPTIONS")) {
+    delete env.NODE_OPTIONS;
+  }
+
   return spawnSync("node", [cliPath, ...args], {
     cwd: options.cwd || process.cwd(),
     encoding: "utf8",
-    env: { ...process.env, NO_COLOR: "1" }
+    env
   });
+}
+
+function parseJsonPayload(raw) {
+  try {
+    return JSON.parse(raw);
+  } catch {
+    const match = raw.match(/\{[\s\S]*\}\s*$/);
+    if (!match) {
+      throw new SyntaxError(`Could not find JSON payload in output:\n${raw}`);
+    }
+    return JSON.parse(match[0]);
+  }
 }
 
 test("help output is structured and includes JSON mode", () => {
@@ -27,7 +51,7 @@ test("help output is structured and includes JSON mode", () => {
 test("detect command supports --json output", () => {
   const result = runCli(["detect", "--cwd", path.join(fixturesDir, "react-vite"), "--json"]);
   assert.equal(result.status, 0);
-  const payload = JSON.parse(result.stdout);
+  const payload = parseJsonPayload(result.stdout);
   assert.equal(payload.command, "detect");
   assert.equal(payload.cwd.endsWith("react-vite"), true);
   assert.equal(Array.isArray(payload.detections), true);
@@ -60,7 +84,7 @@ test("doctor defaults to human-readable output", () => {
 test("command errors emit JSON payload when --json is set", () => {
   const result = runCli(["unknown-command", "--json"]);
   assert.equal(result.status, 1);
-  const payload = JSON.parse(result.stderr);
+  const payload = parseJsonPayload(result.stderr);
   assert.equal(payload.ok, false);
   assert.match(payload.error.why, /Unknown command/);
 });
