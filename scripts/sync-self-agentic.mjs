@@ -2,9 +2,11 @@ import { lstat, mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { renderAgentsMarkdown, validateSkillManifest } from "../packages/catalog/src/index.js";
+import { createTerminalRenderer } from "../packages/core/src/terminal.js";
 import { detectProject } from "../packages/detectors/src/index.js";
 
 const DETERMINISTIC_GENERATED_AT = "self-sync";
+const renderer = createTerminalRenderer();
 
 async function exists(targetPath) {
   try {
@@ -67,12 +69,19 @@ export async function syncSelfAgentic({ cwd = process.cwd() } = {}) {
 }
 
 function parseArgs(argv) {
-  const flags = {};
+  const flags = { json: false };
   const args = [...argv];
 
   while (args.length > 0) {
     const token = args.shift();
-    if (token === "--cwd") flags.cwd = args.shift();
+    if (token === "--cwd") {
+      const value = args.shift();
+      if (!value || value.startsWith("-")) {
+        throw new Error("Missing value for --cwd");
+      }
+      flags.cwd = value;
+    }
+    else if (token === "--json") flags.json = true;
     else if (token === "--help" || token === "-h") flags.help = true;
     else throw new Error(`Unknown flag: ${token}`);
   }
@@ -81,30 +90,71 @@ function parseArgs(argv) {
 }
 
 function printHelp() {
-  console.log(`sync-self-agentic
-
-Usage:
-  node scripts/sync-self-agentic.mjs [--cwd <path>]
-
-Flags:
-  --cwd <path>                    Project root to sync (defaults to current working directory)
-`);
+  renderer.write(renderer.joinBlocks([
+    renderer.status("info", "sync-self-agentic"),
+    renderer.section(
+      "Usage",
+      renderer.list(["node scripts/sync-self-agentic.mjs [--cwd <path>] [--json]"], { bullet: "-" })
+    ),
+    renderer.section(
+      "Flags",
+      renderer.list([
+        "--cwd <path>    Project root to sync (defaults to current working directory)",
+        "--json          Emit stable JSON output for automation"
+      ], { bullet: "-" })
+    )
+  ]));
 }
 
 const isEntryPoint = process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1]);
 
 if (isEntryPoint) {
-  const flags = parseArgs(process.argv.slice(2));
+  const jsonRequested = process.argv.includes("--json");
 
-  if (flags.help) {
-    printHelp();
-  } else {
-    const result = await syncSelfAgentic({
-      cwd: flags.cwd
-    });
+  try {
+    const flags = parseArgs(process.argv.slice(2));
 
-    console.log(`Synced self-agentic structure for ${result.cwd}`);
-    console.log(`Skills: ${result.skills.join(", ")}`);
-    console.log(`Files written: ${result.writtenFiles.length === 0 ? "none" : result.writtenFiles.join(", ")}`);
+    if (flags.help) {
+      printHelp();
+    } else {
+      const result = await syncSelfAgentic({
+        cwd: flags.cwd
+      });
+
+      if (flags.json) {
+        renderer.writeJson({
+          command: "sync-self-agentic",
+          ...result
+        });
+      } else {
+        renderer.write(renderer.joinBlocks([
+          renderer.status("success", "Self-agentic structure synced."),
+          renderer.kv([
+            ["Project", result.cwd],
+            ["Skills", result.skills.join(", ")],
+            ["Files written", result.writtenFiles.length === 0 ? "none" : result.writtenFiles.join(", ")]
+          ])
+        ]));
+      }
+    }
+  } catch (error) {
+    if (jsonRequested) {
+      renderer.writeErrorJson({
+        ok: false,
+        error: {
+          what: "sync-self-agentic failed",
+          why: error.message,
+          hint: "Run `node scripts/sync-self-agentic.mjs --help` for usage."
+        }
+      });
+    } else {
+      renderer.writeError(renderer.error({
+        what: "sync-self-agentic failed",
+        why: error.message,
+        hint: "Run `node scripts/sync-self-agentic.mjs --help` for usage.",
+        exitCode: 1
+      }));
+    }
+    process.exitCode = 1;
   }
 }

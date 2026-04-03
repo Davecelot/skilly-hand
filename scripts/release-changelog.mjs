@@ -2,8 +2,10 @@ import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { createTerminalRenderer } from "../packages/core/src/terminal.js";
 
 const DEFAULT_PACKAGE_NAME = "@skilly-hand/skilly-hand";
+const renderer = createTerminalRenderer();
 
 const UNRELEASED_TEMPLATE = `### Added
 - _None._
@@ -106,7 +108,8 @@ ${releaseSection}
 
 function parseArgs(argv) {
   const flags = {
-    stage: true
+    stage: true,
+    json: false
   };
   const args = [...argv];
 
@@ -118,6 +121,7 @@ function parseArgs(argv) {
     else if (token === "--changelog") flags.changelog = args.shift();
     else if (token === "--package-json") flags.packageJson = args.shift();
     else if (token === "--package-name") flags.packageName = args.shift();
+    else if (token === "--json") flags.json = true;
     else if (token === "--no-stage") flags.stage = false;
     else if (token === "--help" || token === "-h") flags.help = true;
     else throw new Error(`Unknown flag: ${token}`);
@@ -127,20 +131,28 @@ function parseArgs(argv) {
 }
 
 function printHelp() {
-  console.log(`release-changelog
-
-Usage:
-  node scripts/release-changelog.mjs [--version <x.y.z>] [--date <YYYY-MM-DD>]
-
-Flags:
-  --version <x.y.z>               Override release version (defaults to package.json version)
-  --date <YYYY-MM-DD>             Override release date (defaults to today's UTC date)
-  --changelog <path>              Changelog file path (defaults to ./CHANGELOG.md)
-  --package-json <path>           package.json path (defaults to ./package.json)
-  --package-name <name>           npm package name for release link (defaults to @skilly-hand/skilly-hand)
-  --no-stage                      Do not run git add CHANGELOG.md
-  --help, -h                      Show this help output
-`);
+  renderer.write(renderer.joinBlocks([
+    renderer.status("info", "release-changelog"),
+    renderer.section(
+      "Usage",
+      renderer.list(["node scripts/release-changelog.mjs [--version <x.y.z>] [--date <YYYY-MM-DD>] [--json]"], {
+        bullet: "-"
+      })
+    ),
+    renderer.section(
+      "Flags",
+      renderer.list([
+        "--version <x.y.z>      Override release version (defaults to package.json version)",
+        "--date <YYYY-MM-DD>    Override release date (defaults to today's UTC date)",
+        "--changelog <path>     Changelog file path (defaults to ./CHANGELOG.md)",
+        "--package-json <path>  package.json path (defaults to ./package.json)",
+        "--package-name <name>  npm package name for release link",
+        "--json                 Emit stable JSON output for automation",
+        "--no-stage             Do not run git add CHANGELOG.md",
+        "--help, -h             Show this help output"
+      ], { bullet: "-" })
+    )
+  ]));
 }
 
 function loadVersionFromPackageJson(packageJsonRaw) {
@@ -211,22 +223,58 @@ export async function releaseChangelog({
 const isEntryPoint = process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1]);
 
 if (isEntryPoint) {
-  const flags = parseArgs(process.argv.slice(2));
+  const jsonRequested = process.argv.includes("--json");
+  try {
+    const flags = parseArgs(process.argv.slice(2));
 
-  if (flags.help) {
-    printHelp();
-  } else {
-    const cwd = process.cwd();
-    const result = await releaseChangelog({
-      cwd,
-      version: flags.version,
-      date: flags.date,
-      changelogPath: flags.changelog ? path.resolve(cwd, flags.changelog) : undefined,
-      packageJsonPath: flags.packageJson ? path.resolve(cwd, flags.packageJson) : undefined,
-      packageName: flags.packageName ?? DEFAULT_PACKAGE_NAME,
-      stage: flags.stage
-    });
+    if (flags.help) {
+      printHelp();
+    } else {
+      const cwd = process.cwd();
+      const result = await releaseChangelog({
+        cwd,
+        version: flags.version,
+        date: flags.date,
+        changelogPath: flags.changelog ? path.resolve(cwd, flags.changelog) : undefined,
+        packageJsonPath: flags.packageJson ? path.resolve(cwd, flags.packageJson) : undefined,
+        packageName: flags.packageName ?? DEFAULT_PACKAGE_NAME,
+        stage: flags.stage
+      });
 
-    console.log(`Rotated changelog for ${result.version} (${result.date}).`);
+      if (flags.json) {
+        renderer.writeJson({
+          command: "release-changelog",
+          ...result
+        });
+      } else {
+        renderer.write(renderer.joinBlocks([
+          renderer.status("success", "Changelog rotated."),
+          renderer.kv([
+            ["Version", result.version],
+            ["Date", result.date],
+            ["Path", result.changelogPath]
+          ])
+        ]));
+      }
+    }
+  } catch (error) {
+    if (jsonRequested) {
+      renderer.writeErrorJson({
+        ok: false,
+        error: {
+          what: "release-changelog failed",
+          why: error.message,
+          hint: "Run `node scripts/release-changelog.mjs --help` for usage."
+        }
+      });
+    } else {
+      renderer.writeError(renderer.error({
+        what: "release-changelog failed",
+        why: error.message,
+        hint: "Ensure CHANGELOG.md has meaningful entries under `## [Unreleased]`.",
+        exitCode: 1
+      }));
+    }
+    process.exitCode = 1;
   }
 }
