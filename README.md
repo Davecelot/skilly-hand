@@ -74,6 +74,7 @@ The catalog currently includes:
 - `figma-mcp-0to1`
 - `frontend-design`
 - `life-guard`
+- `react-guidelines`
 - `skill-creator`
 - `spec-driven-development`
 - `test-driven-development`
