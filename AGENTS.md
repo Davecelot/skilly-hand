@@ -16,6 +16,7 @@
 
 | Skill | Description | Tags |
 | ----- | ----------- | ---- |
+| `accessibility-audit` | Audit web accessibility against W3C WCAG 2.2 Level AA using framework-agnostic checks, remediation patterns, and portable command-line scanning. | frontend, accessibility, workflow, quality |
 | `agents-root-orchestrator` | Author root AGENTS.md as a Where/What/When orchestrator that routes tasks and skill invocation clearly. | core, workflow, orchestration |
 | `angular-guidelines` | Guide Angular code generation and review using latest stable Angular verification and modern framework best practices. | angular, frontend, workflow, best-practices |
 | `figma-mcp-0to1` | Guide users from Figma MCP installation and authentication through first canvas creation, with function-level tool coverage and operational recovery patterns. | figma, mcp, workflow, design |
@@ -40,6 +41,7 @@
 
 | Action | Skill |
 | ------ | ----- |
+| Auditing, reviewing, or implementing web accessibility against WCAG 2.2 Level AA | `accessibility-audit` |
 | Creating or updating root AGENTS.md orchestration guidance | `agents-root-orchestrator` |
 | Generating, reviewing, or refactoring Angular code artifacts in Angular projects | `angular-guidelines` |
 | Installing, configuring, or using Figma MCP from setup through first canvas creation | `figma-mcp-0to1` |

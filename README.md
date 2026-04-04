@@ -65,6 +65,7 @@ npx skilly-hand
 
 The catalog currently includes:
 
+- `accessibility-audit`
 - `agents-root-orchestrator`
 - `angular-guidelines`
 - `figma-mcp-0to1`

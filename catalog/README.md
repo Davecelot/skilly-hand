@@ -4,6 +4,7 @@ Published portable skills consumed by the `skilly-hand` CLI.
 
 | Skill | Description | Tags | Installs For |
 | ----- | ----------- | ---- | ------------ |
+| `accessibility-audit` | Audit web accessibility against W3C WCAG 2.2 Level AA using framework-agnostic checks, remediation patterns, and portable command-line scanning. | frontend, accessibility, workflow, quality | all |
 | `agents-root-orchestrator` | Author root AGENTS.md as a Where/What/When orchestrator that routes tasks and skill invocation clearly. | core, workflow, orchestration | all |
 | `angular-guidelines` | Guide Angular code generation and review using latest stable Angular verification and modern framework best practices. | angular, frontend, workflow, best-practices | all |
 | `figma-mcp-0to1` | Guide users from Figma MCP installation and authentication through first canvas creation, with function-level tool coverage and operational recovery patterns. | figma, mcp, workflow, design | all |
