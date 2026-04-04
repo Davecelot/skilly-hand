@@ -33,7 +33,6 @@
 ## Quick Start
 
 ```bash
-npm install
 npx skilly-hand
 ```
 
@@ -58,6 +57,10 @@ npx skilly-hand
 | `--json` | Emit machine-readable output and disable interactive prompts |
 | `--yes`, `-y` | Skip confirmation prompts for mutating commands (`install`, `uninstall`) |
 | `--dry-run` | Preview install plan without writing files |
+| `--agent`, `-a <name>` | Target a specific assistant (repeatable; e.g. `--agent claude --agent cursor`) |
+| `--include <tag>` | Only include skills matching the given tag |
+| `--exclude <tag>` | Exclude skills matching the given tag |
+| `--cwd <path>` | Run as if in a different directory |
 
 ---
 
@@ -69,8 +72,11 @@ The catalog currently includes:
 - `agents-root-orchestrator`
 - `angular-guidelines`
 - `figma-mcp-0to1`
+- `frontend-design`
+- `life-guard`
 - `skill-creator`
 - `spec-driven-development`
+- `test-driven-development`
 - `token-optimizer`
 
 See [catalog/README.md](./catalog/README.md) for generated skill metadata.
@@ -124,10 +130,6 @@ packages/
   core/                 # installation, rendering, and restore logic
   detectors/            # stack auto-detection
   catalog/              # catalog access and validation
-source/legacy/
-  agentic-structure/    # original material preserved as reference
-tests/
-  fixtures/             # simulated repos for integration testing
 ```
 
 ---
