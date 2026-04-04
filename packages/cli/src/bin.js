@@ -91,7 +91,7 @@ function buildHelpText(renderer, appVersion) {
     "--json                        Emit stable JSON output for automation",
     "--yes, -y                     Skip install/uninstall confirmations",
     "--verbose, -v                 Reserved for future debug detail",
-    "--agent, -a <name>            codex|claude|cursor|gemini|copilot (repeatable)",
+    "--agent, -a <name>            standard|codex|claude|cursor|gemini|copilot|antigravity|windsurf|trae (repeatable)",
     "--cwd <path>                  Project root (defaults to current directory)",
     "--include <tag>               Include only skills matching all tags",
     "--exclude <tag>               Exclude skills matching any tag",
@@ -102,7 +102,7 @@ function buildHelpText(renderer, appVersion) {
     "npx skilly-hand",
     "npx skilly-hand install --dry-run",
     "npx skilly-hand detect --json",
-    "npx skilly-hand install --agent codex --agent claude",
+    "npx skilly-hand install --agent antigravity --agent windsurf",
     "npx skilly-hand uninstall --yes"
   ], { bullet: "-" }));
 

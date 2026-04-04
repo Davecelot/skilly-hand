@@ -5,10 +5,13 @@ All notable changes to this project are documented in this file.
 ## [Unreleased]
 
 ### Added
-- _None._
+- Added support for `antigravity`, `windsurf`, and `trae` agent targets across install flows.
+- Added native install target coverage for Antigravity (`.agents/skills`, `.agent/skills`, and `.agents/rules/skilly-hand.md`), Windsurf (`.windsurf/skills`), and TRAE (`.trae/skills`).
 
 ### Changed
-- _None._
+- Refactored installer agent target handling to use centralized install profiles for instruction files and skill symlink paths.
+- Updated CLI help output and repository documentation to reflect expanded assistant compatibility and install targets.
+- Expanded tests for new agent support, install/uninstall behavior, and shared `AGENTS.md` target deduplication.
 
 ### Fixed
 - _None._

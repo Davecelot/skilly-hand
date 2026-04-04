@@ -3,8 +3,45 @@ import path from "node:path";
 import { copySkillTo, loadAllSkills, renderAgentsMarkdown, verifyCatalogFiles } from "../../catalog/src/index.js";
 import { detectProject, inspectProjectFiles } from "../../detectors/src/index.js";
 
-export const DEFAULT_AGENTS = ["standard", "codex", "claude", "cursor", "gemini", "copilot"];
+export const DEFAULT_AGENTS = ["standard", "codex", "claude", "cursor", "gemini", "copilot", "antigravity", "windsurf", "trae"];
 const MANAGED_MARKER = "<!-- Managed by skilly-hand.";
+const AGENT_INSTALL_PROFILES = {
+  standard: {
+    instructionFiles: [["AGENTS.md"]],
+    skillPaths: [["skills"]]
+  },
+  codex: {
+    instructionFiles: [["AGENTS.md"]],
+    skillPaths: [[".codex", "skills"]]
+  },
+  claude: {
+    instructionFiles: [["CLAUDE.md"]],
+    skillPaths: [[".claude", "skills"]]
+  },
+  cursor: {
+    instructionFiles: [["cursor-instructions.md"]],
+    skillPaths: [[".cursor", "skills"]]
+  },
+  gemini: {
+    instructionFiles: [["GEMINI.md"]],
+    skillPaths: [[".gemini", "skills"]]
+  },
+  copilot: {
+    instructionFiles: [[".github", "copilot-instructions.md"]]
+  },
+  antigravity: {
+    instructionFiles: [["AGENTS.md"], [".agents", "rules", "skilly-hand.md"]],
+    skillPaths: [[".agents", "skills"], [".agent", "skills"]]
+  },
+  windsurf: {
+    instructionFiles: [["AGENTS.md"]],
+    skillPaths: [[".windsurf", "skills"]]
+  },
+  trae: {
+    instructionFiles: [["AGENTS.md"]],
+    skillPaths: [[".trae", "skills"]]
+  }
+};
 
 function uniq(values) {
   return [...new Set(values)];
@@ -168,30 +205,29 @@ async function ensureSymlink(targetPath, sourcePath, backupsDir, lockData) {
   lockData.managedSymlinks.push(targetPath);
 }
 
-function buildInstructionFiles({ agentsMarkdown, selectedAgents }) {
-  const files = [];
+function buildInstallTargets(selectedAgents) {
+  const instructionTargets = new Map();
+  const skillTargets = new Map();
 
-  if (selectedAgents.includes("standard") || selectedAgents.includes("codex")) {
-    files.push({ pathParts: ["AGENTS.md"], content: agentsMarkdown });
+  for (const agent of selectedAgents) {
+    const profile = AGENT_INSTALL_PROFILES[agent];
+    if (!profile) {
+      continue;
+    }
+
+    for (const pathParts of profile.instructionFiles || []) {
+      instructionTargets.set(path.join(...pathParts), pathParts);
+    }
+
+    for (const pathParts of profile.skillPaths || []) {
+      skillTargets.set(path.join(...pathParts), pathParts);
+    }
   }
 
-  if (selectedAgents.includes("claude")) {
-    files.push({ pathParts: ["CLAUDE.md"], content: agentsMarkdown });
-  }
-
-  if (selectedAgents.includes("gemini")) {
-    files.push({ pathParts: ["GEMINI.md"], content: agentsMarkdown });
-  }
-
-  if (selectedAgents.includes("cursor")) {
-    files.push({ pathParts: ["cursor-instructions.md"], content: agentsMarkdown });
-  }
-
-  if (selectedAgents.includes("copilot")) {
-    files.push({ pathParts: [".github", "copilot-instructions.md"], content: agentsMarkdown });
-  }
-
-  return files;
+  return {
+    instructionTargets: [...instructionTargets.values()],
+    skillTargets: [...skillTargets.values()]
+  };
 }
 
 export async function installProject({
@@ -252,24 +288,16 @@ export async function installProject({
 
   await writeFile(path.join(installRoot, "AGENTS.md"), agentsMarkdown, "utf8");
 
-  for (const instructionFile of buildInstructionFiles({ agentsMarkdown, selectedAgents })) {
-    await ensureManagedTextFile(path.join(cwd, ...instructionFile.pathParts), instructionFile.content, backupsDir, lockData);
+  const { instructionTargets, skillTargets } = buildInstallTargets(selectedAgents);
+
+  for (const pathParts of instructionTargets) {
+    await ensureManagedTextFile(path.join(cwd, ...pathParts), agentsMarkdown, backupsDir, lockData);
   }
 
   const skillsSourcePath = path.join(installRoot, "catalog");
 
-  const agentSkillsPaths = {
-    standard: "skills",
-    codex: path.join(".codex", "skills"),
-    claude: path.join(".claude", "skills"),
-    gemini: path.join(".gemini", "skills"),
-    cursor: path.join(".cursor", "skills")
-  };
-
-  for (const agent of selectedAgents) {
-    if (agentSkillsPaths[agent]) {
-      await ensureSymlink(path.join(cwd, agentSkillsPaths[agent]), skillsSourcePath, backupsDir, lockData);
-    }
+  for (const pathParts of skillTargets) {
+    await ensureSymlink(path.join(cwd, ...pathParts), skillsSourcePath, backupsDir, lockData);
   }
 
   await writeJson(lockPath, lockData);

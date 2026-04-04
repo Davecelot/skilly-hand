@@ -26,5 +26,8 @@ test("catalog manifests are portable and complete", async () => {
     assert.equal(skill.id.startsWith("scannlab-"), false);
     assert.equal(skill.portable, true);
     assert.equal(skill.files.length > 0, true);
+    assert.equal(skill.agentSupport.includes("antigravity"), true);
+    assert.equal(skill.agentSupport.includes("windsurf"), true);
+    assert.equal(skill.agentSupport.includes("trae"), true);
   }
 });

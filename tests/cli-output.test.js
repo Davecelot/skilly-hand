@@ -46,6 +46,9 @@ test("help output is structured and includes JSON mode", () => {
   assert.match(result.stdout, /Usage/);
   assert.match(result.stdout, /Flags/);
   assert.match(result.stdout, /--json/);
+  assert.match(result.stdout, /antigravity/);
+  assert.match(result.stdout, /windsurf/);
+  assert.match(result.stdout, /trae/);
   assert.match(result.stdout, /skilly-hand/);
   assert.doesNotMatch(result.stdout, /autoskills/);
 });

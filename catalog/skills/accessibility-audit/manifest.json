@@ -7,7 +7,7 @@
   "detectors": ["always"],
   "detectionTriggers": ["manual"],
   "installsFor": ["all"],
-  "agentSupport": ["codex", "claude", "cursor", "gemini", "copilot"],
+  "agentSupport": ["codex", "claude", "cursor", "gemini", "copilot", "antigravity", "windsurf", "trae"],
   "skillMetadata": {
     "author": "skilly-hand",
     "last-edit": "2026-04-04",

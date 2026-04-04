@@ -24,7 +24,7 @@
 
 - **Installs portable AI agent skills** into your project from a curated catalog
 - **Auto-detects your stack** and recommends relevant skills automatically
-- **Supports every major coding assistant** — Claude Code, OpenCode, Cursor, Copilot, Gemini, and Codex — from a single command
+- **Supports every major coding assistant** — Claude Code, OpenCode, Cursor, Copilot, Gemini, Codex, Antigravity, Windsurf, and TRAE — from a single command
 - **Ships a curated core skill set** including orchestration, SDD workflow, and Figma MCP onboarding
 - **Preserves original agentic structures** in `source/legacy/` as a migration reference
 
@@ -112,11 +112,20 @@ Skills are installed into `.skilly-hand/` with the correct format for each tool:
 
 | Tool | Install Target |
 | ---- | -------------- |
+| Antigravity | `.agents/skills/`, `.agent/skills/` (compat), `.agents/rules/skilly-hand.md`, `AGENTS.md` |
 | Claude Code / OpenCode | `.claude/skills/` |
 | Cursor | `.cursor/skills/` |
 | GitHub Copilot | `.github/copilot-instructions.md` |
 | Gemini CLI | `.gemini/skills/` |
 | Codex (OpenAI) | `.codex/skills/` |
+| Windsurf | `.windsurf/skills/`, `AGENTS.md` |
+| TRAE | `.trae/skills/`, `AGENTS.md` |
+
+### AI Integrated Structures
+
+- Antigravity: rules at `~/.gemini/GEMINI.md` (global) and workspace `.agents/rules/` (with `.agent/rules/` backward support); skills at `.agents/skills/` or `~/.gemini/antigravity/skills/`; MCP config at `~/.gemini/antigravity/mcp_config.json`.
+- Windsurf: AGENTS-based directory scoping via `AGENTS.md`, rules in `.windsurf/rules/`, skills in `.windsurf/skills/` (plus `.agents/skills/` compatibility), MCP config at `~/.codeium/mcp_config.json`.
+- TRAE: project rules in `.trae/rules/` with `AGENTS.md` support, skills in `.trae/skills/` (optional `.agents/skills/` compatibility toggle), MCP project config via `.trae/mcp.json` and manual/marketplace management in-app.
 
 ---
 
