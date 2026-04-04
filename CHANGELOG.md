@@ -8,6 +8,21 @@ All notable changes to this project are documented in this file.
 - _None._
 
 ### Changed
+- _None._
+
+### Fixed
+- _None._
+
+### Removed
+- _None._
+
+## [0.10.5] - 2026-04-04
+[View on npm](https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.10.5)
+
+### Added
+- _None._
+
+### Changed
 - Renamed portable skill `life-guard` to `review-rangers` across manifests, tests, docs, and AGENTS routing output.
 - Standardized skill instruction structure so metadata is defined in `manifest.json` (removed YAML front matter from `SKILL.md` files and updated skill-creator guidance/templates).
 
