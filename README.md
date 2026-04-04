@@ -73,7 +73,7 @@ The catalog currently includes:
 - `angular-guidelines`
 - `figma-mcp-0to1`
 - `frontend-design`
-- `life-guard`
+- `review-rangers`
 - `react-guidelines`
 - `skill-creator`
 - `spec-driven-development`

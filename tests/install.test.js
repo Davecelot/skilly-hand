@@ -29,7 +29,7 @@ test("dry run returns install plan without writing files", async () => {
   assert.deepEqual(ids, [
     "accessibility-audit",
     "agents-root-orchestrator",
-    "life-guard",
+    "review-rangers",
     "skill-creator",
     "spec-driven-development",
     "test-driven-development",
@@ -44,7 +44,7 @@ test("dry run includes core skills even for no-stack projects", async () => {
 
   assert.equal(result.applied, false);
   assert.equal(result.plan.skills.length, 6);
-  assert.deepEqual(ids, ["agents-root-orchestrator", "life-guard", "skill-creator", "spec-driven-development", "test-driven-development", "token-optimizer"]);
+  assert.deepEqual(ids, ["agents-root-orchestrator", "review-rangers", "skill-creator", "spec-driven-development", "test-driven-development", "token-optimizer"]);
 });
 
 test("dry run includes angular-guidelines for angular projects", async () => {
@@ -57,7 +57,7 @@ test("dry run includes angular-guidelines for angular projects", async () => {
     "accessibility-audit",
     "agents-root-orchestrator",
     "angular-guidelines",
-    "life-guard",
+    "review-rangers",
     "skill-creator",
     "spec-driven-development",
     "test-driven-development",

@@ -1,6 +1,6 @@
 {
-  "id": "life-guard",
-  "title": "Life-Guard",
+  "id": "review-rangers",
+  "title": "Review Rangers",
   "description": "Review code, decisions, and artifacts through a multi-perspective committee and a domain expert safety guard, then synthesize a structured verdict.",
   "portable": true,
   "tags": ["core", "workflow", "review", "quality"],

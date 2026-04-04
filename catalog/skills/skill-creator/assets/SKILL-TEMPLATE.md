@@ -1,22 +1,3 @@
----
-name: {skill-name}
-description: >
-  {Brief description of what this skill enables}.
-  Trigger: {When the AI should load this skill - explicit trigger condition}.
-metadata:
-  author: skilly-hand
-  last-edit: {YYYY-MM-DD}
-  license: Apache-2.0
-  version: "1.0.0"
-  changelog: "{<what changed>; <why it matters>; <where it affects>}"
-  auto-invoke: "{Complete with a brief and specific phrase if the skill needs auto-invoke}"
-allowed-tools: {tool1, tool2, tool3}  # Examples: Read, Edit, Write, Bash, Grep, SubAgent, Task, WebFetch
-# IMPORTANT: Only include 'allowed-modes' if your skill has an agents/ folder with sub-agents.
-# If you don't have agents/, delete the lines below.
-allowed-modes:
-  - {mode-name}     # {Description of when this mode is used}
----
-
 # {Name of the Skill} Guide
 
 ## When to Use
@@ -92,3 +73,4 @@ Otherwise     -> {Default action}
 ## Resources
 
 - Template assets: Place reusable templates, schemas, and examples in `assets/`.
+- Define metadata in `manifest.json` (`id`, `description`, `skillMetadata`, `allowed-tools`, optional `allowed-modes`).

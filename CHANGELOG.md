@@ -8,7 +8,8 @@ All notable changes to this project are documented in this file.
 - _None._
 
 ### Changed
-- _None._
+- Renamed portable skill `life-guard` to `review-rangers` across manifests, tests, docs, and AGENTS routing output.
+- Standardized skill instruction structure so metadata is defined in `manifest.json` (removed YAML front matter from `SKILL.md` files and updated skill-creator guidance/templates).
 
 ### Fixed
 - _None._
@@ -132,7 +133,7 @@ All notable changes to this project are documented in this file.
 
 ### Added
 - Added portable skill `frontend-design` for project-aware UI component design that enforces stack detection before any design work.
-- Added portable skill `life-guard` for multi-perspective code and decision review using a committee + domain expert safety guard pattern.
+- Added portable skill `review-rangers` for multi-perspective code and decision review using a committee + domain expert safety guard pattern.
 - Added portable skill `test-driven-development` for guiding the RED → GREEN → REFACTOR TDD cycle.
 
 ### Changed

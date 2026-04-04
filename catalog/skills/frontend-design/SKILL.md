@@ -1,23 +1,3 @@
----
-name: frontend-design
-description: >
-  Project-aware frontend design skill that detects the existing tech stack, UI libraries,
-  CSS variables, and design tokens before proposing any UI work. Never invents design
-  decisions — reads the project first, confirms with the user, then designs.
-  Trigger: user asks to build, design, style, or update any UI component, page, or visual element in a frontend project.
-metadata:
-  author: skilly-hand
-  last-edit: 2026-04-04
-  license: Apache-2.0
-  version: "1.0.0"
-  changelog: "initial release; prevents AI slop design by enforcing project-aware stack detection before any design work; affects all frontend design and styling tasks"
-  auto-invoke: "design a component, create a UI, style this page, build a frontend, update the layout"
-allowed-tools: Read, Grep, Glob, Bash, Edit, Write
-allowed-modes:
-  - stack-detector      # Scan the project for tech stack, UI libs, CSS vars, and design tokens
-  - component-designer  # Design and implement components following the confirmed project stack
----
-
 # Frontend Design Guide
 
 ## When to Use

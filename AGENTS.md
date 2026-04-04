@@ -21,7 +21,8 @@
 | `angular-guidelines` | Guide Angular code generation and review using latest stable Angular verification and modern framework best practices. | angular, frontend, workflow, best-practices |
 | `figma-mcp-0to1` | Guide users from Figma MCP installation and authentication through first canvas creation, with function-level tool coverage and operational recovery patterns. | figma, mcp, workflow, design |
 | `frontend-design` | Project-aware frontend design skill that detects the existing tech stack, UI libraries, CSS variables, and design tokens before proposing any UI work. | frontend, design, workflow, ui |
-| `life-guard` | Review code, decisions, and artifacts through a multi-perspective committee and a domain expert safety guard, then synthesize a structured verdict. | core, workflow, review, quality |
+| `react-guidelines` | Guide React code generation and review using latest stable React verification and modern framework best practices. | react, frontend, workflow, best-practices |
+| `review-rangers` | Review code, decisions, and artifacts through a multi-perspective committee and a domain expert safety guard, then synthesize a structured verdict. | core, workflow, review, quality |
 | `skill-creator` | Create and standardize AI skills with reusable structure, metadata rules, and templates. | core, workflow, authoring |
 | `spec-driven-development` | Plan, execute, and verify multi-step work through versioned specs with small, testable tasks. | core, workflow, planning |
 | `test-driven-development` | Guide implementation using the RED → GREEN → REFACTOR TDD cycle: write a failing test first, write the minimum code to pass, then refactor while tests stay green. | testing, workflow, quality, core |
@@ -49,7 +50,8 @@
 | Generating, reviewing, or refactoring Angular code artifacts in Angular projects | `angular-guidelines` |
 | Installing, configuring, or using Figma MCP from setup through first canvas creation | `figma-mcp-0to1` |
 | Designing or generating UI components, pages, or layouts in a web or mobile project | `frontend-design` |
-| Reviewing code, decisions, or artifacts where adversarial multi-perspective evaluation adds value | `life-guard` |
+| Generating, reviewing, or refactoring React code artifacts in React projects | `react-guidelines` |
+| Reviewing code, decisions, or artifacts where adversarial multi-perspective evaluation adds value | `review-rangers` |
 | Creating a new skill | `skill-creator` |
 | Planning or executing feature work, bug fixes, and multi-phase implementation | `spec-driven-development` |
 | Implementing features, services, or components using test-driven development (TDD) or RED→GREEN→REFACTOR cycles | `test-driven-development` |

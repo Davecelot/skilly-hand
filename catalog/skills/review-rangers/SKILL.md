@@ -1,19 +1,4 @@
----
-name: life-guard
-description: >
-  Review code, decisions, and artifacts through a multi-perspective committee and a domain expert safety guard, then synthesize a structured verdict.
-  Trigger: Reviewing code, decisions, pull requests, APIs, architecture, or any artifact that benefits from adversarial multi-perspective evaluation.
-metadata:
-  author: skilly-hand
-  last-edit: 2026-04-04
-  license: Apache-2.0
-  version: "1.0.0"
-  changelog: "Added multi-perspective review skill with committee + safety guard synthesis; enables adversarial evaluation without permanent agent files; affects catalog skill coverage for review and quality workflows"
-  auto-invoke: "Reviewing code, decisions, or artifacts where adversarial multi-perspective evaluation adds value"
-allowed-tools: Read, Grep, Glob, Bash, Task, SubAgent
----
-
-# Life-Guard Guide
+# Review Rangers Guide
 
 ## When to Use
 
@@ -166,10 +151,10 @@ Does committee majority agree the target is sound?
 
 ```bash
 # Reference committee member template when constructing agent prompts
-cat .skilly-hand/catalog/life-guard/assets/committee-member-template.md
+cat .skilly-hand/catalog/review-rangers/assets/committee-member-template.md
 
 # Reference safety guard template when constructing agent prompts
-cat .skilly-hand/catalog/life-guard/assets/safety-guard-template.md
+cat .skilly-hand/catalog/review-rangers/assets/safety-guard-template.md
 ```
 
 ---

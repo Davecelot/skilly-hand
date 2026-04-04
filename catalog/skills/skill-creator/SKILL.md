@@ -72,20 +72,20 @@ Generic skill needs {product-name} info?   -> Add references/ pointing to {produ
 
 ---
 
-## Frontmatter Fields
+## Manifest Metadata Fields
 
 | Field | Required | Format | Description |
 |-------|----------|--------|-------------|
-| `name` | Yes | `lowercase-hyphens` | Skill identifier |
-| `description` | Yes | Block with trigger | What skill does plus explicit `Trigger: ...` clause for AI recognition |
-| `metadata.author` | Yes | String | Always `skilly-hand` |
-| `metadata.last-edit` | Yes | ISO 8601 date | Format: `YYYY-MM-DD` (e.g., `2026-03-21`) |
-| `metadata.license` | Yes | String | Always `Apache-2.0` for `skilly-hand` |
-| `metadata.version` | Yes | Semantic version | Format: `"X.Y.Z"` as string |
-| `metadata.changelog` | Yes | Structured text | Format: `"<what changed>; <why it matters>; <where it affects>"` |
-| `metadata.auto-invoke` | Yes | String | Explicit trigger condition (e.g., `"When auditing, reviewing, or validating an existing skill"`) |
-| `allowed-tools` | Yes | Comma-separated | All tools this skill can invoke (e.g., `Read, Edit, Write, SubAgent`) |
-| `allowed-modes` | Optional | YAML list | Use only when skill has an `agents/` folder |
+| `id` | Yes | `lowercase-hyphens` | Skill identifier |
+| `description` | Yes | String | What skill does plus explicit `Trigger: ...` clause for AI recognition |
+| `skillMetadata.author` | Yes | String | Always `skilly-hand` |
+| `skillMetadata.last-edit` | Yes | ISO 8601 date | Format: `YYYY-MM-DD` (e.g., `2026-03-21`) |
+| `skillMetadata.license` | Yes | String | Always `Apache-2.0` for `skilly-hand` |
+| `skillMetadata.version` | Yes | Semantic version | Format: `"X.Y.Z"` as string |
+| `skillMetadata.changelog` | Yes | Structured text | Format: `"<what changed>; <why it matters>; <where it affects>"` |
+| `skillMetadata.auto-invoke` | Yes | String | Explicit trigger condition (e.g., `"When auditing, reviewing, or validating an existing skill"`) |
+| `skillMetadata.allowed-tools` | Yes | String list | All tools this skill can invoke (e.g., `Read`, `Edit`, `Write`, `SubAgent`) |
+| `skillMetadata.allowed-modes` | Optional | String list | Use only when skill has an `agents/` folder |
 
 ---
 
@@ -146,7 +146,7 @@ Do:
 
 Do not:
 
-- Add a Keywords section (agent searches frontmatter, not body).
+- Add a Keywords section (agent searches manifest metadata, not body).
 - Duplicate content from existing docs (reference instead).
 - Include lengthy explanations when a concise rule is enough.
 - Add troubleshooting sections when they are not essential.
@@ -161,7 +161,7 @@ Do not:
 - [ ] Skill does not already exist.
 - [ ] Pattern is reusable (not one-off).
 - [ ] Name follows conventions.
-- [ ] Frontmatter includes all required fields.
+- [ ] `manifest.json` includes all required metadata fields.
 - [ ] `description` includes explicit `Trigger: ...` clause.
 - [ ] `last-edit` uses ISO format (`YYYY-MM-DD`).
 - [ ] `changelog` uses structured format: `what; why; where`.
