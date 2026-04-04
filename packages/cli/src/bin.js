@@ -1,7 +1,8 @@
 #!/usr/bin/env node
+import fs from "node:fs";
 import path from "node:path";
 import { createRequire } from "node:module";
-import { pathToFileURL } from "node:url";
+import { fileURLToPath } from "node:url";
 import { checkbox as inquirerCheckbox, confirm as inquirerConfirm, select as inquirerSelect } from "@inquirer/prompts";
 import { loadAllSkills } from "../../catalog/src/index.js";
 import {
@@ -19,7 +20,17 @@ const { version } = require("../../../package.json");
 
 function isExecutedDirectly(metaUrl, argv1) {
   if (!argv1) return false;
-  return metaUrl === pathToFileURL(argv1).href;
+  const normalizePath = (filePath) => {
+    const absolutePath = path.resolve(filePath);
+    try {
+      const realPath = fs.realpathSync.native ? fs.realpathSync.native(absolutePath) : fs.realpathSync(absolutePath);
+      return path.normalize(realPath);
+    } catch {
+      return path.normalize(absolutePath);
+    }
+  };
+
+  return normalizePath(fileURLToPath(metaUrl)) === normalizePath(argv1);
 }
 
 export function parseArgs(argv) {

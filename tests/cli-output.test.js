@@ -1,5 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 
@@ -87,4 +89,39 @@ test("command errors emit JSON payload when --json is set", () => {
   const payload = parseJsonPayload(result.stderr);
   assert.equal(payload.ok, false);
   assert.match(payload.error.why, /Unknown command/);
+});
+
+test("symlinked CLI entrypoint executes and honors flags", () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "skilly-hand-cli-"));
+  const symlinkPath = path.join(tmpDir, "skilly-hand.js");
+  const env = {
+    ...process.env,
+    NO_COLOR: "1",
+    NODE_NO_WARNINGS: "1"
+  };
+  delete env.NODE_OPTIONS;
+
+  try {
+    fs.symlinkSync(cliPath, symlinkPath, "file");
+    const result = spawnSync("node", [
+      symlinkPath,
+      "install",
+      "--dry-run",
+      "--json",
+      "--cwd",
+      path.join(fixturesDir, "react-vite")
+    ], {
+      cwd: process.cwd(),
+      encoding: "utf8",
+      env
+    });
+
+    assert.equal(result.status, 0);
+    const payload = parseJsonPayload(result.stdout);
+    assert.equal(payload.command, "install");
+    assert.equal(payload.applied, false);
+    assert.equal(payload.plan.cwd.endsWith(path.join("fixtures", "react-vite")), true);
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
 });
