@@ -7,14 +7,17 @@ test("catalog manifests are portable and complete", async () => {
   const issues = await verifyCatalogFiles();
   const ids = skills.map((skill) => skill.id);
 
-  assert.equal(skills.length, 7);
+  assert.equal(skills.length, 10);
   assert.deepEqual(ids, [
     "accessibility-audit",
     "agents-root-orchestrator",
     "angular-guidelines",
     "figma-mcp-0to1",
+    "frontend-design",
+    "life-guard",
     "skill-creator",
     "spec-driven-development",
+    "test-driven-development",
     "token-optimizer"
   ]);
   assert.deepEqual(issues, []);
