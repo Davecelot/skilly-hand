@@ -16,6 +16,23 @@ All notable changes to this project are documented in this file.
 ### Removed
 - _None._
 
+## [0.8.0] - 2026-04-04
+[View on npm](https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.8.0)
+
+### Added
+- Added portable skill `frontend-design` for project-aware UI component design that enforces stack detection before any design work.
+- Added portable skill `life-guard` for multi-perspective code and decision review using a committee + domain expert safety guard pattern.
+- Added portable skill `test-driven-development` for guiding the RED → GREEN → REFACTOR TDD cycle.
+
+### Changed
+- _None._
+
+### Fixed
+- _None._
+
+### Removed
+- _None._
+
 ## [0.7.0] - 2026-04-04
 [View on npm](https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.7.0)
 

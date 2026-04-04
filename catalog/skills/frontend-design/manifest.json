@@ -1,0 +1,27 @@
+{
+  "id": "frontend-design",
+  "title": "Frontend Design",
+  "description": "Project-aware frontend design skill that detects the existing tech stack, UI libraries, CSS variables, and design tokens before proposing any UI work.",
+  "portable": true,
+  "tags": ["frontend", "design", "workflow", "ui"],
+  "detectors": ["always"],
+  "detectionTriggers": ["manual"],
+  "installsFor": ["all"],
+  "agentSupport": ["codex", "claude", "cursor", "gemini", "copilot"],
+  "skillMetadata": {
+    "author": "skilly-hand",
+    "last-edit": "2026-04-04",
+    "license": "Apache-2.0",
+    "version": "1.0.0",
+    "changelog": "Initial frontend-design skill; enforces stack-detection-first workflow before any UI component generation; affects catalog skill coverage for frontend and design workflows",
+    "auto-invoke": "Designing or generating UI components, pages, or layouts in a web or mobile project",
+    "allowed-tools": ["Read", "Grep", "Glob", "Bash", "Edit", "Write"]
+  },
+  "files": [
+    { "path": "SKILL.md", "kind": "instruction" },
+    { "path": "agents/stack-detector.md", "kind": "asset" },
+    { "path": "agents/component-designer.md", "kind": "asset" },
+    { "path": "assets/stack-scan-checklist.md", "kind": "asset" }
+  ],
+  "dependencies": []
+}

@@ -1,0 +1,25 @@
+{
+  "id": "test-driven-development",
+  "title": "Test-Driven Development",
+  "description": "Guide implementation using the RED → GREEN → REFACTOR TDD cycle: write a failing test first, write the minimum code to pass, then refactor while tests stay green.",
+  "portable": true,
+  "tags": ["testing", "workflow", "quality", "core"],
+  "detectors": ["always"],
+  "detectionTriggers": ["manual"],
+  "installsFor": ["all"],
+  "agentSupport": ["codex", "claude", "cursor", "gemini", "copilot"],
+  "skillMetadata": {
+    "author": "skilly-hand",
+    "last-edit": "2026-04-04",
+    "license": "Apache-2.0",
+    "version": "1.0.0",
+    "changelog": "Initial TDD skill ported from legacy scannlab-sdd tdd-templates; enables RED→GREEN→REFACTOR workflow across any stack; affects catalog skill coverage for test-first development",
+    "auto-invoke": "Implementing features, services, or components using test-driven development (TDD) or RED→GREEN→REFACTOR cycles",
+    "allowed-tools": ["Read", "Edit", "Write", "Glob", "Grep", "Bash"]
+  },
+  "files": [
+    { "path": "SKILL.md", "kind": "instruction" },
+    { "path": "assets/tdd-cycle.md", "kind": "asset" }
+  ],
+  "dependencies": []
+}

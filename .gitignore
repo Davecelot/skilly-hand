@@ -4,3 +4,4 @@ catalog/catalog-index.json
 .npm-cache
 /source/
 /sandbox
+.claude
