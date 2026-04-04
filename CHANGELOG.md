@@ -5,6 +5,21 @@ All notable changes to this project are documented in this file.
 ## [Unreleased]
 
 ### Added
+- _None._
+
+### Changed
+- _None._
+
+### Fixed
+- _None._
+
+### Removed
+- _None._
+
+## [0.10.0] - 2026-04-04
+[View on npm](https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.10.0)
+
+### Added
 - Added support for `antigravity`, `windsurf`, and `trae` agent targets across install flows.
 - Added native install target coverage for Antigravity (`.agents/skills`, `.agent/skills`, and `.agents/rules/skilly-hand.md`), Windsurf (`.windsurf/skills`), and TRAE (`.trae/skills`).
 
