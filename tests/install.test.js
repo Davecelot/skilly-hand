@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import os from "node:os";
 import path from "node:path";
-import { cp, mkdtemp, readFile, realpath } from "node:fs/promises";
+import { access, cp, mkdtemp, readFile, realpath } from "node:fs/promises";
 import {
   installProject,
   resolveSkillSelectionByIds,
@@ -102,6 +102,34 @@ test("install creates managed files, symlinks, and restores originals on uninsta
 
   const restoredAgents = await readFile(path.join(projectDir, "AGENTS.md"), "utf8");
   assert.equal(restoredAgents, originalAgents);
+});
+
+test("install with standard agent creates skills/ symlink at root without .company/ folders", async () => {
+  const projectDir = await makeFixtureCopy("no-stack");
+
+  const installResult = await installProject({
+    cwd: projectDir,
+    agents: ["standard"]
+  });
+
+  assert.equal(installResult.applied, true);
+
+  const skillsPath = await realpath(path.join(projectDir, "skills"));
+  const expectedCatalogPath = await realpath(path.join(projectDir, ".skilly-hand", "catalog"));
+  assert.equal(skillsPath, expectedCatalogPath);
+
+  const agentsMd = await readFile(path.join(projectDir, "AGENTS.md"), "utf8");
+  assert.match(agentsMd, /Managed by skilly-hand/);
+
+  // No company-specific folders
+  await assert.rejects(access(path.join(projectDir, ".claude", "skills")), "expected no .claude/skills");
+  await assert.rejects(access(path.join(projectDir, ".codex", "skills")), "expected no .codex/skills");
+
+  const uninstallResult = await uninstallProject(projectDir);
+  assert.equal(uninstallResult.removed, true);
+
+  // skills/ symlink removed
+  await assert.rejects(access(path.join(projectDir, "skills")), "expected skills/ to be removed");
 });
 
 test("selectedSkillIds overrides automatic selection during install", async () => {

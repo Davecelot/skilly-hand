@@ -3,7 +3,7 @@ import path from "node:path";
 import { copySkillTo, loadAllSkills, renderAgentsMarkdown, verifyCatalogFiles } from "../../catalog/src/index.js";
 import { detectProject, inspectProjectFiles } from "../../detectors/src/index.js";
 
-export const DEFAULT_AGENTS = ["codex", "claude", "cursor", "gemini", "copilot"];
+export const DEFAULT_AGENTS = ["standard", "codex", "claude", "cursor", "gemini", "copilot"];
 const MANAGED_MARKER = "<!-- Managed by skilly-hand.";
 
 function uniq(values) {
@@ -171,7 +171,7 @@ async function ensureSymlink(targetPath, sourcePath, backupsDir, lockData) {
 function buildInstructionFiles({ agentsMarkdown, selectedAgents }) {
   const files = [];
 
-  if (selectedAgents.includes("codex")) {
+  if (selectedAgents.includes("standard") || selectedAgents.includes("codex")) {
     files.push({ pathParts: ["AGENTS.md"], content: agentsMarkdown });
   }
 
@@ -258,17 +258,18 @@ export async function installProject({
 
   const skillsSourcePath = path.join(installRoot, "catalog");
 
-  if (selectedAgents.includes("codex")) {
-    await ensureSymlink(path.join(cwd, ".codex", "skills"), skillsSourcePath, backupsDir, lockData);
-  }
-  if (selectedAgents.includes("claude")) {
-    await ensureSymlink(path.join(cwd, ".claude", "skills"), skillsSourcePath, backupsDir, lockData);
-  }
-  if (selectedAgents.includes("gemini")) {
-    await ensureSymlink(path.join(cwd, ".gemini", "skills"), skillsSourcePath, backupsDir, lockData);
-  }
-  if (selectedAgents.includes("cursor")) {
-    await ensureSymlink(path.join(cwd, ".cursor", "skills"), skillsSourcePath, backupsDir, lockData);
+  const agentSkillsPaths = {
+    standard: "skills",
+    codex: path.join(".codex", "skills"),
+    claude: path.join(".claude", "skills"),
+    gemini: path.join(".gemini", "skills"),
+    cursor: path.join(".cursor", "skills")
+  };
+
+  for (const agent of selectedAgents) {
+    if (agentSkillsPaths[agent]) {
+      await ensureSymlink(path.join(cwd, agentSkillsPaths[agent]), skillsSourcePath, backupsDir, lockData);
+    }
   }
 
   await writeJson(lockPath, lockData);

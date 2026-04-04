@@ -352,7 +352,7 @@ async function runInteractiveInstall({
     choices: services.defaultAgents.map((agent) => ({
       value: agent,
       name: agent,
-      checked: true
+      checked: agent === "standard"
     }))
   });
 

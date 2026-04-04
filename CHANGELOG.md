@@ -16,6 +16,24 @@ All notable changes to this project are documented in this file.
 ### Removed
 - _None._
 
+## [0.9.0] - 2026-04-04
+[View on npm](https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.9.0)
+
+### Added
+
+- `standard` agent option: installs `AGENTS.md` and a `skills/` symlink directly at the project root with no vendor-specific folder (`.claude/`, `.codex/`, etc.).
+
+### Changed
+
+- Interactive agent selection now pre-checks only `standard` instead of all five agents, so accepting defaults gives a clean, agent-agnostic installation.
+- `codex` and `standard` both produce `AGENTS.md`; when both are selected the file is written once.
+
+### Fixed
+- _None._
+
+### Removed
+- _None._
+
 ## [0.8.1] - 2026-04-04
 [View on npm](https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.8.1)
 
