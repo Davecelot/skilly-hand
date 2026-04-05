@@ -26,7 +26,8 @@ All notable changes to this project are documented in this file.
 - _None._
 
 ### Fixed
-- _None._
+- Added `project-teacher` to the README catalog list (was missing from the 0.11.0 docs update).
+- Synced test expectations to reflect 12-skill catalog and `project-teacher` install behavior.
 
 ### Removed
 - _None._
