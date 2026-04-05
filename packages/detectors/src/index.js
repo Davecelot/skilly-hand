@@ -10,6 +10,13 @@ async function pathExists(filePath) {
   }
 }
 
+async function configExists(cwd, base, extensions = ["js", "ts"]) {
+  for (const ext of extensions) {
+    if (await pathExists(path.join(cwd, `${base}.${ext}`))) return true;
+  }
+  return false;
+}
+
 async function readJson(filePath) {
   if (!(await pathExists(filePath))) {
     return null;
@@ -41,14 +48,10 @@ export async function detectProject(cwd) {
   const packageJson = await readJson(path.join(cwd, "package.json"));
   const tsconfigExists = await pathExists(path.join(cwd, "tsconfig.json"));
   const angularJsonExists = await pathExists(path.join(cwd, "angular.json"));
-  const viteConfigExists =
-    (await pathExists(path.join(cwd, "vite.config.js"))) ||
-    (await pathExists(path.join(cwd, "vite.config.ts")));
-  const nextConfigExists =
-    (await pathExists(path.join(cwd, "next.config.js"))) ||
-    (await pathExists(path.join(cwd, "next.config.mjs"))) ||
-    (await pathExists(path.join(cwd, "next.config.ts")));
+  const viteConfigExists = await configExists(cwd, "vite.config");
+  const nextConfigExists = await configExists(cwd, "next.config", ["js", "mjs", "ts"]);
   const storybookDirExists = await pathExists(path.join(cwd, ".storybook"));
+  const figmaConfigExists = await configExists(cwd, "figma.config");
   const results = [];
 
   if (packageJson) {
@@ -56,27 +59,34 @@ export async function detectProject(cwd) {
       technology: "nodejs",
       confidence: 1,
       reasons: ["Found package.json"],
-      recommendedSkillIds: ["token-optimizer", "commit-writer", "pr-writer", "spec-driven-development"]
-    });
-  }
-
-  if (packageJson || tsconfigExists) {
-    addDetection(results, {
-      technology: "typescript",
-      confidence: tsconfigExists ? 0.95 : 0.7,
-      reasons: tsconfigExists ? ["Found tsconfig.json"] : ["TypeScript inferred from project layout"],
-      recommendedSkillIds: ["token-optimizer"]
+      recommendedSkillIds: [
+        "token-optimizer",
+        "spec-driven-development",
+        "review-rangers",
+        "project-teacher"
+      ]
     });
   }
 
   const deps = packageJson ? { ...packageJson.dependencies, ...packageJson.devDependencies } : {};
+
+  if (tsconfigExists || "typescript" in deps) {
+    addDetection(results, {
+      technology: "typescript",
+      confidence: tsconfigExists ? 0.95 : 0.9,
+      reasons: tsconfigExists
+        ? ["Found tsconfig.json"]
+        : ['Dependency "typescript" found in package.json'],
+      recommendedSkillIds: ["token-optimizer"]
+    });
+  }
 
   if ("react" in deps) {
     addDetection(results, {
       technology: "react",
       confidence: 0.95,
       reasons: ['Dependency "react" found in package.json'],
-      recommendedSkillIds: ["accessibility-audit", "storybook-component-stories", "playwright-ui-testing"]
+      recommendedSkillIds: ["accessibility-audit", "react-guidelines", "frontend-design"]
     });
   }
 
@@ -84,8 +94,15 @@ export async function detectProject(cwd) {
     addDetection(results, {
       technology: "nextjs",
       confidence: nextConfigExists ? 1 : 0.9,
-      reasons: nextConfigExists ? ["Found next.config.*"] : ['Dependency "next" found in package.json'],
-      recommendedSkillIds: ["accessibility-audit", "playwright-ui-testing", "spec-driven-development"]
+      reasons: nextConfigExists
+        ? ["Found next.config.*"]
+        : ['Dependency "next" found in package.json'],
+      recommendedSkillIds: [
+        "accessibility-audit",
+        "spec-driven-development",
+        "react-guidelines",
+        "frontend-design"
+      ]
     });
   }
 
@@ -93,12 +110,14 @@ export async function detectProject(cwd) {
     addDetection(results, {
       technology: "angular",
       confidence: angularJsonExists ? 1 : 0.95,
-      reasons: angularJsonExists ? ["Found angular.json"] : ['Dependency "@angular/core" found in package.json'],
+      reasons: angularJsonExists
+        ? ["Found angular.json"]
+        : ['Dependency "@angular/core" found in package.json'],
       recommendedSkillIds: [
         "angular-guidelines",
-        "vitest-component-testing",
-        "storybook-component-stories",
-        "accessibility-audit"
+        "accessibility-audit",
+        "frontend-design",
+        "test-driven-development"
       ]
     });
   }
@@ -107,8 +126,10 @@ export async function detectProject(cwd) {
     addDetection(results, {
       technology: "vite",
       confidence: viteConfigExists ? 1 : 0.9,
-      reasons: viteConfigExists ? ["Found vite.config.*"] : ['Dependency "vite" found in package.json'],
-      recommendedSkillIds: ["storybook-component-stories", "playwright-ui-testing"]
+      reasons: viteConfigExists
+        ? ["Found vite.config.*"]
+        : ['Dependency "vite" found in package.json'],
+      recommendedSkillIds: ["frontend-design"]
     });
   }
 
@@ -117,7 +138,7 @@ export async function detectProject(cwd) {
       technology: "playwright",
       confidence: 0.95,
       reasons: ['Dependency "@playwright/test" found in package.json'],
-      recommendedSkillIds: ["playwright-ui-testing"]
+      recommendedSkillIds: ["test-driven-development"]
     });
   }
 
@@ -126,16 +147,19 @@ export async function detectProject(cwd) {
       technology: "vitest",
       confidence: 0.95,
       reasons: ['Dependency "vitest" found in package.json'],
-      recommendedSkillIds: ["vitest-component-testing"]
+      recommendedSkillIds: ["test-driven-development"]
     });
   }
 
-  if ("tailwindcss" in deps || (await pathExists(path.join(cwd, "tailwind.config.js"))) || (await pathExists(path.join(cwd, "tailwind.config.ts")))) {
+  const tailwindConfigExists = await configExists(cwd, "tailwind.config");
+  if ("tailwindcss" in deps || tailwindConfigExists) {
     addDetection(results, {
       technology: "tailwindcss",
-      confidence: 0.9,
-      reasons: ['Dependency "tailwindcss" or config file found'],
-      recommendedSkillIds: ["accessibility-audit", "css-modules"]
+      confidence: tailwindConfigExists ? 1 : 0.9,
+      reasons: tailwindConfigExists
+        ? ["Found tailwind.config.*"]
+        : ['Dependency "tailwindcss" found in package.json'],
+      recommendedSkillIds: ["accessibility-audit", "frontend-design"]
     });
   }
 
@@ -143,8 +167,23 @@ export async function detectProject(cwd) {
     addDetection(results, {
       technology: "storybook",
       confidence: storybookDirExists ? 1 : 0.9,
-      reasons: storybookDirExists ? ["Found .storybook directory"] : ["Storybook dependency found"],
-      recommendedSkillIds: ["storybook-component-stories", "playwright-ui-testing"]
+      reasons: storybookDirExists
+        ? ["Found .storybook directory"]
+        : ["Storybook dependency found in package.json"],
+      recommendedSkillIds: ["frontend-design"]
+    });
+  }
+
+  const figmaDeps = ["@figma/plugin-typings", "@figma/widget-typings", "figma-api"];
+  const figmaDepFound = figmaDeps.find((dep) => dep in deps);
+  if (figmaConfigExists || figmaDepFound) {
+    addDetection(results, {
+      technology: "figma",
+      confidence: figmaConfigExists ? 1 : 0.95,
+      reasons: figmaConfigExists
+        ? ["Found figma.config.*"]
+        : [`Dependency "${figmaDepFound}" found in package.json`],
+      recommendedSkillIds: ["figma-mcp-0to1"]
     });
   }
 
@@ -152,7 +191,20 @@ export async function detectProject(cwd) {
 }
 
 export async function inspectProjectFiles(cwd) {
-  const probes = ["package.json", "tsconfig.json", "angular.json", ".storybook"];
+  const probes = [
+    "package.json",
+    "tsconfig.json",
+    "angular.json",
+    ".storybook",
+    "vite.config.js",
+    "vite.config.ts",
+    "next.config.js",
+    "next.config.mjs",
+    "tailwind.config.js",
+    "tailwind.config.ts",
+    "figma.config.js",
+    "figma.config.ts"
+  ];
   const statuses = [];
 
   for (const probe of probes) {

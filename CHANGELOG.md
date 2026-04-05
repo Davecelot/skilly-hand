@@ -5,10 +5,13 @@ All notable changes to this project are documented in this file.
 ## [Unreleased]
 
 ### Added
-- _None._
+- Figma plugin detection support
+- New test fixtures for figma-plugin projects
 
 ### Changed
-- _None._
+- Improved project detection logic with configExists helper function
+- Updated skill recommendations for React, Next.js, Angular, Vite, and other technologies
+- Changed figma-mcp-0to1 skill detectors from "always" to "figma"
 
 ### Fixed
 - _None._

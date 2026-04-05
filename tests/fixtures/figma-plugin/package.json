@@ -1,0 +1,7 @@
+{
+  "name": "figma-plugin-fixture",
+  "version": "0.0.1",
+  "devDependencies": {
+    "@figma/plugin-typings": "1.0.0"
+  }
+}

@@ -4,7 +4,7 @@
   "description": "Guide users from Figma MCP installation and authentication through first canvas creation, with function-level tool coverage and operational recovery patterns.",
   "portable": true,
   "tags": ["figma", "mcp", "workflow", "design"],
-  "detectors": ["always"],
+  "detectors": ["figma"],
   "detectionTriggers": ["manual"],
   "installsFor": ["all"],
   "agentSupport": ["codex", "claude", "cursor", "gemini", "copilot", "antigravity", "windsurf", "trae"],
