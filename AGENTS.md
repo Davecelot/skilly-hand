@@ -21,6 +21,7 @@
 | `angular-guidelines` | Guide Angular code generation and review using latest stable Angular verification and modern framework best practices. | angular, frontend, workflow, best-practices |
 | `figma-mcp-0to1` | Guide users from Figma MCP installation and authentication through first canvas creation, with function-level tool coverage and operational recovery patterns. | figma, mcp, workflow, design |
 | `frontend-design` | Project-aware frontend design skill that detects the existing tech stack, UI libraries, CSS variables, and design tokens before proposing any UI work. | frontend, design, workflow, ui |
+| `project-teacher` | Scan the active project and teach any concept, code path, or decision using verified information, interactive questions, and simple explanations. | core, workflow, education |
 | `react-guidelines` | Guide React code generation and review using latest stable React verification and modern framework best practices. | react, frontend, workflow, best-practices |
 | `review-rangers` | Review code, decisions, and artifacts through a multi-perspective committee and a domain expert safety guard, then synthesize a structured verdict. | core, workflow, review, quality |
 | `skill-creator` | Create and standardize AI skills with reusable structure, metadata rules, and templates. | core, workflow, authoring |
@@ -50,6 +51,7 @@
 | Generating, reviewing, or refactoring Angular code artifacts in Angular projects | `angular-guidelines` |
 | Installing, configuring, or using Figma MCP from setup through first canvas creation | `figma-mcp-0to1` |
 | Designing or generating UI components, pages, or layouts in a web or mobile project | `frontend-design` |
+| Explaining, understanding, or clarifying any concept, code path, or decision in the project | `project-teacher` |
 | Generating, reviewing, or refactoring React code artifacts in React projects | `react-guidelines` |
 | Reviewing code, decisions, or artifacts where adversarial multi-perspective evaluation adds value | `review-rangers` |
 | Creating a new skill | `skill-creator` |
@@ -83,6 +85,14 @@ Asking for a new reusable skill
   -> skill-creator
   -> spec-driven-development
   -> agents-root-orchestrator
+```
+
+### Clarification-First Planning Workflow
+
+```text
+Clarifying requirements or design intent before writing a spec
+  -> project-teacher
+  -> spec-driven-development (plan mode)
 ```
 
 ### SDD-First Delivery Workflow
