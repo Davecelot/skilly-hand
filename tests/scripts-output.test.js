@@ -98,6 +98,15 @@ test("release-changelog supports JSON success output", async () => {
   assert.equal(payload.version, "1.2.3");
 });
 
+test("security-check exposes --json contract", () => {
+  const result = runScript("scripts/security-check.mjs", ["--json"]);
+  assert.equal(result.status, 0);
+  const payload = JSON.parse(result.stdout);
+  assert.equal(payload.command, "security-check");
+  assert.equal(typeof payload.valid, "boolean");
+  assert.equal(Array.isArray(payload.violations), true);
+});
+
 test("publish-with-otp provides non-interactive OTP guidance in JSON mode", async () => {
   const tmpDir = await mkdtemp(path.join(os.tmpdir(), "skilly-hand-publish-"));
   const fakeNpmPath = path.join(tmpDir, "npm");

@@ -3,7 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createTerminalRenderer } from "../packages/core/src/terminal.js";
 
-const ALLOWED_EXACT_PATHS = new Set(["README.md", "CHANGELOG.md", "LICENSE", "package.json"]);
+const ALLOWED_EXACT_PATHS = new Set(["README.md", "CHANGELOG.md", "LICENSE", "SECURITY.md", "package.json"]);
 const ALLOWED_PREFIXES = ["catalog/", "packages/"];
 const FORBIDDEN_PREFIXES = ["source/legacy/", "tests/", ".github/"];
 const FORBIDDEN_PATTERNS = [

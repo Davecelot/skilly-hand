@@ -5,3 +5,4 @@ catalog/catalog-index.json
 /source/
 /sandbox
 .claude
+.env*

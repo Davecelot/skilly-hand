@@ -16,6 +16,24 @@ All notable changes to this project are documented in this file.
 ### Removed
 - _None._
 
+## [0.12.0] - 2026-04-05
+[View on npm](https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.12.0)
+
+### Added
+- Added `SECURITY.md` policy for vulnerability reporting and response procedures.
+- Added `security-check` script to scan source code for exposed secrets and API keys.
+- Integrated security scanning into the `verify:publish` pipeline to catch credential leaks before release.
+
+### Changed
+- Updated `.gitignore` to include `.env*` pattern for environment variable files.
+- Updated `verify-packlist.mjs` to whitelist `SECURITY.md` in npm package.
+
+### Fixed
+- _None._
+
+### Removed
+- _None._
+
 ## [0.11.1] - 2026-04-05
 [View on npm](https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.11.1)
 
