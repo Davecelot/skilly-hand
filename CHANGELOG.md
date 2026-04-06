@@ -16,6 +16,21 @@ All notable changes to this project are documented in this file.
 ### Removed
 - _None._
 
+## [0.14.0] - 2026-04-06
+[View on npm](https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.14.0)
+
+### Added
+- _None._
+
+### Changed
+- _None._
+
+### Fixed
+- _None._
+
+### Removed
+- _None._
+
 ## [0.13.0] - 2026-04-05
 [View on npm](https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.13.0)
 
