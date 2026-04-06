@@ -1,27 +1,31 @@
 {
   "id": "frontend-design",
   "title": "Frontend Design",
-  "description": "Project-aware frontend design skill that detects the existing tech stack, UI libraries, CSS variables, and design tokens before proposing any UI work.",
+  "description": "Project-aware frontend design skill that detects the existing tech stack, UI libraries, CSS variables, and design tokens before proposing any UI work. Supports greenfield projects via DESIGN.md context setup, and includes post-generation motion and visual refinement phases.",
   "portable": true,
-  "tags": ["frontend", "design", "workflow", "ui"],
+  "tags": ["frontend", "design", "workflow", "ui", "motion", "greenfield"],
   "detectors": ["always"],
   "detectionTriggers": ["manual"],
   "installsFor": ["all"],
   "agentSupport": ["codex", "claude", "cursor", "gemini", "copilot", "antigravity", "windsurf", "trae"],
   "skillMetadata": {
     "author": "skilly-hand",
-    "last-edit": "2026-04-04",
+    "last-edit": "2026-04-05",
     "license": "Apache-2.0",
-    "version": "1.0.0",
-    "changelog": "Initial frontend-design skill; enforces stack-detection-first workflow before any UI component generation; affects catalog skill coverage for frontend and design workflows",
-    "auto-invoke": "Designing or generating UI components, pages, or layouts in a web or mobile project",
+    "version": "1.1.0",
+    "changelog": "v1.1.0: Added design-context-setter agent for greenfield/DESIGN.md workflow; added visual-refiner agent for post-generation quality evaluation; added motion-designer agent for stack-aware micro-interactions; added aesthetic-archetypes reference asset; expanded SKILL.md routing map with optional motion and refinement phases; upgraded component-designer with interaction states checklist and aesthetic principles",
+    "auto-invoke": "Designing or generating UI components, pages, or layouts in a web or mobile project; setting up visual direction for a greenfield project; adding motion or micro-interactions to existing UI; refining or polishing generated UI output",
     "allowed-tools": ["Read", "Grep", "Glob", "Bash", "Edit", "Write"]
   },
   "files": [
     { "path": "SKILL.md", "kind": "instruction" },
     { "path": "agents/stack-detector.md", "kind": "asset" },
+    { "path": "agents/design-context-setter.md", "kind": "asset" },
     { "path": "agents/component-designer.md", "kind": "asset" },
-    { "path": "assets/stack-scan-checklist.md", "kind": "asset" }
+    { "path": "agents/motion-designer.md", "kind": "asset" },
+    { "path": "agents/visual-refiner.md", "kind": "asset" },
+    { "path": "assets/stack-scan-checklist.md", "kind": "asset" },
+    { "path": "assets/aesthetic-archetypes.md", "kind": "asset" }
   ],
   "dependencies": []
 }

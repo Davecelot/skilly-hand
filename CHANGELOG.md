@@ -16,6 +16,31 @@ All notable changes to this project are documented in this file.
 ### Removed
 - _None._
 
+## [0.15.0] - 2026-04-05
+[View on npm](https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.15.0)
+
+### Added
+
+- **frontend-design skill v1.1.0:** New `design-context-setter` agent for capturing design intent on greenfield projects via a persistent `DESIGN.md` file
+- **frontend-design skill v1.1.0:** New `motion-designer` agent for stack-aware animations and micro-interactions with GPU safety and `prefers-reduced-motion` compliance
+- **frontend-design skill v1.1.0:** New `visual-refiner` agent for post-generation quality evaluation (AI slop detection, interaction state coverage, Nielsen's heuristics, directional refinement)
+- **frontend-design skill v1.1.0:** New `aesthetic-archetypes` reference asset with 8 design archetypes for greenfield project direction
+- Enhanced `component-designer` with aesthetic principles, DESIGN.md integration, and complete interaction-state checklist
+
+### Changed
+
+- Updated `AGENTS.md` with expanded frontend-design workflow triggers and routing
+- Updated frontend-design routing map to include optional motion and visual refinement phases
+- Expanded frontend-design auto-invoke triggers to include greenfield setup, motion, and visual refinement scenarios
+
+### Fixed
+
+- _None._
+
+### Removed
+
+- Removed "Clarification-First Planning Workflow" from `AGENTS.md` (superseded by refined workflows)
+
 ## [0.14.0] - 2026-04-06
 [View on npm](https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.14.0)
 
