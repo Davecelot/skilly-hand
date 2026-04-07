@@ -21,6 +21,8 @@
 | `angular-guidelines` | Guide Angular code generation and review using latest stable Angular verification and modern framework best practices. | angular, frontend, workflow, best-practices |
 | `figma-mcp-0to1` | Guide users from Figma MCP installation and authentication through first canvas creation, with function-level tool coverage and operational recovery patterns. | figma, mcp, workflow, design |
 | `frontend-design` | Project-aware frontend design skill that detects the existing tech stack, UI libraries, CSS variables, and design tokens before proposing any UI work. Supports greenfield projects via DESIGN.md context setup, and includes post-generation motion and visual refinement phases. | frontend, design, workflow, ui, motion, greenfield |
+| `output-optimizer` | Optimize output token consumption through compact interpreter modes with controlled expansion when complexity, ambiguity, or risk requires more detail. Trigger: minimizing response verbosity while preserving clarity and correctness. | core, workflow, efficiency, communication |
+| `project-security` | Scan project configuration and release surfaces for leak and security risks, and enforce security gates on commit, push, and publish workflows across GitHub, GitLab, npm, pnpm, yarn, and generic CI. Trigger: validating repository security posture, preventing secret leaks, or hardening delivery pipelines. | security, workflow, quality, core |
 | `project-teacher` | Scan the active project and teach any concept, code path, or decision using verified information, interactive questions, and simple explanations. Trigger: user asks to explain, understand, clarify, or learn about anything in the project or codebase. | core, workflow, education |
 | `react-guidelines` | Guide React code generation and review using latest stable React verification and modern framework best practices. | react, frontend, workflow, best-practices |
 | `review-rangers` | Review code, decisions, and artifacts through a multi-perspective committee and a domain expert safety guard, then synthesize a structured verdict. | core, workflow, review, quality |
@@ -51,6 +53,8 @@
 | Generating, reviewing, or refactoring Angular code artifacts in Angular projects | `angular-guidelines` |
 | Installing, configuring, or using Figma MCP from setup through first canvas creation | `figma-mcp-0to1` |
 | Designing or generating UI components, pages, or layouts in a web or mobile project; setting up visual direction for a greenfield project; adding motion or micro-interactions to existing UI; refining or polishing generated UI output | `frontend-design` |
+| When minimizing output verbosity or selecting compact communication modes | `output-optimizer` |
+| Scanning project configuration and delivery workflows for leaks or security issues before commit, push, or publish | `project-security` |
 | User needs to understand, explain, or learn about any aspect of the project or codebase | `project-teacher` |
 | Generating, reviewing, or refactoring React code artifacts in React projects | `react-guidelines` |
 | Reviewing code, decisions, or artifacts where adversarial multi-perspective evaluation adds value | `review-rangers` |

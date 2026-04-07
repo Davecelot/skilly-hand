@@ -1,0 +1,21 @@
+security_gate:
+  stage: test
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_TAG'
+  before_script:
+    - corepack enable
+    - |
+      if [ -f pnpm-lock.yaml ]; then
+        pnpm install --frozen-lockfile
+      elif [ -f yarn.lock ]; then
+        yarn install --immutable
+      elif [ -f package-lock.json ]; then
+        npm ci
+      elif [ -f package.json ]; then
+        echo "[project-security] missing lockfile; refusing non-deterministic install" >&2
+        exit 1
+      fi
+  script:
+    - sh catalog/skills/project-security/assets/generic-ci-security-gate.sh
