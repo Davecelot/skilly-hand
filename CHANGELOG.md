@@ -11,7 +11,7 @@ All notable changes to this project are documented in this file.
 - _None._
 
 ### Fixed
-- _None._
+- Added missing `output-optimizer` and `project-security` to the README catalog list.
 
 ### Removed
 - _None._
@@ -20,7 +20,8 @@ All notable changes to this project are documented in this file.
 [View on npm](https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.15.1)
 
 ### Added
-- _None._
+- Added portable skill `output-optimizer` for compact interpreter modes that minimize response verbosity while preserving clarity and correctness.
+- Added portable skill `project-security` for scanning and enforcing security gates on commit, push, and publish workflows across GitHub, GitLab, npm, pnpm, yarn, and generic CI.
 
 ### Changed
 - _None._
@@ -56,7 +57,7 @@ All notable changes to this project are documented in this file.
 
 - Removed "Clarification-First Planning Workflow" from `AGENTS.md` (superseded by refined workflows)
 
-## [0.14.0] - 2026-04-06
+## [0.14.0] - 2026-04-05
 [View on npm](https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.14.0)
 
 ### Added
@@ -88,6 +89,8 @@ All notable changes to this project are documented in this file.
 
 ### Removed
 - _None._
+
+## [0.12.0] - 2026-04-05
 [View on npm](https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.12.0)
 
 ### Added
