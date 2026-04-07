@@ -25,11 +25,13 @@ test("dry run returns install plan without writing files", async () => {
   const ids = result.plan.skills.map((skill) => skill.id);
 
   assert.equal(result.applied, false);
-  assert.equal(result.plan.skills.length, 10);
+  assert.equal(result.plan.skills.length, 12);
   assert.deepEqual(ids, [
     "accessibility-audit",
     "agents-root-orchestrator",
     "frontend-design",
+    "output-optimizer",
+    "project-security",
     "project-teacher",
     "react-guidelines",
     "review-rangers",
@@ -46,8 +48,8 @@ test("dry run includes core skills even for no-stack projects", async () => {
   const ids = result.plan.skills.map((skill) => skill.id);
 
   assert.equal(result.applied, false);
-  assert.equal(result.plan.skills.length, 7);
-  assert.deepEqual(ids, ["agents-root-orchestrator", "project-teacher", "review-rangers", "skill-creator", "spec-driven-development", "test-driven-development", "token-optimizer"]);
+  assert.equal(result.plan.skills.length, 9);
+  assert.deepEqual(ids, ["agents-root-orchestrator", "output-optimizer", "project-security", "project-teacher", "review-rangers", "skill-creator", "spec-driven-development", "test-driven-development", "token-optimizer"]);
 });
 
 test("dry run includes angular-guidelines for angular projects", async () => {
@@ -61,6 +63,8 @@ test("dry run includes angular-guidelines for angular projects", async () => {
     "agents-root-orchestrator",
     "angular-guidelines",
     "frontend-design",
+    "output-optimizer",
+    "project-security",
     "project-teacher",
     "review-rangers",
     "skill-creator",
