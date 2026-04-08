@@ -5,6 +5,21 @@ All notable changes to this project are documented in this file.
 ## [Unreleased]
 
 ### Added
+- _None._
+
+### Changed
+- _None._
+
+### Fixed
+- _None._
+
+### Removed
+- _None._
+
+## [0.16.1] - 2026-04-08
+[View on npm](https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.16.1)
+
+### Added
 - Added a Mandatory Skill Gate section to generated agent instruction files to enforce optimizer sequencing across interactions.
 
 ### Changed
