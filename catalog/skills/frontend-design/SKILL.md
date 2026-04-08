@@ -1,3 +1,20 @@
+---
+description: "Project-aware frontend design skill that detects the existing tech stack, UI libraries, CSS variables, and design tokens before proposing any UI work. Supports greenfield projects via DESIGN.md context setup, and includes post-generation motion and visual refinement phases."
+skillMetadata:
+  author: "skilly-hand"
+  last-edit: "2026-04-05"
+  license: "Apache-2.0"
+  version: "1.1.0"
+  changelog: "v1.1.0: Added design-context-setter agent for greenfield/DESIGN.md workflow; added visual-refiner agent for post-generation quality evaluation; added motion-designer agent for stack-aware micro-interactions; added aesthetic-archetypes reference asset; expanded SKILL.md routing map with optional motion and refinement phases; upgraded component-designer with interaction states checklist and aesthetic principles"
+  auto-invoke: "Designing or generating UI components, pages, or layouts in a web or mobile project; setting up visual direction for a greenfield project; adding motion or micro-interactions to existing UI; refining or polishing generated UI output"
+  allowed-tools:
+    - "Read"
+    - "Grep"
+    - "Glob"
+    - "Bash"
+    - "Edit"
+    - "Write"
+---
 # Frontend Design Guide
 
 ## When to Use

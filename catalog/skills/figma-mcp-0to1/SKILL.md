@@ -1,3 +1,24 @@
+---
+description: "Guide users from Figma MCP installation and authentication through first canvas creation, with function-level tool coverage and operational recovery patterns."
+skillMetadata:
+  author: "skilly-hand"
+  last-edit: "2026-04-03"
+  license: "Apache-2.0"
+  version: "1.0.1"
+  changelog: "Added allowed-modes metadata to declare figma-mcp-0to1 sub-agent routing targets; improves discoverability of install-auth, tool-function-catalog, canvas-creation-playbook, and troubleshooting-ops delegation modes; affects figma-mcp-0to1 manifest metadata"
+  auto-invoke: "Installing, configuring, or using Figma MCP from setup through first canvas creation"
+  allowed-tools:
+    - "Read"
+    - "Edit"
+    - "Write"
+    - "Glob"
+    - "Grep"
+    - "Bash"
+    - "WebFetch"
+    - "WebSearch"
+    - "Task"
+    - "SubAgent"
+---
 # Figma MCP 0-to-1 Guide
 
 ## When to Use

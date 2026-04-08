@@ -29,7 +29,7 @@ test("sync-self-agentic generates managed files and is idempotent", async () => 
   assert.match(agents, /Mandatory Skill Gate \(Must Use \/ Must Read\)/);
   assert.match(agents, /Always run `token-optimizer` first/);
   assert.match(agents, /Always run `output-optimizer` immediately after `token-optimizer`/);
-  assert.match(agents, /Default: select a random canonical mode for each new interaction/);
+  assert.match(agents, /Default: use `step-brief` when there is no explicit mode or strong phrasing signal/);
   assert.match(agents, /Persistence: keep the explicitly requested mode active until the user asks for a different mode/);
   assert.match(agents, /### SDD-First Delivery Workflow/);
 

@@ -1,3 +1,22 @@
+---
+description: "Author root AGENTS.md as a Where/What/When orchestrator that routes tasks and skill invocation clearly."
+skillMetadata:
+  author: "skilly-hand"
+  last-edit: "2026-04-03"
+  license: "Apache-2.0"
+  version: "1.0.0"
+  changelog: "Added root AGENTS orchestration guidance around Where/What/When structure; improves AI task routing clarity and trigger recognition; affects root AGENTS authoring workflow"
+  auto-invoke: "Creating or updating root AGENTS.md orchestration guidance"
+  allowed-tools:
+    - "Read"
+    - "Edit"
+    - "Write"
+    - "Glob"
+    - "Grep"
+    - "Bash"
+    - "Task"
+    - "SubAgent"
+---
 # AGENTS Root Orchestrator Guide
 
 ## When to Use

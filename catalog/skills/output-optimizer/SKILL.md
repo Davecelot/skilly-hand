@@ -1,3 +1,21 @@
+---
+description: "Optimize output token consumption through compact interpreter modes with controlled expansion when complexity, ambiguity, or risk requires more detail. Trigger: minimizing response verbosity while preserving clarity and correctness."
+skillMetadata:
+  author: "skilly-hand"
+  last-edit: "2026-04-07"
+  license: "Apache-2.0"
+  version: "1.0.0"
+  changelog: "Added a new portable output compression skill with deterministic interpreter modes and guarded detail expansion; reduces response token costs while preserving safety and clarity; affects response shaping workflows and catalog routing"
+  auto-invoke: "When minimizing output verbosity or selecting compact communication modes"
+  allowed-tools:
+    - "Read"
+    - "Edit"
+    - "Write"
+    - "Glob"
+    - "Grep"
+    - "Bash"
+    - "Task"
+---
 # Output Optimizer Guide
 
 ## When to Use

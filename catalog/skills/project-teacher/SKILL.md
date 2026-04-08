@@ -1,3 +1,20 @@
+---
+description: "Scan the active project and teach any concept, code path, or decision using verified information, interactive questions, and simple explanations. Trigger: user asks to explain, understand, clarify, or learn about anything in the project or codebase."
+skillMetadata:
+  author: "skilly-hand"
+  last-edit: "2026-04-04"
+  license: "Apache-2.0"
+  version: "1.0.0"
+  changelog: "Initial release of project-teacher skill; provides interactive, project-grounded teaching for any concept or code path; affects education and clarification workflows across all projects"
+  auto-invoke: "User needs to understand, explain, or learn about any aspect of the project or codebase"
+  allowed-tools:
+    - "Read"
+    - "Glob"
+    - "Grep"
+    - "Bash"
+    - "WebFetch"
+    - "WebSearch"
+---
 # Project Teacher Guide
 
 ## When to Use

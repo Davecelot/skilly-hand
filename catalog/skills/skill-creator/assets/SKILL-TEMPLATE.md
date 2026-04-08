@@ -1,5 +1,10 @@
 # {Name of the Skill} Guide
 
+<!--
+Managed frontmatter is mirrored from manifest.json by automation.
+Do not hand-author frontmatter in this template.
+-->
+
 ## When to Use
 
 Use this skill when:
@@ -74,3 +79,4 @@ Otherwise     -> {Default action}
 
 - Template assets: Place reusable templates, schemas, and examples in `assets/`.
 - Define metadata in `manifest.json` (`id`, `description`, `skillMetadata`, `allowed-tools`, optional `allowed-modes`).
+- Run skill frontmatter sync so top-level `SKILL.md` mirrors manifest metadata.

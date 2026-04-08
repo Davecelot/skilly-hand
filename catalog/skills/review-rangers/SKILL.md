@@ -1,3 +1,20 @@
+---
+description: "Review code, decisions, and artifacts through a multi-perspective committee and a domain expert safety guard, then synthesize a structured verdict."
+skillMetadata:
+  author: "skilly-hand"
+  last-edit: "2026-04-04"
+  license: "Apache-2.0"
+  version: "1.0.0"
+  changelog: "Added multi-perspective review skill with committee + safety guard synthesis; enables adversarial evaluation without permanent agent files; affects catalog skill coverage for review and quality workflows"
+  auto-invoke: "Reviewing code, decisions, or artifacts where adversarial multi-perspective evaluation adds value"
+  allowed-tools:
+    - "Read"
+    - "Grep"
+    - "Glob"
+    - "Bash"
+    - "Task"
+    - "SubAgent"
+---
 # Review Rangers Guide
 
 ## When to Use

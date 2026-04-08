@@ -1,3 +1,22 @@
+---
+description: "Scan project configuration and release surfaces for leak and security risks, and enforce security gates on commit, push, and publish workflows across GitHub, GitLab, npm, pnpm, yarn, and generic CI. Trigger: validating repository security posture, preventing secret leaks, or hardening delivery pipelines."
+skillMetadata:
+  author: "skilly-hand"
+  last-edit: "2026-04-07"
+  license: "Apache-2.0"
+  version: "1.0.0"
+  changelog: "Added portable project-security skill with commit/push/publish gating assets and CI templates; reduces secret leak and misconfiguration risk before delivery; affects catalog security workflow coverage and auto-invoke routing"
+  auto-invoke: "Scanning project configuration and delivery workflows for leaks or security issues before commit, push, or publish"
+  allowed-tools:
+    - "Read"
+    - "Edit"
+    - "Write"
+    - "Glob"
+    - "Grep"
+    - "Bash"
+    - "Task"
+    - "SubAgent"
+---
 # Project Security Guide
 
 ## When to Use

@@ -1,3 +1,24 @@
+---
+description: "Audit web accessibility against W3C WCAG 2.2 Level AA using framework-agnostic checks, remediation patterns, and portable command-line scanning."
+skillMetadata:
+  author: "skilly-hand"
+  last-edit: "2026-04-04"
+  license: "Apache-2.0"
+  version: "1.0.0"
+  changelog: "Added portable WCAG 2.2 Level AA accessibility auditing skill with W3C-only references and scanner script; enables consistent web accessibility review across frameworks; affects catalog skill coverage and install plans for stacks recommending accessibility-audit"
+  auto-invoke: "Auditing, reviewing, or implementing web accessibility against WCAG 2.2 Level AA"
+  allowed-tools:
+    - "Read"
+    - "Edit"
+    - "Write"
+    - "Glob"
+    - "Grep"
+    - "Bash"
+    - "WebFetch"
+    - "WebSearch"
+    - "Task"
+    - "SubAgent"
+---
 # Accessibility Audit Guide
 
 ## When to Use

@@ -1,3 +1,24 @@
+---
+description: "Guide Angular code generation and review using latest stable Angular verification and modern framework best practices."
+skillMetadata:
+  author: "skilly-hand"
+  last-edit: "2026-04-03"
+  license: "Apache-2.0"
+  version: "1.1.1"
+  changelog: "Added allowed-modes metadata to declare angular-guidelines sub-agent routing targets; improves discoverability of component-creator and angular-tester delegation modes; affects angular-guidelines manifest metadata"
+  auto-invoke: "Generating, reviewing, or refactoring Angular code artifacts in Angular projects"
+  allowed-tools:
+    - "Read"
+    - "Edit"
+    - "Write"
+    - "Glob"
+    - "Grep"
+    - "Bash"
+    - "WebFetch"
+    - "WebSearch"
+    - "Task"
+    - "SubAgent"
+---
 # Angular Guidelines
 
 ## When to Use

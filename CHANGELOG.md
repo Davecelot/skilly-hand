@@ -16,6 +16,26 @@ All notable changes to this project are documented in this file.
 ### Removed
 - _None._
 
+## [0.18.0] - 2026-04-08
+[View on npm](https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.18.0)
+
+### Added
+- Added `sync-catalog` orchestration script to compute catalog README + skill frontmatter updates up front and apply writes atomically with rollback on failure.
+- Added `sync-skill-frontmatter` CLI script with `--check`, `--json`, and `--skill` filtering support.
+- Added regression coverage for catalog sync rollback/idempotency and frontmatter normalization edge cases (`tests/sync-catalog.test.js`, `tests/skill-frontmatter.test.js`).
+
+### Changed
+- Updated root `catalog:sync` script to run `scripts/sync-catalog.mjs` for unified catalog synchronization.
+- Expanded script JSON contract coverage for `sync-catalog` and `sync-skill-frontmatter` in `tests/scripts-output.test.js`.
+- Updated catalog validation flow to verify catalog README drift through dry-run sync checks.
+
+### Fixed
+- Hardened skill frontmatter parsing and verification to avoid false frontmatter detection and preserve markdown content for malformed leading YAML-like blocks.
+- Improved catalog README sync behavior to treat CRLF/LF-equivalent content as in sync.
+
+### Removed
+- _None._
+
 ## [0.17.0] - 2026-04-08
 [View on npm](https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.17.0)
 

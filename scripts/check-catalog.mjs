@@ -2,17 +2,42 @@ import { loadAllSkills, verifyCatalogFiles } from "../packages/catalog/src/index
 import { createTerminalRenderer } from "../packages/core/src/terminal.js";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { syncCatalogReadme } from "./sync-catalog-readme.mjs";
 
 const renderer = createTerminalRenderer();
 
 export async function checkCatalog() {
-  const manifests = await loadAllSkills();
-  const issues = await verifyCatalogFiles();
+  const issues = [];
+  let manifests = [];
+  let readmeStatus = { changed: false };
+
+  try {
+    manifests = await loadAllSkills();
+  } catch (error) {
+    issues.push(`Unable to load catalog manifests: ${error.message}`);
+  }
+
+  try {
+    const catalogIssues = await verifyCatalogFiles();
+    issues.push(...catalogIssues);
+  } catch (error) {
+    issues.push(`Catalog file verification failed: ${error.message}`);
+  }
+
+  try {
+    readmeStatus = await syncCatalogReadme({ dryRun: true });
+  } catch (error) {
+    issues.push(`Catalog README verification failed: ${error.message}`);
+  }
 
   for (const manifest of manifests) {
     if (manifest.id.startsWith("scannlab-")) {
       issues.push(`Portable catalog still contains legacy-prefixed id: ${manifest.id}`);
     }
+  }
+
+  if (readmeStatus.changed) {
+    issues.push("Catalog README is out of sync (run `npm run catalog:sync`).");
   }
 
   return {

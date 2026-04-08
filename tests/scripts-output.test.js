@@ -35,6 +35,38 @@ test("build-catalog-index exposes --json contract", () => {
   assert.equal(Array.isArray(payload.entries), true);
 });
 
+test("sync-catalog exposes --json contract", () => {
+  const result = runScript("scripts/sync-catalog.mjs", ["--json", "--check"]);
+  assert.equal(result.status, 0);
+  const payload = JSON.parse(result.stdout);
+  assert.equal(payload.command, "sync-catalog");
+  assert.equal(payload.checkOnly, true);
+  assert.equal(typeof payload.readmeChanged, "boolean");
+  assert.equal(typeof payload.skillCount, "number");
+  assert.equal(Array.isArray(payload.updatedSkillIds), true);
+  assert.equal(Array.isArray(payload.changedFiles), true);
+});
+
+test("sync-skill-frontmatter exposes --json contract", () => {
+  const result = runScript("scripts/sync-skill-frontmatter.mjs", ["--json", "--check"]);
+  assert.equal(result.status, 0);
+  const payload = JSON.parse(result.stdout);
+  assert.equal(payload.command, "sync-skill-frontmatter");
+  assert.equal(payload.checkOnly, true);
+  assert.equal(typeof payload.skillCount, "number");
+  assert.equal(Array.isArray(payload.updatedSkillIds), true);
+});
+
+test("sync-skill-frontmatter supports --skill filter", () => {
+  const result = runScript("scripts/sync-skill-frontmatter.mjs", ["--json", "--check", "--skill", "token-optimizer"]);
+  assert.equal(result.status, 0);
+  const payload = JSON.parse(result.stdout);
+  assert.equal(payload.command, "sync-skill-frontmatter");
+  assert.equal(payload.checkOnly, true);
+  assert.equal(payload.skillCount, 1);
+  assert.equal(Array.isArray(payload.updatedSkillIds), true);
+});
+
 test("verify-packlist exposes --json contract", async () => {
   const npmCache = await mkdtemp(path.join(os.tmpdir(), "skilly-hand-npm-cache-"));
   const result = runScript("scripts/verify-packlist.mjs", ["--json"], {

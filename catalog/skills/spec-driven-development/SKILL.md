@@ -1,3 +1,22 @@
+---
+description: "Plan, execute, and verify multi-step work through versioned specs with small, testable tasks."
+skillMetadata:
+  author: "skilly-hand"
+  last-edit: "2026-04-03"
+  license: "Apache-2.0"
+  version: "1.0.3"
+  changelog: "Added OpenSpec complementary support routing guidance to spec-driven-development instructions; improves planning continuity and review clarity when local SDD needs reinforcement; affects spec-driven-development SKILL guidance and manifest metadata"
+  auto-invoke: "Planning or executing feature work, bug fixes, and multi-phase implementation"
+  allowed-tools:
+    - "Read"
+    - "Edit"
+    - "Write"
+    - "Glob"
+    - "Grep"
+    - "Bash"
+    - "Task"
+    - "SubAgent"
+---
 # Spec-Driven Development Guide
 
 ## When to Use

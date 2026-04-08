@@ -1,4 +1,4 @@
-import { cp, mkdir, readFile, readdir, stat, writeFile } from "node:fs/promises";
+import { cp, mkdir, readFile, readdir, rm, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -19,6 +19,16 @@ const REQUIRED_FIELDS = [
   "agentSupport",
   "files",
   "dependencies"
+];
+
+const MIRRORED_SKILL_METADATA_KEYS = [
+  "author",
+  "last-edit",
+  "license",
+  "version",
+  "changelog",
+  "auto-invoke",
+  "allowed-tools"
 ];
 
 export function getCatalogRoot() {
@@ -70,7 +80,370 @@ export function validateSkillManifest(manifest) {
     throw new Error(`Skill "${manifest.id}" must declare files`);
   }
 
+  const hasSkillInstruction = manifest.files.some((file) => file.path === "SKILL.md" && file.kind === "instruction");
+  if (!hasSkillInstruction) {
+    throw new Error(`Skill "${manifest.id}" must include files entry for SKILL.md as instruction`);
+  }
+
+  assertFrontmatterFields(manifest);
+
   return true;
+}
+
+function toLf(text) {
+  return text.replaceAll("\r\n", "\n");
+}
+
+function splitLinesWithOffsets(text) {
+  const lines = [];
+  let start = 0;
+  for (let index = 0; index < text.length; index += 1) {
+    if (text[index] === "\n") {
+      lines.push({
+        text: text.slice(start, index),
+        start,
+        end: index + 1
+      });
+      start = index + 1;
+    }
+  }
+  if (start < text.length) {
+    lines.push({
+      text: text.slice(start),
+      start,
+      end: text.length
+    });
+  } else if (text.length === 0) {
+    lines.push({ text: "", start: 0, end: 0 });
+  }
+  return lines;
+}
+
+function yamlQuote(value) {
+  return JSON.stringify(String(value));
+}
+
+function assertFrontmatterFields(manifest) {
+  if (!manifest || typeof manifest !== "object") {
+    throw new Error("Invalid manifest while building SKILL.md frontmatter");
+  }
+
+  if (typeof manifest.description !== "string" || manifest.description.length === 0) {
+    throw new Error(`Skill "${manifest.id}" is missing required manifest.description for frontmatter mirroring`);
+  }
+
+  if (!manifest.skillMetadata || typeof manifest.skillMetadata !== "object") {
+    throw new Error(`Skill "${manifest.id}" is missing required manifest.skillMetadata for frontmatter mirroring`);
+  }
+
+  for (const key of MIRRORED_SKILL_METADATA_KEYS) {
+    if (!(key in manifest.skillMetadata)) {
+      throw new Error(`Skill "${manifest.id}" is missing required skillMetadata.${key} for frontmatter mirroring`);
+    }
+  }
+
+  const scalarKeys = ["author", "last-edit", "license", "version", "changelog", "auto-invoke"];
+  for (const key of scalarKeys) {
+    if (typeof manifest.skillMetadata[key] !== "string" || manifest.skillMetadata[key].trim().length === 0) {
+      throw new Error(`Skill "${manifest.id}" has invalid skillMetadata.${key}; expected a non-empty string`);
+    }
+  }
+
+  if (!Array.isArray(manifest.skillMetadata["allowed-tools"])) {
+    throw new Error(`Skill "${manifest.id}" must declare skillMetadata.allowed-tools as an array`);
+  }
+
+  for (const tool of manifest.skillMetadata["allowed-tools"]) {
+    if (typeof tool !== "string" || tool.trim().length === 0) {
+      throw new Error(`Skill "${manifest.id}" has invalid skillMetadata.allowed-tools; expected non-empty strings`);
+    }
+  }
+}
+
+export function buildSkillFrontmatterPayload(manifest) {
+  assertFrontmatterFields(manifest);
+  return {
+    description: manifest.description,
+    skillMetadata: {
+      author: manifest.skillMetadata.author,
+      "last-edit": manifest.skillMetadata["last-edit"],
+      license: manifest.skillMetadata.license,
+      version: manifest.skillMetadata.version,
+      changelog: manifest.skillMetadata.changelog,
+      "auto-invoke": manifest.skillMetadata["auto-invoke"],
+      "allowed-tools": [...manifest.skillMetadata["allowed-tools"]]
+    }
+  };
+}
+
+function renderSkillFrontmatterInner(payload) {
+  const lines = [
+    `description: ${yamlQuote(payload.description)}`,
+    "skillMetadata:",
+    `  author: ${yamlQuote(payload.skillMetadata.author)}`,
+    `  last-edit: ${yamlQuote(payload.skillMetadata["last-edit"])}`,
+    `  license: ${yamlQuote(payload.skillMetadata.license)}`,
+    `  version: ${yamlQuote(payload.skillMetadata.version)}`,
+    `  changelog: ${yamlQuote(payload.skillMetadata.changelog)}`,
+    `  auto-invoke: ${yamlQuote(payload.skillMetadata["auto-invoke"])}`,
+    "  allowed-tools:"
+  ];
+
+  for (const tool of payload.skillMetadata["allowed-tools"]) {
+    lines.push(`    - ${yamlQuote(tool)}`);
+  }
+
+  return lines.join("\n");
+}
+
+export function renderSkillFrontmatter(manifest) {
+  const payload = buildSkillFrontmatterPayload(manifest);
+  return `---\n${renderSkillFrontmatterInner(payload)}\n---\n`;
+}
+
+export function splitSkillMarkdown(content) {
+  const normalized = toLf(content);
+  const source = normalized.startsWith("\uFEFF") ? normalized.slice(1) : normalized;
+  const lines = splitLinesWithOffsets(source);
+  const mirroredKeys = new Set([
+    "description",
+    "skillMetadata",
+    "author",
+    "last-edit",
+    "license",
+    "version",
+    "changelog",
+    "auto-invoke",
+    "allowed-tools"
+  ]);
+  const isYamlLike = (line) => (
+    line.trim().length === 0 ||
+    /^\s*[A-Za-z0-9_-]+:(?:\s.*)?$/.test(line) ||
+    /^\s*-\s+.*$/.test(line)
+  );
+
+  let firstNonBlankIndex = 0;
+  while (firstNonBlankIndex < lines.length && lines[firstNonBlankIndex].text.trim().length === 0) {
+    firstNonBlankIndex += 1;
+  }
+
+  if (firstNonBlankIndex >= lines.length || lines[firstNonBlankIndex].text !== "---") {
+    return {
+      hasFrontmatter: false,
+      malformedFrontmatter: false,
+      frontmatter: null,
+      body: source
+    };
+  }
+
+  const openLine = lines[firstNonBlankIndex];
+  let sawKeyValue = false;
+  let sawMirroredKey = false;
+  const detectedKeys = new Set();
+
+  for (let index = firstNonBlankIndex + 1; index < lines.length; index += 1) {
+    const line = lines[index].text;
+    const nextLine = index + 1 < lines.length ? lines[index + 1].text : null;
+
+    if (
+      sawMirroredKey &&
+      line.trim().length === 0 &&
+      nextLine &&
+      /^(?:[-*+]\s+|\d+\.\s+|#{1,6}\s+|>\s+|```)/.test(nextLine)
+    ) {
+      return {
+        hasFrontmatter: true,
+        malformedFrontmatter: true,
+        frontmatter: null,
+        body: source.slice(lines[index + 1].start)
+      };
+    }
+
+    if (line === "---") {
+      if (!sawKeyValue || !sawMirroredKey) {
+        return {
+          hasFrontmatter: false,
+          malformedFrontmatter: false,
+          frontmatter: null,
+          body: source
+        };
+      }
+      const end = lines[index].end;
+      const frontmatter = source.slice(openLine.start, end);
+      return {
+        hasFrontmatter: true,
+        malformedFrontmatter: false,
+        frontmatter: frontmatter.endsWith("\n") ? frontmatter : `${frontmatter}\n`,
+        body: source.slice(end),
+        detectedKeys: Array.from(detectedKeys)
+      };
+    }
+
+    if (/^\s*[A-Za-z0-9_-]+:(?:\s.*)?$/.test(line)) {
+      sawKeyValue = true;
+      const key = line.split(":", 1)[0].trim();
+      detectedKeys.add(key);
+      if (mirroredKeys.has(key)) {
+        sawMirroredKey = true;
+      }
+    }
+
+    if (!isYamlLike(line)) {
+      if (!sawKeyValue || !sawMirroredKey) {
+        return {
+          hasFrontmatter: false,
+          malformedFrontmatter: false,
+          frontmatter: null,
+          body: source
+        };
+      }
+      return {
+        hasFrontmatter: true,
+        malformedFrontmatter: true,
+        frontmatter: null,
+        body: source.slice(lines[index].start),
+        detectedKeys: Array.from(detectedKeys)
+      };
+    }
+  }
+
+  if (!sawKeyValue) {
+    return {
+      hasFrontmatter: false,
+      malformedFrontmatter: false,
+      frontmatter: null,
+      body: source
+    };
+  }
+
+  if (!sawMirroredKey) {
+    return {
+      hasFrontmatter: false,
+      malformedFrontmatter: false,
+      frontmatter: null,
+      body: source
+    };
+  }
+
+  return {
+    hasFrontmatter: true,
+    malformedFrontmatter: true,
+    frontmatter: null,
+    body: "",
+    detectedKeys: Array.from(detectedKeys)
+  };
+}
+
+export function applyManifestFrontmatterToSkill(content, manifest) {
+  const expectedFrontmatter = renderSkillFrontmatter(manifest);
+  const parts = splitSkillMarkdown(content);
+  return `${expectedFrontmatter}${parts.body}`;
+}
+
+export function verifySkillFrontmatterContent(content, manifest) {
+  const expectedFrontmatter = renderSkillFrontmatter(manifest);
+  const parts = splitSkillMarkdown(content);
+  if (!parts.hasFrontmatter) {
+    return { ok: false, reason: "missing" };
+  }
+  if (parts.malformedFrontmatter || !parts.frontmatter) {
+    return { ok: false, reason: "malformed" };
+  }
+  if (parts.frontmatter !== expectedFrontmatter) {
+    return { ok: false, reason: "mismatch" };
+  }
+  const residual = splitSkillMarkdown(parts.body);
+  if (residual.hasFrontmatter && !residual.malformedFrontmatter && residual.frontmatter === expectedFrontmatter) {
+    return { ok: false, reason: "residual-frontmatter" };
+  }
+  return { ok: true, reason: null };
+}
+
+export async function syncSkillFrontmatter({ skillId, dryRun = false } = {}) {
+  const plan = await planSkillFrontmatterSync({ skillId });
+  if (!dryRun) {
+    await applyTextUpdatesAtomically(plan.updates);
+  }
+  return {
+    skillCount: plan.skillCount,
+    updatedSkillIds: plan.updatedSkillIds
+  };
+}
+
+export async function planSkillFrontmatterSync({ skillId } = {}) {
+  const allIds = await listSkillIds();
+  if (skillId && !allIds.includes(skillId)) {
+    throw new Error(`Unknown skill id: ${skillId}`);
+  }
+
+  const ids = skillId ? [skillId] : allIds;
+  const updatedSkillIds = [];
+  const updates = [];
+
+  for (const id of ids) {
+    const manifest = await loadSkillManifest(id);
+    const skillPath = path.join(skillsDir, id, "SKILL.md");
+    const current = await readFile(skillPath, "utf8");
+    const next = applyManifestFrontmatterToSkill(current, manifest);
+    if (next !== toLf(current)) {
+      updatedSkillIds.push(id);
+      updates.push({
+        skillId: id,
+        path: skillPath,
+        content: next
+      });
+    }
+  }
+
+  return {
+    skillCount: ids.length,
+    updatedSkillIds,
+    updates
+  };
+}
+
+export async function applyTextUpdatesAtomically(updates) {
+  const deduped = [];
+  const seenPaths = new Set();
+  for (let index = updates.length - 1; index >= 0; index -= 1) {
+    const update = updates[index];
+    if (!seenPaths.has(update.path)) {
+      seenPaths.add(update.path);
+      deduped.push(update);
+    }
+  }
+  deduped.reverse();
+
+  const originals = new Map();
+  for (const update of deduped) {
+    try {
+      originals.set(update.path, await readFile(update.path, "utf8"));
+    } catch (error) {
+      if (error?.code === "ENOENT") {
+        originals.set(update.path, null);
+      } else {
+        throw error;
+      }
+    }
+  }
+
+  const writtenPaths = [];
+  try {
+    for (const update of deduped) {
+      await writeFile(update.path, update.content, "utf8");
+      writtenPaths.push(update.path);
+    }
+  } catch (error) {
+    for (const targetPath of writtenPaths.reverse()) {
+      const original = originals.get(targetPath);
+      if (original === null) {
+        await rm(targetPath, { force: true });
+      } else {
+        await writeFile(targetPath, original, "utf8");
+      }
+    }
+    throw error;
+  }
 }
 
 export async function copySkillTo(targetCatalogDir, skillId) {
@@ -88,6 +461,7 @@ export async function readTemplate(templateName) {
 }
 
 export function renderAgentsMarkdown({ skills, detections, generatedAt, projectName }) {
+  const escapeTableCell = (value) => String(value).replaceAll("|", "\\|").replaceAll("\n", "<br>");
   const sortedSkills = [...skills].sort((a, b) => a.id.localeCompare(b.id));
   const sortedDetections = [...detections].sort((a, b) => a.technology.localeCompare(b.technology));
   const autoInvokeSkills = sortedSkills.filter((skill) => skill.skillMetadata?.["auto-invoke"]);
@@ -114,7 +488,7 @@ export function renderAgentsMarkdown({ skills, detections, generatedAt, projectN
   ];
 
   for (const skill of sortedSkills) {
-    lines.push(`| \`${skill.id}\` | ${skill.description} | ${skill.tags.join(", ")} |`);
+    lines.push(`| \`${skill.id}\` | ${escapeTableCell(skill.description)} | ${escapeTableCell(skill.tags.join(", "))} |`);
   }
 
   lines.push(
@@ -126,7 +500,7 @@ export function renderAgentsMarkdown({ skills, detections, generatedAt, projectN
     "1. Always run `token-optimizer` first to classify complexity and set the minimum viable reasoning depth.",
     "2. Always run `output-optimizer` immediately after `token-optimizer` for response-shape control.",
     "3. `output-optimizer` mode policy:",
-    "   - Default: select a random canonical mode for each new interaction.",
+    "   - Default: use `step-brief` when there is no explicit mode or strong phrasing signal.",
     "   - Override: if user explicitly requests a mode (for example `mode: step-brief`), that explicit mode wins.",
     "   - Persistence: keep the explicitly requested mode active until the user asks for a different mode.",
     "",
@@ -154,7 +528,7 @@ export function renderAgentsMarkdown({ skills, detections, generatedAt, projectN
   } else {
     lines.push("| Action | Skill |", "| ------ | ----- |");
     for (const skill of autoInvokeSkills) {
-      lines.push(`| ${skill.skillMetadata["auto-invoke"]} | \`${skill.id}\` |`);
+      lines.push(`| ${escapeTableCell(skill.skillMetadata["auto-invoke"])} | \`${skill.id}\` |`);
     }
   }
 
@@ -229,6 +603,28 @@ export async function verifyCatalogFiles() {
       } catch {
         issues.push(`Missing file for ${skillId}: ${file.path}`);
       }
+    }
+
+    const skillDocPath = path.join(skillPath, "SKILL.md");
+    let skillDocContent;
+    try {
+      skillDocContent = await readFile(skillDocPath, "utf8");
+    } catch (error) {
+      if (error?.code === "ENOENT") {
+        // Missing file is already surfaced above via manifest file verification.
+        continue;
+      }
+      issues.push(`Cannot read ${skillId}/SKILL.md: ${error.message}`);
+      continue;
+    }
+
+    try {
+      const status = verifySkillFrontmatterContent(skillDocContent, manifest);
+      if (!status.ok) {
+        issues.push(`Frontmatter ${status.reason} for ${skillId}: SKILL.md`);
+      }
+    } catch (error) {
+      issues.push(`Frontmatter validation failed for ${skillId}: ${error.message}`);
     }
   }
 

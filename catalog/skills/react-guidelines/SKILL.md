@@ -1,3 +1,24 @@
+---
+description: "Guide React code generation and review using latest stable React verification and modern framework best practices."
+skillMetadata:
+  author: "skilly-hand"
+  last-edit: "2026-04-04"
+  license: "Apache-2.0"
+  version: "1.0.0"
+  changelog: "Added new react-guidelines skill with component and testing sub-agent routing; improves React-specific generation and review consistency with latest-stable preflight checks; affects portable catalog skill discovery and React workflow guidance"
+  auto-invoke: "Generating, reviewing, or refactoring React code artifacts in React projects"
+  allowed-tools:
+    - "Read"
+    - "Edit"
+    - "Write"
+    - "Glob"
+    - "Grep"
+    - "Bash"
+    - "WebFetch"
+    - "WebSearch"
+    - "Task"
+    - "SubAgent"
+---
 # React Guidelines
 
 ## When to Use

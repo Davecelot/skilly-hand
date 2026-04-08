@@ -1,3 +1,24 @@
+---
+description: "Create and standardize AI skills with reusable structure, metadata rules, and templates."
+skillMetadata:
+  author: "skilly-hand"
+  last-edit: "2026-03-27"
+  license: "Apache-2.0"
+  version: "1.2.3"
+  changelog: "Metadata updated to ensure compliance with current standards; maintains skill integrity and version tracking; affects metadata section"
+  auto-invoke: "Creating a new skill"
+  allowed-tools:
+    - "Read"
+    - "Edit"
+    - "Write"
+    - "Glob"
+    - "Grep"
+    - "Bash"
+    - "WebFetch"
+    - "WebSearch"
+    - "Task"
+    - "SubAgent"
+---
 # Skill Creator Guide
 
 ## When to Create a Skill
@@ -87,6 +108,17 @@ Generic skill needs {product-name} info?   -> Add references/ pointing to {produ
 | `skillMetadata.allowed-tools` | Yes | String list | All tools this skill can invoke (e.g., `Read`, `Edit`, `Write`, `SubAgent`) |
 | `skillMetadata.allowed-modes` | Optional | String list | Use only when skill has an `agents/` folder |
 
+### SKILL.md Frontmatter Mirroring
+
+Top-level `SKILL.md` files now include managed YAML frontmatter mirrored from `manifest.json`.
+
+Rules:
+
+- `manifest.json` is the single source of truth.
+- Mirror only `description` and `skillMetadata.{author,last-edit,license,version,changelog,auto-invoke,allowed-tools}`.
+- Do not manually edit mirrored frontmatter in `SKILL.md`; run sync automation instead.
+- Keep instruction body content in `SKILL.md` focused on workflow guidance.
+
 ---
 
 ## Metadata Standards
@@ -153,6 +185,7 @@ Do not:
 - Use web URLs in references.
 - Leave `changelog` empty or informal.
 - Use non-ISO date formats.
+- Manually drift `SKILL.md` frontmatter away from `manifest.json`.
 
 ---
 
@@ -167,6 +200,7 @@ Do not:
 - [ ] `changelog` uses structured format: `what; why; where`.
 - [ ] `allowed-modes` is present only when `agents/` exists.
 - [ ] `allowed-tools` matches actual tool usage.
+- [ ] `SKILL.md` frontmatter is synced from `manifest.json`.
 - [ ] Critical patterns are clear and concise.
 - [ ] Code examples are minimal and focused.
 - [ ] Commands section exists with copy-paste commands.

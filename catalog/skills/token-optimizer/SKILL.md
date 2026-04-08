@@ -1,3 +1,21 @@
+---
+description: "Classify task complexity and right-size reasoning depth, context gathering, and response detail to reduce wasted tokens."
+skillMetadata:
+  author: "skilly-hand"
+  last-edit: "2026-04-03"
+  license: "Apache-2.0"
+  version: "1.0.3"
+  changelog: "Migrated token-optimizer into portable catalog format with curated model-agnostic guidance; improves default reasoning and token-efficiency behavior across installs; affects skill discovery, auto-invoke routing, and install baseline"
+  auto-invoke: "Classifying task complexity and choosing reasoning depth/token budget"
+  allowed-tools:
+    - "Read"
+    - "Edit"
+    - "Write"
+    - "Glob"
+    - "Grep"
+    - "Bash"
+    - "Task"
+---
 # Token Optimizer Guide
 
 ## When to Use

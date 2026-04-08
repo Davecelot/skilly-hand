@@ -101,7 +101,7 @@ test("install creates managed files, symlinks, and restores originals on uninsta
   assert.match(managedAgents, /### Mandatory Skill Gate \(Must Use \/ Must Read\)/);
   assert.match(managedAgents, /Always run `token-optimizer` first/);
   assert.match(managedAgents, /Always run `output-optimizer` immediately after `token-optimizer`/);
-  assert.match(managedAgents, /Default: select a random canonical mode for each new interaction/);
+  assert.match(managedAgents, /Default: use `step-brief` when there is no explicit mode or strong phrasing signal/);
   assert.match(managedAgents, /Persistence: keep the explicitly requested mode active until the user asks for a different mode/);
   assert.match(managedAgents, /## Chaining Notations/);
   assert.match(managedAgents, /`agents-root-orchestrator`/);
