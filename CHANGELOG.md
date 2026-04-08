@@ -16,6 +16,24 @@ All notable changes to this project are documented in this file.
 ### Removed
 - _None._
 
+## [0.17.0] - 2026-04-08
+[View on npm](https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.17.0)
+
+### Added
+- Added sandbox harness and matrix integration tests (`scripts/test-in-sandbox.mjs`, `tests/sandbox-harness.test.js`, `tests/sandbox-matrix.test.js`) and wired them into the root test pipeline.
+- Added required `review-rangers` final-gate guidance to the spec-driven-development verify flow and validation checklist.
+
+### Changed
+- Updated installer reconciliation logic to remove stale managed targets when agent selection narrows, while preserving/restoring backups for retained targets.
+- Updated backup behavior to skip backup creation for files already marked as managed content.
+- Updated root `npm test` to run sandbox integration verification after the node test suite.
+
+### Fixed
+- Fixed uninstall and re-install behavior for narrowed agent selections by restoring original files and cleaning obsolete managed artifacts.
+
+### Removed
+- _None._
+
 ## [0.16.1] - 2026-04-08
 [View on npm](https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.16.1)
 

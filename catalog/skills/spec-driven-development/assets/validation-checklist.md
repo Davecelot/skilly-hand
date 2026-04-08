@@ -28,5 +28,6 @@ Use this checklist before implementation and again before archive.
 - [ ] All planned tasks are complete.
 - [ ] Feature-level validation passes.
 - [ ] Constraints were respected.
+- [ ] Final `review-rangers` gate completed with no unresolved blockers.
 - [ ] No unintended scope creep.
 - [ ] Work is moved from `.sdd/active/` to `.sdd/archive/`.

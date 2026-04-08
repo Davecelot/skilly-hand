@@ -15,7 +15,15 @@ Validate that implementation matches the approved spec and passes quality checks
 2. Run task-level verification evidence checks.
 3. Run feature-level validation commands.
 4. Confirm constraints (`MUST`, `MUST NOT`) were respected.
-5. Report pass/fail per area with concrete evidence.
+5. Run a final structured `review-rangers` pass over the full change set.
+6. Report pass/fail per area with concrete evidence.
+
+### Required Final Gate (`review-rangers`)
+
+- Validate selected agent targets vs actual instruction files/symlinks written.
+- Validate stale managed target cleanup after re-install/reselection.
+- Validate backup and restore safety (including uninstall restore behavior).
+- Any unresolved `review-rangers` blocker keeps verification in failed state.
 
 ## Quality Bar
 

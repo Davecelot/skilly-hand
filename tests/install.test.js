@@ -224,6 +224,67 @@ test("install deduplicates shared AGENTS target for multi-agent installs", async
   assert.equal(uninstallResult.removed, true);
 });
 
+test("reinstall with narrower agents removes stale managed targets", async () => {
+  const projectDir = await makeFixtureCopy("no-stack");
+
+  await installProject({ cwd: projectDir });
+  await installProject({
+    cwd: projectDir,
+    agents: ["codex", "claude", "copilot"]
+  });
+
+  await access(path.join(projectDir, "AGENTS.md"));
+  await access(path.join(projectDir, "CLAUDE.md"));
+  await access(path.join(projectDir, ".github", "copilot-instructions.md"));
+  await access(path.join(projectDir, ".codex", "skills"));
+  await access(path.join(projectDir, ".claude", "skills"));
+
+  await assert.rejects(access(path.join(projectDir, "GEMINI.md")));
+  await assert.rejects(access(path.join(projectDir, "cursor-instructions.md")));
+  await assert.rejects(access(path.join(projectDir, ".cursor", "skills")));
+  await assert.rejects(access(path.join(projectDir, ".gemini", "skills")));
+  await assert.rejects(access(path.join(projectDir, ".windsurf", "skills")));
+  await assert.rejects(access(path.join(projectDir, ".trae", "skills")));
+  await assert.rejects(access(path.join(projectDir, "skills")));
+  await assert.rejects(access(path.join(projectDir, ".agents", "skills")));
+  await assert.rejects(access(path.join(projectDir, ".agent", "skills")));
+
+  const lockPath = path.join(projectDir, ".skilly-hand", "manifest.lock.json");
+  const lockData = JSON.parse(await readFile(lockPath, "utf8"));
+  assert.deepEqual(lockData.agents, ["codex", "claude", "copilot"]);
+});
+
+test("uninstall after narrowing agent selection removes managed artifacts and restores originals", async () => {
+  const projectDir = await makeFixtureCopy("node-basic");
+  const originalAgents = await readFile(path.join(projectDir, "AGENTS.md"), "utf8");
+
+  await installProject({ cwd: projectDir });
+  await installProject({
+    cwd: projectDir,
+    agents: ["codex", "claude", "copilot"]
+  });
+
+  const uninstallResult = await uninstallProject(projectDir);
+  assert.equal(uninstallResult.removed, true);
+
+  const restoredAgents = await readFile(path.join(projectDir, "AGENTS.md"), "utf8");
+  assert.equal(restoredAgents, originalAgents);
+
+  await assert.rejects(access(path.join(projectDir, ".codex", "skills")));
+  await assert.rejects(access(path.join(projectDir, ".claude", "skills")));
+  await assert.rejects(access(path.join(projectDir, ".cursor", "skills")));
+  await assert.rejects(access(path.join(projectDir, ".gemini", "skills")));
+  await assert.rejects(access(path.join(projectDir, ".windsurf", "skills")));
+  await assert.rejects(access(path.join(projectDir, ".trae", "skills")));
+  await assert.rejects(access(path.join(projectDir, "skills")));
+  await assert.rejects(access(path.join(projectDir, ".agents", "skills")));
+  await assert.rejects(access(path.join(projectDir, ".agent", "skills")));
+  await assert.rejects(access(path.join(projectDir, ".github", "copilot-instructions.md")));
+  await assert.rejects(access(path.join(projectDir, "CLAUDE.md")));
+  await assert.rejects(access(path.join(projectDir, "GEMINI.md")));
+  await assert.rejects(access(path.join(projectDir, "cursor-instructions.md")));
+});
+
 test("selectedSkillIds overrides automatic selection during install", async () => {
   const projectDir = await makeFixtureCopy("react-vite");
   const result = await installProject({

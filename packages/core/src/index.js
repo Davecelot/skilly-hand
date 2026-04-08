@@ -175,7 +175,11 @@ async function ensureManagedTextFile(targetPath, content, backupsDir, lockData) 
       return;
     }
 
-    await backupPathIfNeeded(targetPath, backupsDir, lockData);
+    // Do not back up previously managed content; backups are for restoring
+    // user-authored files replaced by managed files.
+    if (!current.includes(MANAGED_MARKER)) {
+      await backupPathIfNeeded(targetPath, backupsDir, lockData);
+    }
   }
 
   await mkdir(path.dirname(targetPath), { recursive: true });
@@ -230,6 +234,69 @@ function buildInstallTargets(selectedAgents) {
   };
 }
 
+async function reconcileManagedTargets({
+  previousLock,
+  selectedInstructionTargets,
+  selectedSkillTargets,
+  lockData
+}) {
+  if (!previousLock) {
+    return;
+  }
+
+  const selectedInstructions = new Set(selectedInstructionTargets);
+  const selectedSkills = new Set(selectedSkillTargets);
+  const selectedTargets = new Set([...selectedInstructions, ...selectedSkills]);
+  const previousBackups = previousLock.backups || {};
+
+  for (const [targetPath, backupPath] of Object.entries(previousBackups)) {
+    if (!selectedTargets.has(targetPath)) {
+      continue;
+    }
+    if (await exists(backupPath)) {
+      lockData.backups[targetPath] = backupPath;
+    }
+  }
+
+  for (const symlinkPath of previousLock.managedSymlinks || []) {
+    if (selectedSkills.has(symlinkPath)) {
+      continue;
+    }
+
+    if (await exists(symlinkPath)) {
+      await rm(symlinkPath, { recursive: true, force: true });
+    }
+
+    const backupPath = previousBackups[symlinkPath];
+    if (backupPath && await exists(backupPath)) {
+      await mkdir(path.dirname(symlinkPath), { recursive: true });
+      await cp(backupPath, symlinkPath, { recursive: true, force: true });
+    }
+  }
+
+  for (const filePath of previousLock.managedFiles || []) {
+    if (selectedInstructions.has(filePath)) {
+      continue;
+    }
+
+    const backupPath = previousBackups[filePath];
+    if (backupPath && await exists(backupPath)) {
+      await mkdir(path.dirname(filePath), { recursive: true });
+      await cp(backupPath, filePath, { recursive: true, force: true });
+      continue;
+    }
+
+    if (!(await exists(filePath))) {
+      continue;
+    }
+
+    const content = await readFile(filePath, "utf8");
+    if (content.includes(MANAGED_MARKER)) {
+      await rm(filePath, { force: true });
+    }
+  }
+}
+
 export async function installProject({
   cwd,
   agents,
@@ -259,6 +326,7 @@ export async function installProject({
   const targetCatalogDir = path.join(installRoot, "catalog");
   const backupsDir = path.join(installRoot, "backups");
   const lockPath = path.join(installRoot, "manifest.lock.json");
+  const previousLock = await exists(lockPath) ? await readJson(lockPath) : null;
   const lockData = {
     version: 1,
     generatedAt: plan.generatedAt,
@@ -289,15 +357,24 @@ export async function installProject({
   await writeFile(path.join(installRoot, "AGENTS.md"), agentsMarkdown, "utf8");
 
   const { instructionTargets, skillTargets } = buildInstallTargets(selectedAgents);
+  const absoluteInstructionTargets = instructionTargets.map((pathParts) => path.join(cwd, ...pathParts));
+  const absoluteSkillTargets = skillTargets.map((pathParts) => path.join(cwd, ...pathParts));
 
-  for (const pathParts of instructionTargets) {
-    await ensureManagedTextFile(path.join(cwd, ...pathParts), agentsMarkdown, backupsDir, lockData);
+  await reconcileManagedTargets({
+    previousLock,
+    selectedInstructionTargets: absoluteInstructionTargets,
+    selectedSkillTargets: absoluteSkillTargets,
+    lockData
+  });
+
+  for (const targetPath of absoluteInstructionTargets) {
+    await ensureManagedTextFile(targetPath, agentsMarkdown, backupsDir, lockData);
   }
 
   const skillsSourcePath = path.join(installRoot, "catalog");
 
-  for (const pathParts of skillTargets) {
-    await ensureSymlink(path.join(cwd, ...pathParts), skillsSourcePath, backupsDir, lockData);
+  for (const targetPath of absoluteSkillTargets) {
+    await ensureSymlink(targetPath, skillsSourcePath, backupsDir, lockData);
   }
 
   await writeJson(lockPath, lockData);

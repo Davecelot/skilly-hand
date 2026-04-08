@@ -22,7 +22,7 @@ Do not use this skill for:
 1. Define the spec in `.sdd/active/<feature-name>/spec.md`.
 2. Review and refine scope, constraints, and tasks.
 3. Execute one small task at a time.
-4. Verify each task and the end-to-end outcome.
+4. Verify each task and the end-to-end outcome, ending with a required `review-rangers` final gate.
 5. Archive to `.sdd/archive/` when complete.
 
 Recommended task size:
