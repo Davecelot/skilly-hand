@@ -90,15 +90,28 @@ test("install creates managed files, symlinks, and restores originals on uninsta
   assert.equal(codexSkillsPath, expectedCatalogPath);
 
   const managedAgents = await readFile(path.join(projectDir, "AGENTS.md"), "utf8");
+  const claudeInstructions = await readFile(path.join(projectDir, "CLAUDE.md"), "utf8");
+  const cursorInstructions = await readFile(path.join(projectDir, "cursor-instructions.md"), "utf8");
+  const geminiInstructions = await readFile(path.join(projectDir, "GEMINI.md"), "utf8");
+  const copilotInstructions = await readFile(path.join(projectDir, ".github", "copilot-instructions.md"), "utf8");
   assert.match(managedAgents, /Managed by skilly-hand/);
   assert.match(managedAgents, /## Where/);
   assert.match(managedAgents, /## What/);
   assert.match(managedAgents, /## When/);
+  assert.match(managedAgents, /### Mandatory Skill Gate \(Must Use \/ Must Read\)/);
+  assert.match(managedAgents, /Always run `token-optimizer` first/);
+  assert.match(managedAgents, /Always run `output-optimizer` immediately after `token-optimizer`/);
+  assert.match(managedAgents, /Default: select a random canonical mode for each new interaction/);
+  assert.match(managedAgents, /Persistence: keep the explicitly requested mode active until the user asks for a different mode/);
   assert.match(managedAgents, /## Chaining Notations/);
   assert.match(managedAgents, /`agents-root-orchestrator`/);
   assert.match(managedAgents, /SDD-first policy/);
   assert.match(managedAgents, /`spec-driven-development`/);
   assert.match(managedAgents, /### SDD-First Delivery Workflow/);
+  assert.match(claudeInstructions, /### Mandatory Skill Gate \(Must Use \/ Must Read\)/);
+  assert.match(cursorInstructions, /### Mandatory Skill Gate \(Must Use \/ Must Read\)/);
+  assert.match(geminiInstructions, /### Mandatory Skill Gate \(Must Use \/ Must Read\)/);
+  assert.match(copilotInstructions, /### Mandatory Skill Gate \(Must Use \/ Must Read\)/);
 
   const doctorResult = await runDoctor(projectDir);
   assert.equal(doctorResult.installed, true);
@@ -159,6 +172,8 @@ test("install with antigravity creates native skills links and rule bridge files
   const agentsMd = await readFile(path.join(projectDir, "AGENTS.md"), "utf8");
   const antigravityRuleFile = await readFile(path.join(projectDir, ".agents", "rules", "skilly-hand.md"), "utf8");
   assert.match(agentsMd, /Managed by skilly-hand/);
+  assert.match(agentsMd, /### Mandatory Skill Gate \(Must Use \/ Must Read\)/);
+  assert.match(antigravityRuleFile, /### Mandatory Skill Gate \(Must Use \/ Must Read\)/);
   assert.equal(agentsMd, antigravityRuleFile);
 
   const uninstallResult = await uninstallProject(projectDir);

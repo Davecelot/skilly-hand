@@ -5,13 +5,14 @@ All notable changes to this project are documented in this file.
 ## [Unreleased]
 
 ### Added
-- _None._
+- Added a Mandatory Skill Gate section to generated agent instruction files to enforce optimizer sequencing across interactions.
 
 ### Changed
-- _None._
+- Updated routing guidance to apply mandatory-gate precedence before task-specific skill chains.
+- Synced catalog markdown rendering so generated AGENTS output includes the Mandatory Skill Gate and precedence guidance.
 
 ### Fixed
-- _None._
+- Updated install and self-sync test coverage to assert Mandatory Skill Gate propagation across managed instruction targets.
 
 ### Removed
 - _None._

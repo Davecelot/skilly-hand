@@ -31,7 +31,20 @@
 | `test-driven-development` | Guide implementation using the RED → GREEN → REFACTOR TDD cycle: write a failing test first, write the minimum code to pass, then refactor while tests stay green. | testing, workflow, quality, core |
 | `token-optimizer` | Classify task complexity and right-size reasoning depth, context gathering, and response detail to reduce wasted tokens. | core, workflow, efficiency |
 
+### Mandatory Skill Gate (Must Use / Must Read)
+
+This gate has global precedence and applies to every user interaction across all supported agent conventions/files.
+
+1. Always run `token-optimizer` first to classify complexity and set the minimum viable reasoning depth.
+2. Always run `output-optimizer` immediately after `token-optimizer` for response-shape control.
+3. `output-optimizer` mode policy:
+   - Default: select a random canonical mode for each new interaction.
+   - Override: if user explicitly requests a mode (for example `mode: step-brief`), that explicit mode wins.
+   - Persistence: keep the explicitly requested mode active until the user asks for a different mode.
+
 ### Task Routing
+
+**Mandatory-gate precedence:** apply the mandatory optimizer gate before task-routing chains below.
 
 **SDD-first policy:** for feature delivery, bug fixes, or any multi-step implementation, start with `spec-driven-development` unless the task is clearly trivial and one-step.
 
