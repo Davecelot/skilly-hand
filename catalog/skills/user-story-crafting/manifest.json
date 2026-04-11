@@ -1,0 +1,29 @@
+{
+  "id": "user-story-crafting",
+  "title": "User Story Crafting",
+  "description": "Create and refine user stories with structured quality gates, splitting heuristics, and lightweight story mapping for release slicing. Trigger: writing, restructuring, splitting, or sequencing user stories for delivery-ready backlog work.",
+  "portable": true,
+  "tags": ["product", "workflow", "planning", "quality"],
+  "detectors": ["always"],
+  "detectionTriggers": ["always"],
+  "installsFor": ["all"],
+  "agentSupport": ["codex", "claude", "cursor", "gemini", "copilot", "antigravity", "windsurf", "trae"],
+  "skillMetadata": {
+    "author": "skilly-hand",
+    "last-edit": "2026-04-11",
+    "license": "Apache-2.0",
+    "version": "1.0.0",
+    "changelog": "Added new user-story-crafting skill with integrated writing, structuring, splitting, and mapping agents; improves backlog quality and delivery sequencing through a unified user-story workflow; affects catalog skills, agent routing metadata, and managed AGENTS outputs",
+    "auto-invoke": "Writing, restructuring, splitting, or sequencing user stories into delivery-ready backlog items",
+    "allowed-modes": ["story-writer", "story-structurer", "story-splitter", "story-mapper"],
+    "allowed-tools": ["Read", "Edit", "Write", "Glob", "Grep", "Bash", "Task", "SubAgent"]
+  },
+  "files": [
+    { "path": "SKILL.md", "kind": "instruction" },
+    { "path": "agents/story-writer.md", "kind": "instruction" },
+    { "path": "agents/story-structurer.md", "kind": "instruction" },
+    { "path": "agents/story-splitter.md", "kind": "instruction" },
+    { "path": "agents/story-mapper.md", "kind": "instruction" }
+  ],
+  "dependencies": []
+}

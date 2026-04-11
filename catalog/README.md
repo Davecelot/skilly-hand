@@ -18,5 +18,6 @@ Published portable skills consumed by the `skilly-hand` CLI.
 | `spec-driven-development` | Plan, execute, and verify multi-step work through versioned specs with small, testable tasks. | core, workflow, planning | all |
 | `test-driven-development` | Guide implementation using the RED → GREEN → REFACTOR TDD cycle: write a failing test first, write the minimum code to pass, then refactor while tests stay green. | testing, workflow, quality, core | all |
 | `token-optimizer` | Classify task complexity and right-size reasoning depth, context gathering, and response detail to reduce wasted tokens. | core, workflow, efficiency | all |
+| `user-story-crafting` | Create and refine user stories with structured quality gates, splitting heuristics, and lightweight story mapping for release slicing. Trigger: writing, restructuring, splitting, or sequencing user stories for delivery-ready backlog work. | product, workflow, planning, quality | all |
 
 Legacy source remains under `source/legacy/agentic-structure` and is excluded from installation.

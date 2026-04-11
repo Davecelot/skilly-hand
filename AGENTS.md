@@ -7,7 +7,7 @@
 
 - Scope: repository root and all descendant folders unless a deeper AGENTS guide overrides locally.
 - Generated at: self-sync
-- Detected technologies: nodejs
+- Detected technologies: nodejs, react
 - Escalation boundary: when work changes global architecture, CI/CD, release, or security policy, escalate before implementation.
 
 ## What
@@ -30,6 +30,7 @@
 | `spec-driven-development` | Plan, execute, and verify multi-step work through versioned specs with small, testable tasks. | core, workflow, planning |
 | `test-driven-development` | Guide implementation using the RED → GREEN → REFACTOR TDD cycle: write a failing test first, write the minimum code to pass, then refactor while tests stay green. | testing, workflow, quality, core |
 | `token-optimizer` | Classify task complexity and right-size reasoning depth, context gathering, and response detail to reduce wasted tokens. | core, workflow, efficiency |
+| `user-story-crafting` | Create and refine user stories with structured quality gates, splitting heuristics, and lightweight story mapping for release slicing. Trigger: writing, restructuring, splitting, or sequencing user stories for delivery-ready backlog work. | product, workflow, planning, quality |
 
 ### Mandatory Skill Gate (Must Use / Must Read)
 
@@ -38,7 +39,7 @@ This gate has global precedence and applies to every user interaction across all
 1. Always run `token-optimizer` first to classify complexity and set the minimum viable reasoning depth.
 2. Always run `output-optimizer` immediately after `token-optimizer` for response-shape control.
 3. `output-optimizer` mode policy:
-   - Default: select a random canonical mode for each new interaction.
+   - Default: use `step-brief` when there is no explicit mode or strong phrasing signal.
    - Override: if user explicitly requests a mode (for example `mode: step-brief`), that explicit mode wins.
    - Persistence: keep the explicitly requested mode active until the user asks for a different mode.
 
@@ -75,6 +76,7 @@ This gate has global precedence and applies to every user interaction across all
 | Planning or executing feature work, bug fixes, and multi-phase implementation | `spec-driven-development` |
 | Implementing features, services, or components using test-driven development (TDD) or RED→GREEN→REFACTOR cycles | `test-driven-development` |
 | Classifying task complexity and choosing reasoning depth/token budget | `token-optimizer` |
+| Writing, restructuring, splitting, or sequencing user stories into delivery-ready backlog items | `user-story-crafting` |
 
 ### Sequencing Rules
 
