@@ -176,6 +176,27 @@ async function assertAgentArtifacts({ workspace, agents }) {
   }
 }
 
+async function assertOnlySelectedAgentArtifacts({ workspace, selectedAgents }) {
+  const selectedTargets = resolveExpectedTargets(selectedAgents);
+  const allTargets = resolveExpectedTargets(DEFAULT_AGENTS);
+
+  for (const instruction of allTargets.instructions) {
+    if (selectedTargets.instructions.includes(instruction)) {
+      await assertPathExists(workspace, instruction);
+    } else {
+      await assertPathMissing(workspace, instruction);
+    }
+  }
+
+  for (const symlink of allTargets.symlinks) {
+    if (selectedTargets.symlinks.includes(symlink)) {
+      await assertPathExists(workspace, symlink);
+    } else {
+      await assertPathMissing(workspace, symlink);
+    }
+  }
+}
+
 async function ensureScenarioWorkspace({ repoRoot, scenarioName, fixtureName = "no-stack" }) {
   const scenariosRoot = resolveSandboxScenariosPath({ repoRoot });
   const fixturePath = path.join(repoRoot, "tests", "fixtures", fixtureName);
@@ -193,8 +214,33 @@ async function runScenario(name, runner) {
   return { name, ok: true };
 }
 
-async function scenarioInstallFewSkills({ repoRoot }) {
-  const workspace = await ensureScenarioWorkspace({ repoRoot, scenarioName: "install-few-skills", fixtureName: "react-vite" });
+async function scenarioInstallOneSkill({ repoRoot }) {
+  const workspace = await ensureScenarioWorkspace({ repoRoot, scenarioName: "install-one-skill", fixtureName: "react-vite" });
+  const selectedSkillIds = ["token-optimizer"];
+
+  const installResult = await installProject({
+    cwd: workspace,
+    agents: ["codex"],
+    selectedSkillIds
+  });
+
+  assertCondition(installResult.applied === true, "one-skill install should apply changes");
+
+  const lock = await readLock(workspace);
+  assertCondition(equalArrays(lock.skills, selectedSkillIds), "one-skill lock should match requested skill");
+  assertCondition(equalArrays(lock.agents, ["codex"]), "one-skill lock should include codex only");
+
+  const doctorResult = await runDoctor(workspace);
+  assertCondition(doctorResult.installed === true, "one-skill doctor should report installed=true");
+  assertCondition(equalArrays(doctorResult.lock.skills, selectedSkillIds), "one-skill doctor lock skills mismatch");
+
+  const uninstallResult = await uninstallProject(workspace);
+  assertCondition(uninstallResult.removed === true, "one-skill uninstall should remove install");
+  await assertPathMissing(workspace, ".skilly-hand");
+}
+
+async function scenarioInstallMultipleSkills({ repoRoot }) {
+  const workspace = await ensureScenarioWorkspace({ repoRoot, scenarioName: "install-multiple-skills", fixtureName: "react-vite" });
   const selectedSkillIds = ["token-optimizer", "spec-driven-development", "review-rangers"];
 
   const installResult = await installProject({
@@ -203,21 +249,22 @@ async function scenarioInstallFewSkills({ repoRoot }) {
     selectedSkillIds
   });
 
-  assertCondition(installResult.applied === true, "few-skills install should apply changes");
+  assertCondition(installResult.applied === true, "multiple-skills install should apply changes");
 
   const lock = await readLock(workspace);
-  assertCondition(equalArrays([...lock.skills].sort(), [...selectedSkillIds].sort()), "few-skills lock should match requested skills");
-  assertCondition(equalArrays(lock.agents, ["codex"]), "few-skills lock should include codex only");
+  assertCondition(equalArrays([...lock.skills].sort(), [...selectedSkillIds].sort()), "multiple-skills lock should match requested skills");
+  assertCondition(lock.skills.length === selectedSkillIds.length, "multiple-skills lock should include only requested skills");
+  assertCondition(equalArrays(lock.agents, ["codex"]), "multiple-skills lock should include codex only");
 
   await assertAgentArtifacts({ workspace, agents: ["codex"] });
 
   const uninstallResult = await uninstallProject(workspace);
-  assertCondition(uninstallResult.removed === true, "few-skills uninstall should remove install");
+  assertCondition(uninstallResult.removed === true, "multiple-skills uninstall should remove install");
   await assertPathMissing(workspace, ".skilly-hand");
 }
 
-async function scenarioInstallAllSkillsCore({ repoRoot }) {
-  const workspace = await ensureScenarioWorkspace({ repoRoot, scenarioName: "install-all-skills-core", fixtureName: "no-stack" });
+async function scenarioInstallAllSkills({ repoRoot }) {
+  const workspace = await ensureScenarioWorkspace({ repoRoot, scenarioName: "install-all-skills", fixtureName: "no-stack" });
   const catalog = await loadAllSkills();
   const allPortableSkillIds = catalog.filter((skill) => skill.portable).map((skill) => skill.id);
 
@@ -227,158 +274,38 @@ async function scenarioInstallAllSkillsCore({ repoRoot }) {
     selectedSkillIds: allPortableSkillIds
   });
 
-  assertCondition(installResult.applied === true, "all-skills core install should apply changes");
+  assertCondition(installResult.applied === true, "all-skills install should apply changes");
 
   const lock = await readLock(workspace);
-  assertCondition(lock.skills.length === allPortableSkillIds.length, "all-skills core lock count mismatch");
-  assertCondition(equalArrays([...lock.skills].sort(), [...allPortableSkillIds].sort()), "all-skills core lock contents mismatch");
+  assertCondition(lock.skills.length === allPortableSkillIds.length, "all-skills lock count mismatch");
+  assertCondition(equalArrays([...lock.skills].sort(), [...allPortableSkillIds].sort()), "all-skills lock contents mismatch");
 
   await uninstallProject(workspace);
 }
 
-async function scenarioInstallAllSkillsCliPath({ repoRoot }) {
-  const workspace = await ensureScenarioWorkspace({ repoRoot, scenarioName: "install-all-skills-cli", fixtureName: "no-stack" });
-  const catalog = await loadAllSkills();
-  const allPortableSkillIds = catalog.filter((skill) => skill.portable).map((skill) => skill.id).sort();
-
-  const stdout = createWritable(true);
-  const stderr = createWritable(true);
-  const prompt = createPromptMock({
-    selectValues: ["install", "exit"],
-    checkboxValues: [allPortableSkillIds, ["codex"]],
-    confirmValues: [false]
-  });
-
-  await runCli({
-    argv: [],
-    stdout,
-    stderr,
-    env: { ...process.env, NO_COLOR: "1", TERM: "xterm-256color" },
-    platform: process.platform,
-    prompt,
-    cwdResolver: () => workspace
-  });
-
-  assertCondition(/Dry run complete/.test(stdout.value()), "all-skills CLI path should render dry-run output");
-  assertCondition(/Installation cancelled/.test(stdout.value()), "all-skills CLI path should support cancel after preview");
-  await assertPathMissing(workspace, ".skilly-hand");
-}
-
-async function scenarioInstallOneEnvironment({ repoRoot }) {
-  const workspace = await ensureScenarioWorkspace({ repoRoot, scenarioName: "install-one-environment", fixtureName: "no-stack" });
-  const installResult = runCliCommand({
-    repoRoot,
-    cwd: workspace,
-    args: ["install", "--yes", "--agent", "codex"]
-  });
-
-  assertCondition(installResult.status === 0, `one-environment CLI install failed:\n${installResult.stderr || installResult.stdout}`);
-
-  await assertAgentArtifacts({ workspace, agents: ["codex"] });
-
-  const doctorResult = runCliCommand({ repoRoot, cwd: workspace, args: ["doctor", "--json"] });
-  assertCondition(doctorResult.status === 0, "one-environment doctor should succeed");
-
-  const doctorPayload = parseJsonPayload(doctorResult.stdout, "doctor");
-  assertCondition(doctorPayload.installed === true, "one-environment doctor should report installed=true");
-  assertCondition(equalArrays(doctorPayload.lock.agents, ["codex"]), "one-environment lock agents mismatch");
-
-  const uninstallResult = runCliCommand({ repoRoot, cwd: workspace, args: ["uninstall", "--yes"] });
-  assertCondition(uninstallResult.status === 0, "one-environment uninstall should succeed");
-  await assertPathMissing(workspace, ".skilly-hand");
-}
-
-async function scenarioInstallFewEnvironments({ repoRoot }) {
-  const workspace = await ensureScenarioWorkspace({ repoRoot, scenarioName: "install-few-environments", fixtureName: "no-stack" });
-  const selectedAgents = ["codex", "claude", "copilot"];
-
-  const installResult = runCliCommand({
-    repoRoot,
-    cwd: workspace,
-    args: ["install", "--yes", "--agent", "codex", "--agent", "claude", "--agent", "copilot"]
-  });
-  assertCondition(installResult.status === 0, "few-environments install should succeed");
-
-  await assertAgentArtifacts({ workspace, agents: selectedAgents });
-
-  const lock = await readLock(workspace);
-  assertCondition(equalArrays(lock.agents, selectedAgents), "few-environments lock agents mismatch");
-
-  await assertPathMissing(workspace, "GEMINI.md");
-  await assertPathMissing(workspace, "cursor-instructions.md");
-  await assertPathMissing(workspace, path.join(".cursor", "skills"));
-  await assertPathMissing(workspace, path.join(".gemini", "skills"));
-
-  await uninstallProject(workspace);
-}
-
-async function scenarioInstallAllEnvironments({ repoRoot }) {
-  const workspace = await ensureScenarioWorkspace({ repoRoot, scenarioName: "install-all-environments", fixtureName: "no-stack" });
-
-  const installResult = await installProject({
-    cwd: workspace,
-    agents: DEFAULT_AGENTS
-  });
-  assertCondition(installResult.applied === true, "all-environments core install should apply changes");
-
-  await assertAgentArtifacts({ workspace, agents: DEFAULT_AGENTS });
-
-  const lock = await readLock(workspace);
-  assertCondition(equalArrays(lock.agents, DEFAULT_AGENTS), "all-environments lock should match DEFAULT_AGENTS");
-
-  await uninstallProject(workspace);
-}
-
-async function scenarioDetectStackSignals({ repoRoot }) {
-  const reactWorkspace = await ensureScenarioWorkspace({ repoRoot, scenarioName: "detect-react", fixtureName: "react-vite" });
-  const angularWorkspace = await ensureScenarioWorkspace({ repoRoot, scenarioName: "detect-angular", fixtureName: "angular-app" });
-  const noStackWorkspace = await ensureScenarioWorkspace({ repoRoot, scenarioName: "detect-no-stack", fixtureName: "no-stack" });
-
-  const reactDetect = runCliCommand({ repoRoot, cwd: reactWorkspace, args: ["detect", "--json"] });
-  const angularDetect = runCliCommand({ repoRoot, cwd: angularWorkspace, args: ["detect", "--json"] });
-  const noStackDetect = runCliCommand({ repoRoot, cwd: noStackWorkspace, args: ["detect", "--json"] });
-
-  assertCondition(reactDetect.status === 0, "react detect should succeed");
-  assertCondition(angularDetect.status === 0, "angular detect should succeed");
-  assertCondition(noStackDetect.status === 0, "no-stack detect should succeed");
-
-  const reactPayload = parseJsonPayload(reactDetect.stdout, "detect react");
-  const angularPayload = parseJsonPayload(angularDetect.stdout, "detect angular");
-  const noStackPayload = parseJsonPayload(noStackDetect.stdout, "detect no-stack");
-
-  const reactTech = reactPayload.detections.map((d) => d.technology);
-  const angularTech = angularPayload.detections.map((d) => d.technology);
-
-  assertCondition(reactTech.includes("react"), "react detect should include react technology");
-  assertCondition(reactTech.includes("vite"), "react detect should include vite technology");
-  assertCondition(angularTech.includes("angular"), "angular detect should include angular technology");
-  assertCondition(noStackPayload.count === 0, "no-stack detect should have zero detections");
-}
-
-async function scenarioDoctorLifecycle({ repoRoot }) {
-  const workspace = await ensureScenarioWorkspace({ repoRoot, scenarioName: "doctor-lifecycle", fixtureName: "no-stack" });
-
-  const before = await runDoctor(workspace);
-  assertCondition(before.installed === false, "doctor before install should report installed=false");
-
-  await installProject({ cwd: workspace, agents: ["codex"] });
-
-  const afterInstall = await runDoctor(workspace);
-  assertCondition(afterInstall.installed === true, "doctor after install should report installed=true");
-  assertCondition(equalArrays(afterInstall.lock.agents, ["codex"]), "doctor after install lock agents mismatch");
-
-  await uninstallProject(workspace);
-
-  const afterUninstall = await runDoctor(workspace);
-  assertCondition(afterUninstall.installed === false, "doctor after uninstall should report installed=false");
-}
-
-async function scenarioGeneralCliInteractions({ repoRoot }) {
-  const workspace = await ensureScenarioWorkspace({ repoRoot, scenarioName: "general-cli", fixtureName: "react-vite" });
+async function scenarioUxCliContracts({ repoRoot }) {
+  const workspace = await ensureScenarioWorkspace({ repoRoot, scenarioName: "ux-cli-contracts", fixtureName: "react-vite" });
 
   const help = runCliCommand({ repoRoot, cwd: workspace, args: ["--help"] });
   assertCondition(help.status === 0, "help should succeed");
   assertCondition(/Usage/.test(help.stdout), "help output should include Usage");
+
+  const stdout = createWritable(true);
+  const stderr = createWritable(true);
+
+  await runCli({
+    argv: ["--classic", "--dry-run"],
+    stdin: { isTTY: true },
+    stdout,
+    stderr,
+    env: { ...process.env, NO_COLOR: "1", TERM: "xterm-256color" },
+    platform: process.platform,
+    cwdResolver: () => workspace
+  });
+
+  assertCondition(/Install Preflight/.test(stdout.value()), "classic dry-run should render install preflight output");
+  assertCondition(/Skill Plan/.test(stdout.value()), "classic dry-run should render skill plan output");
+  assertCondition(/Dry run complete/.test(stdout.value()), "classic dry-run should render dry-run output");
 
   const list = runCliCommand({ repoRoot, cwd: workspace, args: ["list", "--json"] });
   assertCondition(list.status === 0, "list --json should succeed");
@@ -400,6 +327,7 @@ async function scenarioGeneralCliInteractions({ repoRoot }) {
   const installApply = runCliCommand({ repoRoot, cwd: workspace, args: ["install", "--yes", "--json", "--agent", "codex"] });
   assertCondition(installApply.status === 0, "install --yes --json should succeed");
   const installApplyPayload = parseJsonPayload(installApply.stdout, "install apply");
+  assertCondition(installApplyPayload.command === "install", "install apply payload should include command=install");
   assertCondition(installApplyPayload.applied === true, "install apply payload should include applied=true");
 
   const doctor = runCliCommand({ repoRoot, cwd: workspace, args: ["doctor", "--json"] });
@@ -424,31 +352,143 @@ async function scenarioGeneralCliInteractions({ repoRoot }) {
   const unknownPayload = parseJsonPayload(unknownCommand.stderr, "unknown command");
   assertCondition(unknownPayload.ok === false, "unknown command JSON should include ok=false");
   assertCondition(/Unknown command/.test(unknownPayload.error.why), "unknown command JSON should explain unknown command");
+
+  await assertPathMissing(workspace, ".skilly-hand");
 }
 
-async function scenarioInstallAndUninstallLifecycle({ repoRoot }) {
-  const workspace = await ensureScenarioWorkspace({ repoRoot, scenarioName: "install-uninstall-lifecycle", fixtureName: "node-basic" });
+async function scenarioInstallOneAgent({ repoRoot }) {
+  const workspace = await ensureScenarioWorkspace({ repoRoot, scenarioName: "install-one-agent", fixtureName: "no-stack" });
+  const installResult = runCliCommand({
+    repoRoot,
+    cwd: workspace,
+    args: ["install", "--yes", "--agent", "codex"]
+  });
+
+  assertCondition(installResult.status === 0, `one-agent CLI install failed:\n${installResult.stderr || installResult.stdout}`);
+
+  await assertOnlySelectedAgentArtifacts({ workspace, selectedAgents: ["codex"] });
+
+  const doctorResult = runCliCommand({ repoRoot, cwd: workspace, args: ["doctor", "--json"] });
+  assertCondition(doctorResult.status === 0, "one-agent doctor should succeed");
+
+  const doctorPayload = parseJsonPayload(doctorResult.stdout, "doctor");
+  assertCondition(doctorPayload.installed === true, "one-agent doctor should report installed=true");
+  assertCondition(equalArrays(doctorPayload.lock.agents, ["codex"]), "one-agent lock agents mismatch");
+
+  const uninstallResult = runCliCommand({ repoRoot, cwd: workspace, args: ["uninstall", "--yes"] });
+  assertCondition(uninstallResult.status === 0, "one-agent uninstall should succeed");
+  await assertPathMissing(workspace, ".skilly-hand");
+}
+
+async function scenarioInstallMultipleAgents({ repoRoot }) {
+  const workspace = await ensureScenarioWorkspace({ repoRoot, scenarioName: "install-multiple-agents", fixtureName: "no-stack" });
+  const selectedAgents = ["codex", "claude", "copilot"];
+
+  const installResult = runCliCommand({
+    repoRoot,
+    cwd: workspace,
+    args: ["install", "--yes", "--agent", "codex", "--agent", "claude", "--agent", "copilot"]
+  });
+  assertCondition(installResult.status === 0, "multiple-agents install should succeed");
+
+  await assertOnlySelectedAgentArtifacts({ workspace, selectedAgents });
+
+  const lock = await readLock(workspace);
+  assertCondition(equalArrays(lock.agents, selectedAgents), "multiple-agents lock agents mismatch");
+
+  await uninstallProject(workspace);
+}
+
+async function scenarioInstallAllAgents({ repoRoot }) {
+  const workspace = await ensureScenarioWorkspace({ repoRoot, scenarioName: "install-all-agents", fixtureName: "no-stack" });
 
   const installResult = await installProject({
     cwd: workspace,
-    agents: ["codex", "claude", "copilot"]
+    agents: DEFAULT_AGENTS
   });
-  assertCondition(installResult.applied === true, "lifecycle install should apply changes");
+  assertCondition(installResult.applied === true, "all-agents core install should apply changes");
+
+  await assertAgentArtifacts({ workspace, agents: DEFAULT_AGENTS });
 
   const lock = await readLock(workspace);
-  assertCondition(equalArrays(lock.agents, ["codex", "claude", "copilot"]), "lifecycle lock agents mismatch");
+  assertCondition(equalArrays(lock.agents, DEFAULT_AGENTS), "all-agents lock should match DEFAULT_AGENTS");
 
-  await assertPathExists(workspace, "AGENTS.md");
-  await assertPathExists(workspace, "CLAUDE.md");
-  await assertPathExists(workspace, path.join(".github", "copilot-instructions.md"));
-  await assertPathExists(workspace, path.join(".codex", "skills"));
-  await assertPathExists(workspace, path.join(".claude", "skills"));
+  await uninstallProject(workspace);
+}
+
+async function scenarioUninstallEverything({ repoRoot }) {
+  const workspace = await ensureScenarioWorkspace({ repoRoot, scenarioName: "uninstall-everything", fixtureName: "node-basic" });
+  const originalAgents = await readFile(path.join(workspace, "AGENTS.md"), "utf8");
+  const catalog = await loadAllSkills();
+  const allPortableSkillIds = catalog.filter((skill) => skill.portable).map((skill) => skill.id);
+
+  const installResult = await installProject({
+    cwd: workspace,
+    agents: DEFAULT_AGENTS,
+    selectedSkillIds: allPortableSkillIds
+  });
+  assertCondition(installResult.applied === true, "uninstall-everything setup install should apply changes");
+
+  const lock = await readLock(workspace);
+  assertCondition(equalArrays(lock.agents, DEFAULT_AGENTS), "uninstall-everything lock agents mismatch");
+  assertCondition(equalArrays([...lock.skills].sort(), [...allPortableSkillIds].sort()), "uninstall-everything lock skills mismatch");
+  await assertAgentArtifacts({ workspace, agents: DEFAULT_AGENTS });
 
   const uninstallResult = await uninstallProject(workspace);
-  assertCondition(uninstallResult.removed === true, "lifecycle uninstall should remove installation");
+  assertCondition(uninstallResult.removed === true, "uninstall-everything should remove installation");
+
+  const restoredAgents = await readFile(path.join(workspace, "AGENTS.md"), "utf8");
+  assertCondition(restoredAgents === originalAgents, "uninstall-everything should restore original AGENTS.md");
+
   await assertPathMissing(workspace, ".skilly-hand");
-  await assertPathMissing(workspace, "CLAUDE.md");
-  await assertPathMissing(workspace, path.join(".github", "copilot-instructions.md"));
+
+  const allTargets = resolveExpectedTargets(DEFAULT_AGENTS);
+  for (const instruction of allTargets.instructions) {
+    if (instruction === "AGENTS.md") continue;
+    await assertPathMissing(workspace, instruction);
+  }
+  for (const symlink of allTargets.symlinks) {
+    await assertPathMissing(workspace, symlink);
+  }
+
+  const secondUninstall = await uninstallProject(workspace);
+  assertCondition(secondUninstall.removed === false, "second uninstall should report removed=false");
+}
+
+const SANDBOX_SCENARIOS = [
+  ["install-one-agent", scenarioInstallOneAgent],
+  ["install-multiple-agents", scenarioInstallMultipleAgents],
+  ["install-all-agents", scenarioInstallAllAgents],
+  ["install-one-skill", scenarioInstallOneSkill],
+  ["install-multiple-skills", scenarioInstallMultipleSkills],
+  ["install-all-skills", scenarioInstallAllSkills],
+  ["uninstall-everything", scenarioUninstallEverything],
+  ["ux-cli-contracts", scenarioUxCliContracts]
+];
+
+function parseMainArgs(argv) {
+  const scenarioNames = [];
+  let listScenarios = false;
+
+  for (let i = 0; i < argv.length; i += 1) {
+    const token = argv[i];
+    if (token === "--scenario") {
+      const value = argv[i + 1];
+      if (!value || value.startsWith("--")) {
+        throw new Error("Missing value for --scenario");
+      }
+      scenarioNames.push(value);
+      i += 1;
+      continue;
+    }
+    if (token === "--list-scenarios") {
+      listScenarios = true;
+      continue;
+    }
+    throw new Error(`Unknown flag: ${token}`);
+  }
+
+  return { scenarioNames, listScenarios };
 }
 
 export function resolveSandboxProjectPath({ repoRoot = path.resolve(".") } = {}) {
@@ -474,18 +514,7 @@ export async function runSandboxMatrixTests({ repoRoot = path.resolve(".") } = {
   const { sandboxProject } = await verifySandboxProject({ repoRoot });
   await mkdir(sandboxProject, { recursive: true });
 
-  const scenarios = [
-    ["installing a few skills", scenarioInstallFewSkills],
-    ["installing all skills", scenarioInstallAllSkillsCore],
-    ["all-skills CLI path", scenarioInstallAllSkillsCliPath],
-    ["installing for one environment", scenarioInstallOneEnvironment],
-    ["installing for a few environments", scenarioInstallFewEnvironments],
-    ["installing for all environments", scenarioInstallAllEnvironments],
-    ["detecting stack", scenarioDetectStackSignals],
-    ["using doctor lifecycle", scenarioDoctorLifecycle],
-    ["general CLI interactions", scenarioGeneralCliInteractions],
-    ["install and uninstall commands", scenarioInstallAndUninstallLifecycle]
-  ];
+  const scenarios = [...SANDBOX_SCENARIOS];
 
   const results = [];
   for (const [name, scenario] of scenarios) {
@@ -503,11 +532,40 @@ export async function runSandboxTests({ repoRoot = path.resolve(".") } = {}) {
   return runSandboxMatrixTests({ repoRoot });
 }
 
+export function getSandboxScenarioNames() {
+  return SANDBOX_SCENARIOS.map(([name]) => name);
+}
+
+export async function runSandboxScenario({ repoRoot = path.resolve("."), scenarioName }) {
+  const scenario = SANDBOX_SCENARIOS.find(([name]) => name === scenarioName);
+  if (!scenario) {
+    throw new Error(`Unknown sandbox scenario: ${scenarioName}`);
+  }
+  const [name, runner] = scenario;
+  return runScenario(name, () => runner({ repoRoot }));
+}
+
 const isMain = fileURLToPath(import.meta.url) === path.resolve(process.argv[1] || "");
 
 if (isMain) {
-  const result = await runSandboxMatrixTests();
-  if (!result.ok) {
+  try {
+    const { scenarioNames, listScenarios } = parseMainArgs(process.argv.slice(2));
+    if (listScenarios) {
+      process.stdout.write(`${getSandboxScenarioNames().join("\n")}\n`);
+    } else if (scenarioNames.length === 0) {
+      const result = await runSandboxMatrixTests();
+      if (!result.ok) process.exitCode = 1;
+    } else {
+      const results = [];
+      for (const scenarioName of scenarioNames) {
+        results.push(await runSandboxScenario({ scenarioName }));
+      }
+      if (!results.every((item) => item.ok)) {
+        process.exitCode = 1;
+      }
+    }
+  } catch (error) {
+    process.stderr.write(`${error.message}\n`);
     process.exitCode = 1;
   }
 }

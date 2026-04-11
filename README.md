@@ -5,8 +5,8 @@
 ██╔════╝██║ ██╔╝██║██║     ██║     ╚██╗ ██╔╝    ██║  ██║██╔══██╗████╗  ██║██╔══██╗
 ╚█████╗ █████╔╝ ██║██║     ██║      ╚████╔╝     ███████║███████║██╔██╗ ██║██║  ██║
  ╚══██╗ ██╔═██╗ ██║██║     ██║       ╚██╔╝      ██╔══██║██╔══██║██║╚██╗██║██║  ██║
-██████╔╝██║  ██╗██║███████╗███████╗   ██║        ██║  ██║██║  ██║██║ ╚████║██████╔╝
-╚═════╝ ╚═╝  ╚═╝╚═╝╚══════╝╚══════╝   ╚═╝        ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═════╝
+██████╔╝██║  ██╗██║███████╗███████╗   ██║       ██║  ██║██║  ██║██║ ╚████║██████╔╝
+╚═════╝ ╚═╝  ╚═╝╚═╝╚══════╝╚══════╝   ╚═╝       ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═════╝
 ```
 
 **Portable AI agent skills. One CLI. Every coding assistant.**
@@ -36,7 +36,7 @@
 npx skilly-hand
 ```
 
-`npx skilly-hand` opens an interactive command launcher when running in a TTY.
+`npx skilly-hand` opens a full-screen skilly-hand terminal UI when running in a TTY.
 
 ---
 
@@ -55,6 +55,7 @@ npx skilly-hand
 | Flag | Description |
 | ---- | ----------- |
 | `--json` | Emit machine-readable output and disable interactive prompts |
+| `--classic` | Force plain text command mode and skip full-screen TUI |
 | `--yes`, `-y` | Skip confirmation prompts for mutating commands (`install`, `uninstall`) |
 | `--dry-run` | Preview install plan without writing files |
 | `--agent`, `-a <name>` | Target a specific assistant (repeatable; e.g. `--agent claude --agent cursor`) |
@@ -99,6 +100,11 @@ See [catalog/README.md](./catalog/README.md) for generated skill metadata.
    - The script runs the publish gate, asks for OTP with hidden input, and if left blank lets npm trigger your default security method.
 8. Smoke test after publish: `npx @skilly-hand/skilly-hand@<version> --help`.
 9. Verify npm metadata (README render, changelog, license, executable bin).
+
+### Security Automation
+
+- `npm run security:check` runs repository secret/config checks plus strict dependency security checks.
+- `npm run security:deps` runs strict dependency audit + outdated reporting only.
 
 ---
 

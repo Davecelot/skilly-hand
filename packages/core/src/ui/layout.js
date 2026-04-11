@@ -30,6 +30,68 @@ function truncate(value, maxWidth) {
   return clean.slice(0, maxWidth - 1) + "…";
 }
 
+function summarizeDenseValue(value) {
+  const raw = String(value);
+  const parts = raw.split(",").map((part) => part.trim()).filter(Boolean);
+  if (parts.length < 4) return { display: raw, detail: null };
+  return {
+    display: `${parts.slice(0, 3).join(", ")} +${parts.length - 3} more`,
+    detail: raw
+  };
+}
+
+function fitWidths(preferred, minimums, target) {
+  const widths = [...preferred];
+  let current = widths.reduce((sum, width) => sum + width, 0);
+  if (current <= target) return widths;
+
+  while (current > target) {
+    let idx = -1;
+    let widest = 0;
+
+    for (let i = 0; i < widths.length; i += 1) {
+      if (widths[i] > minimums[i] && widths[i] > widest) {
+        widest = widths[i];
+        idx = i;
+      }
+    }
+
+    if (idx === -1) return null;
+    widths[idx] -= 1;
+    current -= 1;
+  }
+
+  return widths;
+}
+
+function nextWrapChunk(text, width) {
+  if (text.length <= width) return [text, ""];
+  const split = text.lastIndexOf(" ", width);
+  if (split <= 0) return [text.slice(0, width), text.slice(width)];
+  return [text.slice(0, split), text.slice(split + 1)];
+}
+
+function wrapPrefixedText(text, maxWidth, firstPrefix, continuationPrefix) {
+  const lines = [];
+  let remaining = String(text).trim();
+  let first = true;
+
+  while (remaining.length > 0) {
+    const prefix = first ? firstPrefix : continuationPrefix;
+    const available = Math.max(8, maxWidth - prefix.length);
+    const [chunk, rest] = nextWrapChunk(remaining, available);
+    lines.push(prefix + chunk);
+    remaining = rest.trimStart();
+    first = false;
+  }
+
+  if (lines.length === 0) {
+    return [firstPrefix.trimEnd()];
+  }
+
+  return lines;
+}
+
 // Box character sets
 const BOX = {
   // double-line outer (for banner)
@@ -140,27 +202,29 @@ export function createLayout(theme, unicodeEnabled) {
   function borderedTable(columns, rows, opts = {}) {
     if (!columns || columns.length === 0) return "";
     const maxColW = opts.maxColWidth || 36;
-
+    const viewportWidth = Math.max(40, Number(opts.viewportWidth) || 80);
     const headers = columns.map((c) => String(c.header));
+    const detailMarker = unicodeEnabled ? "↳ " : "-> ";
+    const minWidths = headers.map((header) => Math.max(6, Math.min(visLen(header), 14)));
+
     const matrix = rows.map((row) =>
-      columns.map((c) => truncate(String(row[c.key] ?? ""), maxColW))
+      columns.map((c) => {
+        const summarized = summarizeDenseValue(String(row[c.key] ?? ""));
+        return {
+          display: summarized.display,
+          detail: summarized.detail
+        };
+      })
     );
 
-    // Compute column widths
-    const widths = headers.map((h, i) => {
-      const contentMax = matrix.reduce((m, row) => Math.max(m, visLen(row[i])), 0);
-      return Math.max(visLen(h), contentMax, 3);
+    const preferredWidths = headers.map((h, i) => {
+      const contentMax = matrix.reduce((max, row) => Math.max(max, visLen(row[i].display)), 0);
+      return Math.min(Math.max(visLen(h), contentMax, 3), maxColW);
     });
 
-    if (!unicodeEnabled) {
-      // Plain fallback — original table style
-      const headerLine = headers.map((h, i) => padEnd(h, widths[i])).join("  ");
-      const sepLine = widths.map((w) => "-".repeat(w)).join("  ");
-      const bodyLines = matrix.map((row) =>
-        row.map((cell, i) => padEnd(cell, widths[i])).join("  ")
-      );
-      return [headerLine, sepLine, ...bodyLines].join("\n");
-    }
+    const borderedOverhead = (3 * headers.length) + 1;
+    const compactOverhead = 3 * Math.max(headers.length - 1, 0);
+    const preferredSum = preferredWidths.reduce((sum, width) => sum + width, 0);
 
     const s = box.s;
 
@@ -174,33 +238,120 @@ export function createLayout(theme, unicodeEnabled) {
       return leftC + inner + rightC;
     }
 
-    const topBorder    = makeDivider(widths, s.tl, s.mt, s.tr, s.h);
-    const headerRow    = makeRow(headers.map((h, i) => theme.bold(h)), widths, theme.primary(s.v), theme.primary(s.v), theme.primary(s.v));
-    const headerSep    = makeDivider(widths, s.dl, s.dc, s.dr, s.dh);
-    const bodyRows     = matrix.map((row) =>
-      makeRow(
-        row.map((cell, i) => {
-          // color first column (usually ID) with accent
-          return i === 0 ? theme.accent(cell) : cell;
-        }),
-        widths, theme.primary(s.v), theme.primary(s.v), theme.primary(s.v)
-      )
-    );
-    const bottomBorder = makeDivider(widths, s.bl, s.mb, s.br, s.h);
+    function buildCompactTable(widths) {
+      const compactRows = [];
+      const formattedHeaders = headers.map((header, idx) => truncate(header, widths[idx]));
+      const headerLine = formattedHeaders.map((header, idx) => padEnd(header, widths[idx])).join(" | ");
+      const sepLine = widths.map((width) => "-".repeat(width)).join("-+-");
 
-    // Apply primary color to border chars
-    const colorBorder = (line) => {
-      // Replace non-letter/space chars with colored versions
-      return theme.primary(line);
-    };
+      compactRows.push(headerLine);
+      compactRows.push(sepLine);
 
-    return [
-      colorBorder(topBorder),
-      headerRow,
-      colorBorder(headerSep),
-      ...bodyRows,
-      colorBorder(bottomBorder),
-    ].join("\n");
+      for (let rowIdx = 0; rowIdx < matrix.length; rowIdx += 1) {
+        const row = matrix[rowIdx];
+        const cells = row.map((cell, colIdx) => truncate(cell.display, widths[colIdx]));
+        compactRows.push(cells.map((cell, colIdx) => padEnd(cell, widths[colIdx])).join(" | "));
+
+        const details = [];
+        for (let colIdx = 0; colIdx < row.length; colIdx += 1) {
+          if (!row[colIdx].detail) continue;
+          details.push(...wrapPrefixedText(
+            `${headers[colIdx]}: ${row[colIdx].detail}`,
+            viewportWidth,
+            `${detailMarker}`,
+            "  "
+          ));
+        }
+        compactRows.push(...details.map((line) => theme.muted(line)));
+      }
+
+      return compactRows.join("\n");
+    }
+
+    function buildCardList() {
+      const cardRows = [];
+      for (let rowIdx = 0; rowIdx < matrix.length; rowIdx += 1) {
+        const row = matrix[rowIdx];
+        for (let colIdx = 0; colIdx < row.length; colIdx += 1) {
+          const header = headers[colIdx];
+          const value = row[colIdx].display;
+          const isFirst = colIdx === 0;
+          const prefix = isFirst ? `${detailMarker}${header}: ` : `  ${header}: `;
+          const continuation = isFirst ? "  " : "    ";
+          const lineSet = wrapPrefixedText(value, viewportWidth, prefix, continuation);
+          if (isFirst) {
+            cardRows.push(...lineSet.map((line, idx) => idx === 0 ? theme.accent(line) : line));
+          } else {
+            cardRows.push(...lineSet);
+          }
+
+          if (row[colIdx].detail) {
+            cardRows.push(...wrapPrefixedText(
+              row[colIdx].detail,
+              viewportWidth,
+              `    ${header} (full): `,
+              "      "
+            ).map((line) => theme.muted(line)));
+          }
+        }
+
+        if (rowIdx < matrix.length - 1) {
+          cardRows.push(theme.muted("-".repeat(Math.min(32, viewportWidth))));
+        }
+      }
+      return cardRows.join("\n");
+    }
+
+    const canUseBordered = unicodeEnabled && (preferredSum + borderedOverhead <= viewportWidth);
+    if (canUseBordered) {
+      const widths = preferredWidths;
+      const topBorder = makeDivider(widths, s.tl, s.mt, s.tr, s.h);
+      const headerRow = makeRow(headers.map((h) => theme.bold(h)), widths, theme.primary(s.v), theme.primary(s.v), theme.primary(s.v));
+      const headerSep = makeDivider(widths, s.dl, s.dc, s.dr, s.dh);
+      const tableWidth = visLen(topBorder);
+      const detailContentWidth = Math.max(8, tableWidth - 4);
+
+      const bodyRows = [];
+      for (const row of matrix) {
+        bodyRows.push(makeRow(
+          row.map((cell, i) => i === 0 ? theme.accent(truncate(cell.display, widths[i])) : truncate(cell.display, widths[i])),
+          widths,
+          theme.primary(s.v),
+          theme.primary(s.v),
+          theme.primary(s.v)
+        ));
+
+        for (let colIdx = 0; colIdx < row.length; colIdx += 1) {
+          if (!row[colIdx].detail) continue;
+          const wrapped = wrapPrefixedText(
+            `${headers[colIdx]}: ${row[colIdx].detail}`,
+            detailContentWidth,
+            detailMarker,
+            "  "
+          );
+          for (const line of wrapped) {
+            bodyRows.push(
+              theme.primary(s.v) +
+              " " +
+              padEnd(theme.muted(line), detailContentWidth) +
+              " " +
+              theme.primary(s.v)
+            );
+          }
+        }
+      }
+
+      const bottomBorder = makeDivider(widths, s.bl, s.mb, s.br, s.h);
+      return [theme.primary(topBorder), headerRow, theme.primary(headerSep), ...bodyRows, theme.primary(bottomBorder)].join("\n");
+    }
+
+    const compactWidthTarget = viewportWidth - compactOverhead;
+    const fittedCompactWidths = fitWidths(preferredWidths, minWidths, compactWidthTarget);
+    if (fittedCompactWidths) {
+      return buildCompactTable(fittedCompactWidths);
+    }
+
+    return buildCardList();
   }
 
   // ── Detection grid ────────────────────────────────────────────────────────

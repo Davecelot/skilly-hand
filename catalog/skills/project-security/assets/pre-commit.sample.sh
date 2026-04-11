@@ -6,4 +6,4 @@ script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 . "$script_dir/run-security-check.shared.sh"
 
 echo "[project-security] running commit gate..."
-run_security_check
+run_security_gates

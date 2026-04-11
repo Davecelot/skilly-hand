@@ -7,6 +7,7 @@ import { spawnSync } from "node:child_process";
 
 const cliPath = path.resolve("packages/cli/src/bin.js");
 const fixturesDir = path.resolve("tests/fixtures");
+const ANSI_PATTERN = /\x1b\[[0-9;]*m/g;
 
 function runCli(args, options = {}) {
   const env = {
@@ -38,6 +39,12 @@ function parseJsonPayload(raw) {
     }
     return JSON.parse(match[0]);
   }
+}
+
+function maxVisibleLineLength(block) {
+  return String(block)
+    .split("\n")
+    .reduce((max, line) => Math.max(max, line.replace(ANSI_PATTERN, "").length), 0);
 }
 
 test("help output is structured and includes JSON mode", () => {
@@ -84,6 +91,16 @@ test("doctor defaults to human-readable output", () => {
   assert.match(result.stdout, /Doctor Summary/);
   assert.match(result.stdout, /Project Probes/);
   assert.equal(result.stdout.trim().startsWith("{"), false);
+});
+
+test("list output adapts to constrained terminal width", () => {
+  const result = runCli(["list"], {
+    env: { COLUMNS: "72" }
+  });
+
+  assert.equal(result.status, 0);
+  assert.match(result.stdout, /Skills/);
+  assert.equal(maxVisibleLineLength(result.stdout) <= 72, true);
 });
 
 test("command errors emit JSON payload when --json is set", () => {

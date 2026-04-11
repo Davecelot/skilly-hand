@@ -24,6 +24,19 @@ function normalizeBooleanEnv(value) {
   return true;
 }
 
+function detectViewportWidth({ stdout = process.stdout, env = process.env } = {}) {
+  if (stdout?.isTTY && Number.isInteger(stdout.columns) && stdout.columns > 0) {
+    return stdout.columns;
+  }
+
+  const envColumns = Number.parseInt(String(env?.COLUMNS ?? ""), 10);
+  if (Number.isInteger(envColumns) && envColumns > 0) {
+    return envColumns;
+  }
+
+  return 80;
+}
+
 // Kept as exported API (tests import these directly)
 export function detectColorSupport({ env = process.env, stream = process.stdout } = {}) {
   const noColor = normalizeBooleanEnv(env.NO_COLOR);
@@ -78,6 +91,7 @@ export function createTerminalRenderer({
   const colorLevel = detectColorLevel({ env, stream: stdout });
   const colorEnabled = colorLevel > 0;
   const unicodeEnabled = detectUnicodeSupport({ env, stream: stdout, platform });
+  const viewportWidth = detectViewportWidth({ stdout, env });
 
   const theme = createTheme(colorLevel);
   const layout = createLayout(theme, unicodeEnabled);
@@ -109,6 +123,7 @@ export function createTerminalRenderer({
     colorEnabled,
     colorLevel,
     unicodeEnabled,
+    viewportWidth,
     symbols,
     style,
     theme,
@@ -134,11 +149,7 @@ export function createTerminalRenderer({
     },
 
     table(columns, rows) {
-      // Use bordered table when unicode is on; fall back to plain
-      if (unicodeEnabled) {
-        return layout.borderedTable(columns, rows);
-      }
-      return renderPlainTable(columns, rows);
+      return layout.borderedTable(columns, rows, { viewportWidth });
     },
 
     status(level, message, detail = "") {

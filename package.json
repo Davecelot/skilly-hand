@@ -1,6 +1,6 @@
 {
   "name": "@skilly-hand/skilly-hand",
-  "version": "0.18.0",
+  "version": "0.19.0",
   "license": "CC-BY-NC-4.0",
   "type": "module",
   "publishConfig": {
@@ -29,7 +29,8 @@
     "catalog:sync": "node ./scripts/sync-catalog.mjs",
     "agentic:self:sync": "node ./scripts/sync-self-agentic.mjs",
     "test": "node --test tests/*.test.js && node ./scripts/test-in-sandbox.mjs",
-    "security:check": "node ./scripts/security-check.mjs",
+    "security:deps": "node ./scripts/dependency-security-check.mjs --strict",
+    "security:check": "node ./scripts/security-check.mjs --strict-deps",
     "verify:packlist": "node ./scripts/verify-packlist.mjs",
     "verify:versions": "node ./scripts/verify-versions.mjs",
     "verify:publish": "npm run verify:versions && npm run security:check && npm run catalog:check && npm test && npm run verify:packlist",
@@ -46,6 +47,7 @@
     "doctor": "node ./packages/cli/src/bin.js doctor"
   },
   "dependencies": {
-    "@inquirer/prompts": "^7.10.1"
+    "ink": "^5.2.1",
+    "react": "^18.3.1"
   }
 }

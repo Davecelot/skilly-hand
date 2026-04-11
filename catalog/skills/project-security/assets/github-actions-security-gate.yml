@@ -5,6 +5,8 @@ on:
   push:
     branches:
       - "**"
+  schedule:
+    - cron: "23 5 * * 1"
   release:
     types: [published]
 
@@ -36,3 +38,39 @@ jobs:
 
       - name: Run security gate
         run: sh catalog/skills/project-security/assets/generic-ci-security-gate.sh
+
+  dependency-report:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+
+      - name: Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "20"
+
+      - name: Install dependencies (auto-detect package manager)
+        run: |
+          corepack enable
+          if [ -f pnpm-lock.yaml ]; then
+            pnpm install --frozen-lockfile
+          elif [ -f yarn.lock ]; then
+            yarn install --immutable
+          elif [ -f package-lock.json ]; then
+            npm ci
+          elif [ -f package.json ]; then
+            echo "[project-security] missing lockfile; refusing non-deterministic install" >&2
+            exit 1
+          fi
+
+      - name: Generate dependency report
+        run: |
+          node scripts/dependency-security-check.mjs --json > dependency-security-report.json
+
+      - name: Upload dependency report artifact
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275f52d1598f
+        with:
+          name: dependency-security-report
+          path: dependency-security-report.json

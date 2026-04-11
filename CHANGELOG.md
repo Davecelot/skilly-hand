@@ -16,6 +16,25 @@ All notable changes to this project are documented in this file.
 ### Removed
 - _None._
 
+## [0.19.0] - 2026-04-11
+[View on npm](https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.19.0)
+
+### Added
+- Added `scripts/dependency-security-check.mjs` plus new npm script `security:deps` for strict dependency audit and outdated-package reporting.
+- Added a full-screen Ink terminal UI for interactive CLI flows, including the new `--classic` fallback flag for plain text mode.
+- Added dependency security report automation to the project-security GitHub Actions template (scheduled artifact workflow).
+
+### Changed
+- Updated `security:check` to run strict dependency checks in addition to secret/config scanning.
+- Updated project-security hook/CI assets to use shared `run_security_gates` flow.
+- Updated CLI command routing and terminal rendering to support Ink-backed interactive sessions.
+
+### Fixed
+- Expanded and refreshed interactive/terminal/script test coverage for the new UI and security flows.
+
+### Removed
+- _None._
+
 ## [0.18.0] - 2026-04-08
 [View on npm](https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.18.0)
 

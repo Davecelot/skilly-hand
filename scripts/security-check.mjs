@@ -2,6 +2,7 @@ import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createTerminalRenderer } from "../packages/core/src/terminal.js";
+import { runDependencySecurityCheck } from "./dependency-security-check.mjs";
 
 // Directories and files to skip entirely during source scanning
 const SKIP_DIRS = new Set(["node_modules", ".git", ".npm-cache"]);
@@ -127,7 +128,7 @@ async function findEnvFiles(cwd) {
   return results.map((f) => path.relative(cwd, f));
 }
 
-export async function checkSecurity({ cwd = process.cwd() } = {}) {
+export async function checkSecurity({ cwd = process.cwd(), strictDeps = false } = {}) {
   const resolvedCwd = path.resolve(cwd);
 
   const sourceFiles = await collectSourceFiles(resolvedCwd);
@@ -139,6 +140,10 @@ export async function checkSecurity({ cwd = process.cwd() } = {}) {
 
   const gitignoreProblems = await checkGitignore(resolvedCwd);
   const envFileProblems = await findEnvFiles(resolvedCwd);
+  const dependencySecurity = await runDependencySecurityCheck({
+    cwd: resolvedCwd,
+    strict: strictDeps
+  });
 
   const problems = [];
 
@@ -151,6 +156,9 @@ export async function checkSecurity({ cwd = process.cwd() } = {}) {
   for (const f of envFileProblems) {
     problems.push(`Unexpected .env file found: ${f}`);
   }
+  for (const issue of dependencySecurity.issues || []) {
+    problems.push(`Dependency security issue: ${issue}`);
+  }
 
   return {
     cwd: resolvedCwd,
@@ -158,19 +166,21 @@ export async function checkSecurity({ cwd = process.cwd() } = {}) {
     violations: allViolations,
     gitignoreProblems,
     envFileProblems,
+    dependencySecurity,
     filesScanned: sourceFiles.length,
     problems
   };
 }
 
 function parseArgs(argv) {
-  const flags = { json: false, help: false };
+  const flags = { json: false, help: false, strictDeps: false };
   const args = [...argv];
 
   while (args.length > 0) {
     const token = args.shift();
     if (token === "--json") flags.json = true;
     else if (token === "--help" || token === "-h") flags.help = true;
+    else if (token === "--strict-deps") flags.strictDeps = true;
     else throw new Error(`Unknown flag: ${token}`);
   }
 
@@ -180,8 +190,8 @@ function parseArgs(argv) {
 function printHelp() {
   renderer.write(renderer.joinBlocks([
     renderer.status("info", "security-check"),
-    renderer.section("Usage", renderer.list(["node scripts/security-check.mjs [--json]"], { bullet: "-" })),
-    renderer.section("Description", "Scans source files for hardcoded secrets, validates .gitignore entries, and checks for unexpected .env files.")
+    renderer.section("Usage", renderer.list(["node scripts/security-check.mjs [--json] [--strict-deps]"], { bullet: "-" })),
+    renderer.section("Description", "Scans source files for hardcoded secrets, validates .gitignore entries, checks for unexpected .env files, and runs dependency security checks.")
   ]));
 }
 
@@ -195,7 +205,7 @@ if (isEntryPoint) {
     if (flags.help) {
       printHelp();
     } else {
-      const result = await checkSecurity();
+      const result = await checkSecurity({ strictDeps: flags.strictDeps });
       if (flags.json) {
         renderer.writeJson({
           command: "security-check",

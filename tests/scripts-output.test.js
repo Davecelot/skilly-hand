@@ -137,6 +137,16 @@ test("security-check exposes --json contract", () => {
   assert.equal(payload.command, "security-check");
   assert.equal(typeof payload.valid, "boolean");
   assert.equal(Array.isArray(payload.violations), true);
+  assert.equal(typeof payload.dependencySecurity, "object");
+});
+
+test("dependency-security-check exposes --json contract", () => {
+  const result = runScript("scripts/dependency-security-check.mjs", ["--json"]);
+  assert.equal(result.status, 0);
+  const payload = JSON.parse(result.stdout);
+  assert.equal(payload.command, "dependency-security-check");
+  assert.equal(typeof payload.valid, "boolean");
+  assert.equal(typeof payload.checks, "object");
 });
 
 test("publish-with-otp provides non-interactive OTP guidance in JSON mode", async () => {
