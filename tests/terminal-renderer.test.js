@@ -50,6 +50,20 @@ test("renderer formats sections, status lines, and tables", () => {
   assert.match(table, /token-optimizer/);
 });
 
+test("renderer banner keeps multi-line block logo", () => {
+  const renderer = createTerminalRenderer({
+    env: { NO_COLOR: "1", TERM: "xterm-256color" },
+    stdout: { isTTY: true, columns: 140, write() {} },
+    stderr: { isTTY: true, write() {} },
+    platform: "darwin"
+  });
+
+  const banner = renderer.banner("0.21.1");
+
+  assert.match(banner, /████\s+██\s+██/);
+  assert.match(banner, /████\s+██████/);
+});
+
 test("renderer adapts table mode by terminal width and keeps lines bounded", () => {
   const columns = [
     { key: "id", header: "Skill ID" },

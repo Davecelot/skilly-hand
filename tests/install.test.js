@@ -2,11 +2,14 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import os from "node:os";
 import path from "node:path";
-import { access, cp, mkdtemp, readFile, realpath } from "node:fs/promises";
+import { access, cp, mkdir, mkdtemp, readFile, realpath, writeFile } from "node:fs/promises";
 import {
+  NATIVE_ADAPTER_REGISTRY,
+  evaluateNativeCoverage,
   installProject,
   resolveSkillSelectionByIds,
   runDoctor,
+  setupNativeProject,
   uninstallProject
 } from "../packages/core/src/index.js";
 
@@ -319,4 +322,85 @@ test("resolveSkillSelectionByIds rejects non-portable skills", () => {
     () => resolveSkillSelectionByIds({ catalog, selectedSkillIds: ["internal-skill"] }),
     /Skill is not portable: internal-skill/
   );
+});
+
+test("native adapter registry covers all default agents and has unique target paths", () => {
+  const adapters = Object.entries(NATIVE_ADAPTER_REGISTRY);
+  assert.equal(adapters.length, 9);
+  assert.deepEqual([...Object.keys(NATIVE_ADAPTER_REGISTRY)].sort(), [
+    "antigravity",
+    "claude",
+    "codex",
+    "copilot",
+    "cursor",
+    "gemini",
+    "standard",
+    "trae",
+    "windsurf"
+  ]);
+
+  const targets = adapters
+    .filter(([, adapter]) => adapter.supported)
+    .map(([, adapter]) => adapter.targetPath.join(path.sep));
+  assert.equal(new Set(targets).size, targets.length);
+});
+
+test("native setup creates managed native files and doctor reports coverage statuses", async () => {
+  const projectDir = await makeFixtureCopy("no-stack");
+  await installProject({
+    cwd: projectDir,
+    agents: ["codex", "cursor", "standard"]
+  });
+
+  const result = await setupNativeProject({
+    cwd: projectDir,
+    agents: ["codex", "cursor", "standard"]
+  });
+  assert.equal(result.applied, true);
+
+  const codexRule = await readFile(path.join(projectDir, ".codex", "rules", "skilly-hand.md"), "utf8");
+  const cursorRule = await readFile(path.join(projectDir, ".cursor", "rules", "skilly-hand.mdc"), "utf8");
+  assert.match(codexRule, /Managed by skilly-hand native setup/);
+  assert.match(cursorRule, /Managed by skilly-hand native setup/);
+
+  const lockPath = path.join(projectDir, ".skilly-hand", "manifest.lock.json");
+  const lockData = JSON.parse(await readFile(lockPath, "utf8"));
+  assert.equal(lockData.managedNativeFiles.length >= 2, true);
+  assert.equal(lockData.nativeProfiles.codex.status, "configured");
+  assert.equal(lockData.nativeProfiles.cursor.status, "configured");
+  assert.equal(lockData.nativeProfiles.standard.status, "not-supported");
+
+  const doctor = await runDoctor(projectDir);
+  const byAgent = new Map(doctor.nativeStatus.map((row) => [row.agent, row]));
+  assert.equal(byAgent.get("codex")?.status, "configured");
+  assert.equal(byAgent.get("cursor")?.status, "configured");
+  assert.equal(byAgent.get("standard")?.status, "not-supported");
+});
+
+test("native setup reconciles agent narrowing and uninstall removes managed native files", async () => {
+  const projectDir = await makeFixtureCopy("no-stack");
+  await installProject({ cwd: projectDir, agents: ["codex", "claude"] });
+  await setupNativeProject({ cwd: projectDir, agents: ["codex", "claude"] });
+  await setupNativeProject({ cwd: projectDir, agents: ["codex"] });
+
+  await access(path.join(projectDir, ".codex", "skills"));
+  await access(path.join(projectDir, ".codex", "rules", "skilly-hand.md"));
+  await assert.rejects(access(path.join(projectDir, ".claude", "rules", "skilly-hand.md")));
+
+  const uninstallResult = await uninstallProject(projectDir);
+  assert.equal(uninstallResult.removed, true);
+  await assert.rejects(access(path.join(projectDir, ".codex", "skills")));
+  await assert.rejects(access(path.join(projectDir, ".codex", "rules", "skilly-hand.md")));
+});
+
+test("native coverage reports partial when target exists without managed marker", async () => {
+  const projectDir = await makeFixtureCopy("no-stack");
+  const manualPath = path.join(projectDir, ".codex", "rules", "skilly-hand.md");
+  await mkdir(path.dirname(manualPath), { recursive: true });
+  await writeFile(manualPath, "# manual rules\n", "utf8");
+
+  const status = await evaluateNativeCoverage({ cwd: projectDir, agents: ["codex"] });
+  assert.equal(status.length, 1);
+  assert.equal(status[0].status, "partial");
+  assert.match(status[0].remediation, /native setup/);
 });

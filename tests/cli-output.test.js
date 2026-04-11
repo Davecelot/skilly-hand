@@ -78,6 +78,22 @@ test("install dry-run provides structured text output", () => {
   assert.match(result.stdout, /Dry run complete/);
 });
 
+test("native setup dry-run provides structured text output", () => {
+  const result = runCli(["native", "setup", "--dry-run", "--cwd", path.join(fixturesDir, "react-vite")]);
+  assert.equal(result.status, 0);
+  assert.match(result.stdout, /Native Setup Preflight/);
+  assert.match(result.stdout, /Native Coverage/);
+  assert.match(result.stdout, /dry run complete/i);
+});
+
+test("native setup supports --json output", () => {
+  const result = runCli(["native", "setup", "--dry-run", "--cwd", path.join(fixturesDir, "react-vite"), "--json"]);
+  assert.equal(result.status, 0);
+  const payload = parseJsonPayload(result.stdout);
+  assert.equal(payload.command, "native setup");
+  assert.equal(Array.isArray(payload.nativeStatus), true);
+});
+
 test("non-interactive no-command invocation defaults to install output", () => {
   const result = runCli(["--dry-run", "--cwd", path.join(fixturesDir, "react-vite")]);
   assert.equal(result.status, 0);

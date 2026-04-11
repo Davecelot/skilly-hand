@@ -5,13 +5,15 @@ All notable changes to this project are documented in this file.
 ## [Unreleased]
 
 ### Added
-- _None._
+- Added `native setup` command support to configure native agent instruction/rule adapters from the CLI and interactive UI flows.
 
 ### Changed
-- _None._
+- Refactored CLI presentation output to a shared result-document model used across text output and Ink-rendered interactive views.
+- Expanded interactive launcher result rendering with richer sectioned previews, improved scrolling behavior, and integrated install/native setup summaries.
 
 ### Fixed
-- _None._
+- Hardened interactive command behavior for `--json` and `--classic` modes so non-interactive flows skip full-screen TUI entry points reliably.
+- Expanded install/native setup regression coverage for agent-target reconciliation, uninstall restore behavior, and renderer width constraints.
 
 ### Removed
 - _None._

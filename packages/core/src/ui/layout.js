@@ -123,9 +123,10 @@ const BOX_ASCII = {
   },
 };
 
-export function createLayout(theme, unicodeEnabled) {
+export function createLayout(theme, unicodeEnabled, options = {}) {
   const box = unicodeEnabled ? BOX : BOX_ASCII;
   const brand = getBrand();
+  const density = options.density || "balanced";
 
   // ── Banner ────────────────────────────────────────────────────────────────
 
@@ -154,8 +155,10 @@ export function createLayout(theme, unicodeEnabled) {
     const d = box.d;
     const hLine = d.h.repeat(innerW + 2); // +2 for padding spaces inside border
 
-    const rows = logo.map((logoLine, i) => {
-      const logoColored = theme.primary(theme.bold(logoLine));
+    const rowCount = Math.max(logo.length, rightLines.length);
+    const rows = Array.from({ length: rowCount }, (_, i) => {
+      const logoLine = logo[i] ?? "";
+      const logoColored = logoLine ? theme.primary(theme.bold(logoLine)) : "";
       const rightLine = rightLines[i] || "";
       const logoLen = logoW;
       const logoPadded = padEnd(logoColored, logoLen + (visLen(logoColored) - stripAnsi(logoColored).length));
@@ -192,8 +195,8 @@ export function createLayout(theme, unicodeEnabled) {
     if (!unicodeEnabled) {
       return theme.bold(title);
     }
-    const s = box.s;
-    const decorated = theme.primary(s.tl) + theme.primary(s.h.repeat(2)) + " " + theme.bold(title) + " " + theme.primary(s.h.repeat(Math.max(2, 40 - title.length)));
+    const rightRuleLength = density === "compact" ? Math.max(2, 28 - title.length) : Math.max(4, 36 - title.length);
+    const decorated = `${theme.primary("─")} ${theme.bold(title)} ${theme.muted("─".repeat(rightRuleLength))}`;
     return decorated;
   }
 
@@ -201,7 +204,7 @@ export function createLayout(theme, unicodeEnabled) {
 
   function borderedTable(columns, rows, opts = {}) {
     if (!columns || columns.length === 0) return "";
-    const maxColW = opts.maxColWidth || 36;
+    const maxColW = opts.maxColWidth || (density === "compact" ? 32 : 40);
     const viewportWidth = Math.max(40, Number(opts.viewportWidth) || 80);
     const headers = columns.map((c) => String(c.header));
     const detailMarker = unicodeEnabled ? "↳ " : "-> ";
@@ -302,7 +305,8 @@ export function createLayout(theme, unicodeEnabled) {
       return cardRows.join("\n");
     }
 
-    const canUseBordered = unicodeEnabled && (preferredSum + borderedOverhead <= viewportWidth);
+    const borderSlack = density === "compact" ? 0 : 2;
+    const canUseBordered = unicodeEnabled && (preferredSum + borderedOverhead <= (viewportWidth - borderSlack));
     if (canUseBordered) {
       const widths = preferredWidths;
       const topBorder = makeDivider(widths, s.tl, s.mt, s.tr, s.h);

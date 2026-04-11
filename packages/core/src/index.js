@@ -5,6 +5,7 @@ import { detectProject, inspectProjectFiles } from "../../detectors/src/index.js
 
 export const DEFAULT_AGENTS = ["standard", "codex", "claude", "cursor", "gemini", "copilot", "antigravity", "windsurf", "trae"];
 const MANAGED_MARKER = "<!-- Managed by skilly-hand.";
+const NATIVE_SETUP_MARKER = "<!-- Managed by skilly-hand native setup.";
 const AGENT_INSTALL_PROFILES = {
   standard: {
     instructionFiles: [["AGENTS.md"]],
@@ -43,6 +44,61 @@ const AGENT_INSTALL_PROFILES = {
   }
 };
 
+export const NATIVE_ADAPTER_REGISTRY = {
+  standard: {
+    supported: false,
+    reason: "No dedicated native instruction or hook surface is available for the standard profile."
+  },
+  codex: {
+    supported: true,
+    mode: "rule_file",
+    targetPath: [".codex", "rules", "skilly-hand.md"],
+    remediation: "Run `npx skilly-hand native setup --agent codex`."
+  },
+  claude: {
+    supported: true,
+    mode: "rule_file",
+    targetPath: [".claude", "rules", "skilly-hand.md"],
+    remediation: "Run `npx skilly-hand native setup --agent claude`."
+  },
+  cursor: {
+    supported: true,
+    mode: "rule_file",
+    targetPath: [".cursor", "rules", "skilly-hand.mdc"],
+    remediation: "Run `npx skilly-hand native setup --agent cursor`."
+  },
+  gemini: {
+    supported: true,
+    mode: "rule_file",
+    targetPath: [".gemini", "rules", "skilly-hand.md"],
+    remediation: "Run `npx skilly-hand native setup --agent gemini`."
+  },
+  copilot: {
+    supported: true,
+    mode: "rule_file",
+    targetPath: [".github", "instructions", "skilly-hand.md"],
+    remediation: "Run `npx skilly-hand native setup --agent copilot`."
+  },
+  antigravity: {
+    supported: true,
+    mode: "rule_file",
+    targetPath: [".agents", "rules", "skilly-hand-native.md"],
+    remediation: "Run `npx skilly-hand native setup --agent antigravity`."
+  },
+  windsurf: {
+    supported: true,
+    mode: "rule_file",
+    targetPath: [".windsurf", "rules", "skilly-hand.md"],
+    remediation: "Run `npx skilly-hand native setup --agent windsurf`."
+  },
+  trae: {
+    supported: true,
+    mode: "rule_file",
+    targetPath: [".trae", "rules", "skilly-hand.md"],
+    remediation: "Run `npx skilly-hand native setup --agent trae`."
+  }
+};
+
 function uniq(values) {
   return [...new Set(values)];
 }
@@ -67,6 +123,63 @@ async function writeJson(filePath, data) {
 
 function nowIso() {
   return new Date().toISOString();
+}
+
+function createLockData({ cwd, generatedAt, agents = [], skills = [], detections = [] }) {
+  return {
+    version: 1,
+    generatedAt,
+    cwd,
+    agents,
+    skills,
+    detections,
+    managedFiles: [],
+    managedSymlinks: [],
+    managedNativeFiles: [],
+    nativeProfiles: {},
+    backups: {}
+  };
+}
+
+function toRelativePath(cwd, targetPath) {
+  return path.relative(cwd, targetPath) || ".";
+}
+
+function resolveNativeAdapterTarget(cwd, adapter) {
+  return path.join(cwd, ...adapter.targetPath);
+}
+
+function buildNativeRuleContent(agent, adapter) {
+  const trigger = "Run token-optimizer before review-rangers when doing risk-heavy review passes.";
+  return [
+    `${NATIVE_SETUP_MARKER} Re-run \`npx skilly-hand native setup\` to regenerate. -->`,
+    `# skilly-hand Native Bootstrap (${agent})`,
+    "",
+    `This file is managed by skilly-hand to keep native ${adapter.mode.replace("_", " ")} behavior consistent.`,
+    "",
+    "## Always-On Defaults",
+    "- Apply AGENTS guidance from the repository root before task routing.",
+    "- Enforce optimizer gate order: `token-optimizer` then `output-optimizer`.",
+    "- Keep output concise by default (`step-brief`) unless user asks otherwise.",
+    "",
+    "## Token-Safe Review Stage",
+    `- ${trigger}`,
+    "- Keep review verdicts concise unless a blocker requires expanded rationale.",
+    "",
+    "## Sync",
+    "- Regenerate this file via `npx skilly-hand native setup` after workflow updates.",
+    ""
+  ].join("\n");
+}
+
+function retainNativeProfilesForAgents(previousLock, selectedAgents) {
+  const previousProfiles = previousLock?.nativeProfiles || {};
+  const retained = {};
+  for (const agent of selectedAgents) {
+    if (!previousProfiles[agent]) continue;
+    retained[agent] = previousProfiles[agent];
+  }
+  return retained;
 }
 
 function normalizeAgentList(agents) {
@@ -167,11 +280,11 @@ async function backupPathIfNeeded(targetPath, backupsDir, lockData) {
   return backupPath;
 }
 
-async function ensureManagedTextFile(targetPath, content, backupsDir, lockData) {
+async function ensureManagedTextFile(targetPath, content, backupsDir, lockData, collectionKey = "managedFiles") {
   if (await exists(targetPath)) {
     const current = await readFile(targetPath, "utf8");
     if (current === content) {
-      lockData.managedFiles.push(targetPath);
+      lockData[collectionKey].push(targetPath);
       return;
     }
 
@@ -184,7 +297,7 @@ async function ensureManagedTextFile(targetPath, content, backupsDir, lockData) 
 
   await mkdir(path.dirname(targetPath), { recursive: true });
   await writeFile(targetPath, content, "utf8");
-  lockData.managedFiles.push(targetPath);
+  lockData[collectionKey].push(targetPath);
 }
 
 async function ensureSymlink(targetPath, sourcePath, backupsDir, lockData) {
@@ -238,6 +351,7 @@ async function reconcileManagedTargets({
   previousLock,
   selectedInstructionTargets,
   selectedSkillTargets,
+  selectedNativeTargets = [],
   lockData
 }) {
   if (!previousLock) {
@@ -246,7 +360,8 @@ async function reconcileManagedTargets({
 
   const selectedInstructions = new Set(selectedInstructionTargets);
   const selectedSkills = new Set(selectedSkillTargets);
-  const selectedTargets = new Set([...selectedInstructions, ...selectedSkills]);
+  const selectedNatives = new Set(selectedNativeTargets);
+  const selectedTargets = new Set([...selectedInstructions, ...selectedSkills, ...selectedNatives]);
   const previousBackups = previousLock.backups || {};
 
   for (const [targetPath, backupPath] of Object.entries(previousBackups)) {
@@ -295,6 +410,170 @@ async function reconcileManagedTargets({
       await rm(filePath, { force: true });
     }
   }
+
+  for (const filePath of previousLock.managedNativeFiles || []) {
+    if (selectedNatives.has(filePath)) {
+      continue;
+    }
+
+    const backupPath = previousBackups[filePath];
+    if (backupPath && await exists(backupPath)) {
+      await mkdir(path.dirname(filePath), { recursive: true });
+      await cp(backupPath, filePath, { recursive: true, force: true });
+      continue;
+    }
+
+    if (!(await exists(filePath))) {
+      continue;
+    }
+
+    const content = await readFile(filePath, "utf8");
+    if (content.includes(MANAGED_MARKER) || content.includes(NATIVE_SETUP_MARKER)) {
+      await rm(filePath, { force: true });
+    }
+  }
+}
+
+export async function evaluateNativeCoverage({ cwd, agents }) {
+  const selectedAgents = normalizeAgentList(agents);
+  const rows = [];
+
+  for (const agent of selectedAgents) {
+    const adapter = NATIVE_ADAPTER_REGISTRY[agent];
+    if (!adapter || adapter.supported === false) {
+      rows.push({
+        agent,
+        status: "not-supported",
+        mode: adapter?.mode || null,
+        target: null,
+        remediation: adapter?.reason || "No native setup adapter available for this agent."
+      });
+      continue;
+    }
+
+    const target = resolveNativeAdapterTarget(cwd, adapter);
+    const relativeTarget = toRelativePath(cwd, target);
+    if (!(await exists(target))) {
+      rows.push({
+        agent,
+        status: "missing",
+        mode: adapter.mode,
+        target: relativeTarget,
+        remediation: adapter.remediation
+      });
+      continue;
+    }
+
+    const content = await readFile(target, "utf8");
+    const hasMarker = content.includes(NATIVE_SETUP_MARKER);
+    rows.push({
+      agent,
+      status: hasMarker ? "configured" : "partial",
+      mode: adapter.mode,
+      target: relativeTarget,
+      remediation: hasMarker ? "No action needed." : adapter.remediation
+    });
+  }
+
+  return rows;
+}
+
+export async function setupNativeProject({
+  cwd,
+  agents,
+  dryRun = false
+}) {
+  const selectedAgents = normalizeAgentList(agents);
+  const generatedAt = nowIso();
+  const installRoot = path.join(cwd, ".skilly-hand");
+  const backupsDir = path.join(installRoot, "backups");
+  const lockPath = path.join(installRoot, "manifest.lock.json");
+  const previousLock = await exists(lockPath) ? await readJson(lockPath) : null;
+  const selectedNativeTargets = selectedAgents
+    .map((agent) => NATIVE_ADAPTER_REGISTRY[agent])
+    .filter((adapter) => adapter && adapter.supported)
+    .map((adapter) => resolveNativeAdapterTarget(cwd, adapter));
+
+  const nativeStatusBefore = await evaluateNativeCoverage({ cwd, agents: selectedAgents });
+
+  const plan = {
+    cwd,
+    generatedAt,
+    agents: selectedAgents,
+    installRoot,
+    nativeStatus: nativeStatusBefore
+  };
+
+  if (dryRun) {
+    return {
+      plan,
+      applied: false
+    };
+  }
+
+  await mkdir(installRoot, { recursive: true });
+  await mkdir(backupsDir, { recursive: true });
+
+  const lockData = createLockData({
+    cwd,
+    generatedAt,
+    agents: previousLock?.agents || selectedAgents,
+    skills: previousLock?.skills || [],
+    detections: previousLock?.detections || []
+  });
+
+  await reconcileManagedTargets({
+    previousLock,
+    selectedInstructionTargets: previousLock?.managedFiles || [],
+    selectedSkillTargets: previousLock?.managedSymlinks || [],
+    selectedNativeTargets,
+    lockData
+  });
+
+  lockData.managedFiles = [...(previousLock?.managedFiles || [])];
+  lockData.managedSymlinks = [...(previousLock?.managedSymlinks || [])];
+
+  const retainedProfiles = retainNativeProfilesForAgents(previousLock, selectedAgents);
+  lockData.nativeProfiles = retainedProfiles;
+  lockData.managedNativeFiles = uniq(
+    Object.values(retainedProfiles)
+      .flatMap((profile) => profile?.managedFiles || [])
+      .filter(Boolean)
+  );
+
+  for (const agent of selectedAgents) {
+    const adapter = NATIVE_ADAPTER_REGISTRY[agent];
+    if (!adapter || adapter.supported === false) {
+      lockData.nativeProfiles[agent] = {
+        status: "not-supported",
+        mode: adapter?.mode || null,
+        managedFiles: [],
+        target: null
+      };
+      continue;
+    }
+
+    const targetPath = resolveNativeAdapterTarget(cwd, adapter);
+    const content = buildNativeRuleContent(agent, adapter);
+    await ensureManagedTextFile(targetPath, content, backupsDir, lockData, "managedNativeFiles");
+    lockData.nativeProfiles[agent] = {
+      status: "configured",
+      mode: adapter.mode,
+      managedFiles: [targetPath],
+      target: toRelativePath(cwd, targetPath)
+    };
+  }
+
+  lockData.managedNativeFiles = uniq(lockData.managedNativeFiles);
+
+  await writeJson(lockPath, lockData);
+
+  return {
+    plan,
+    applied: true,
+    lockPath,
+    nativeStatus: await evaluateNativeCoverage({ cwd, agents: selectedAgents })
+  };
 }
 
 export async function installProject({
@@ -327,17 +606,13 @@ export async function installProject({
   const backupsDir = path.join(installRoot, "backups");
   const lockPath = path.join(installRoot, "manifest.lock.json");
   const previousLock = await exists(lockPath) ? await readJson(lockPath) : null;
-  const lockData = {
-    version: 1,
-    generatedAt: plan.generatedAt,
+  const lockData = createLockData({
     cwd,
+    generatedAt: plan.generatedAt,
     agents: selectedAgents,
     skills: skills.map((skill) => skill.id),
-    detections,
-    managedFiles: [],
-    managedSymlinks: [],
-    backups: {}
-  };
+    detections
+  });
 
   await mkdir(installRoot, { recursive: true });
   await mkdir(targetCatalogDir, { recursive: true });
@@ -359,13 +634,23 @@ export async function installProject({
   const { instructionTargets, skillTargets } = buildInstallTargets(selectedAgents);
   const absoluteInstructionTargets = instructionTargets.map((pathParts) => path.join(cwd, ...pathParts));
   const absoluteSkillTargets = skillTargets.map((pathParts) => path.join(cwd, ...pathParts));
+  const retainedNativeProfiles = retainNativeProfilesForAgents(previousLock, selectedAgents);
+  const retainedNativeTargets = uniq(
+    Object.values(retainedNativeProfiles)
+      .flatMap((profile) => profile?.managedFiles || [])
+      .filter(Boolean)
+  );
 
   await reconcileManagedTargets({
     previousLock,
     selectedInstructionTargets: absoluteInstructionTargets,
     selectedSkillTargets: absoluteSkillTargets,
+    selectedNativeTargets: retainedNativeTargets,
     lockData
   });
+
+  lockData.nativeProfiles = retainedNativeProfiles;
+  lockData.managedNativeFiles = retainedNativeTargets;
 
   for (const targetPath of absoluteInstructionTargets) {
     await ensureManagedTextFile(targetPath, agentsMarkdown, backupsDir, lockData);
@@ -407,6 +692,15 @@ export async function uninstallProject(cwd) {
     }
   }
 
+  for (const filePath of lockData.managedNativeFiles || []) {
+    if (await exists(filePath)) {
+      const content = await readFile(filePath, "utf8");
+      if (content.includes(NATIVE_SETUP_MARKER) || content.includes(MANAGED_MARKER)) {
+        await rm(filePath, { force: true });
+      }
+    }
+  }
+
   for (const [targetPath, backupPath] of Object.entries(lockData.backups || {})) {
     if (await exists(backupPath)) {
       await mkdir(path.dirname(targetPath), { recursive: true });
@@ -428,15 +722,19 @@ export async function runDoctor(cwd) {
     cwd,
     installed,
     catalogIssues,
-    fileStatus
+    fileStatus,
+    nativeStatus: await evaluateNativeCoverage({ cwd, agents: installed ? undefined : DEFAULT_AGENTS })
   };
 
   if (installed) {
     const lock = await readJson(lockPath);
+    result.nativeStatus = await evaluateNativeCoverage({ cwd, agents: lock.agents });
     result.lock = {
       agents: lock.agents,
       skills: lock.skills,
-      generatedAt: lock.generatedAt
+      generatedAt: lock.generatedAt,
+      managedNativeFiles: lock.managedNativeFiles || [],
+      nativeProfiles: lock.nativeProfiles || {}
     };
   }
 

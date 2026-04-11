@@ -69,7 +69,8 @@ const PALETTE_BG = {
 
 const identity = (value) => String(value);
 
-export function createTheme(level) {
+export function createTheme(level, options = {}) {
+  const colorProfile = options.colorProfile || "mono-accent";
   if (level === 0) {
     const noop = identity;
     return {
@@ -98,7 +99,7 @@ export function createTheme(level) {
     return identity;
   }
 
-  return {
+  const baseTheme = {
     level,
     primary:   makeColor("primary"),
     accent:    makeColor("accent"),
@@ -117,4 +118,17 @@ export function createTheme(level) {
     bgWarn:    makeBg("warn"),
     bgError:   makeBg("error"),
   };
+
+  if (colorProfile === "mono-accent") {
+    return {
+      ...baseTheme,
+      success: baseTheme.accent,
+      warn: identity,
+      error: identity,
+      info: baseTheme.accent,
+      magenta: baseTheme.accent
+    };
+  }
+
+  return baseTheme;
 }

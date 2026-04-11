@@ -86,15 +86,17 @@ export function createTerminalRenderer({
   stdout = process.stdout,
   stderr = process.stderr,
   env = process.env,
-  platform = process.platform
+  platform = process.platform,
+  colorProfile = "mono-accent",
+  density = "balanced"
 } = {}) {
   const colorLevel = detectColorLevel({ env, stream: stdout });
   const colorEnabled = colorLevel > 0;
   const unicodeEnabled = detectUnicodeSupport({ env, stream: stdout, platform });
   const viewportWidth = detectViewportWidth({ stdout, env });
 
-  const theme = createTheme(colorLevel);
-  const layout = createLayout(theme, unicodeEnabled);
+  const theme = createTheme(colorLevel, { colorProfile });
+  const layout = createLayout(theme, unicodeEnabled, { density });
 
   // Backward-compat style object (callers in tests may use renderer.style.*)
   const style = {

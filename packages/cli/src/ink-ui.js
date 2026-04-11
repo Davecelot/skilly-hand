@@ -2,6 +2,12 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Box, Text, render, useApp, useInput } from "ink";
 import { getBrand } from "../../core/src/ui/brand.js";
 
+const ANSI_PATTERN = /\x1b\[[0-9;]*m/g;
+
+function stripAnsi(value) {
+  return String(value || "").replace(ANSI_PATTERN, "");
+}
+
 function wrapText(text, width) {
   const safeWidth = Math.max(20, width || 80);
   const input = String(text || "").split("\n");
@@ -41,6 +47,16 @@ function formatConfirmPreviewLines(preview, width) {
   const head = rawLines.slice(0, headEnd).map((line) => truncateLine(line, width));
   const body = rawLines.slice(headEnd).flatMap((line) => wrapText(line, width));
   return [...head, ...body];
+}
+
+function formatConfirmPreviewFromDoc(previewDoc, width) {
+  const blocks = docToBlocks(previewDoc, Math.max(24, width - 2));
+  const lines = [];
+  for (let idx = 0; idx < blocks.length; idx += 1) {
+    lines.push(...blocks[idx].lines.map((line) => line.text));
+    if (idx < blocks.length - 1) lines.push("");
+  }
+  return lines;
 }
 
 function clamp(value, min, max) {
@@ -133,7 +149,7 @@ function Header({ appVersion }) {
     ...logo.map((line, idx) => React.createElement(Text, { key: `logo-${idx}`, color: "cyan" }, line)),
     React.createElement(
       Box,
-      { marginTop: 0 },
+      { marginTop: 1 },
       React.createElement(Text, { color: "cyan", bold: true }, `${brand.name}`),
       React.createElement(Text, { color: "gray" }, appVersion ? `  v${appVersion}` : ""),
       React.createElement(Text, { color: "gray" }, `  ${brand.tagline}`)
@@ -181,6 +197,186 @@ function ResultPanel({ title, lines, busy, maxLines, offset }) {
       { color: "gray" },
       `Lines ${from}-${to} of ${lines.length}  |  ↑/↓ or j/k scroll`
     )
+  );
+}
+
+function isResultDoc(value) {
+  return Boolean(value && typeof value === "object" && value.type === "result-doc");
+}
+
+function padEndPlain(value, width) {
+  const raw = String(value || "");
+  if (raw.length >= width) return raw;
+  return raw + " ".repeat(width - raw.length);
+}
+
+function truncatePlain(value, width) {
+  const raw = String(value || "");
+  if (raw.length <= width) return raw;
+  if (width <= 1) return raw.slice(0, width);
+  return `${raw.slice(0, width - 1)}…`;
+}
+
+function renderAdaptiveTableLines({ columns, rows, width }) {
+  const safeWidth = Math.max(40, width);
+  const headers = columns.map((column) => String(column.header));
+  const values = rows.map((row) => columns.map((column) => String(row[column.key] ?? "")));
+
+  if (headers.length === 0) return [];
+
+  if (safeWidth >= 90 && headers.length <= 4) {
+    const desired = headers.map((header, index) => {
+      const maxCell = values.reduce((max, row) => Math.max(max, row[index]?.length || 0), header.length);
+      return Math.min(Math.max(10, maxCell), 36);
+    });
+    const gap = 3;
+    let total = desired.reduce((sum, value) => sum + value, 0) + (headers.length - 1) * gap;
+    while (total > safeWidth && desired.some((value) => value > 10)) {
+      const idx = desired.findIndex((value) => value === Math.max(...desired));
+      desired[idx] -= 1;
+      total -= 1;
+    }
+
+    const headerLine = headers.map((header, index) => padEndPlain(truncatePlain(header, desired[index]), desired[index])).join("   ");
+    const sepLine = desired.map((value) => "─".repeat(value)).join("   ");
+    const lines = [
+      { text: headerLine, tone: "label" },
+      { text: sepLine, tone: "muted" }
+    ];
+    for (const row of values) {
+      lines.push({
+        text: row.map((cell, index) => padEndPlain(truncatePlain(cell, desired[index]), desired[index])).join("   "),
+        tone: "body"
+      });
+    }
+    return lines;
+  }
+
+  if (safeWidth >= 68) {
+    const maxCols = Math.min(headers.length, 3);
+    const usedHeaders = headers.slice(0, maxCols);
+    const colWidths = usedHeaders.map((header, index) => {
+      const maxCell = values.reduce((max, row) => Math.max(max, (row[index] || "").length), header.length);
+      return Math.min(Math.max(8, maxCell), 26);
+    });
+    const headerLine = usedHeaders.map((header, index) => padEndPlain(truncatePlain(header, colWidths[index]), colWidths[index])).join(" | ");
+    const sepLine = colWidths.map((value) => "─".repeat(value)).join("-+-");
+    const lines = [
+      { text: headerLine, tone: "label" },
+      { text: sepLine, tone: "muted" }
+    ];
+    for (const row of values) {
+      lines.push({
+        text: usedHeaders.map((_, index) => padEndPlain(truncatePlain(row[index] || "", colWidths[index]), colWidths[index])).join(" | "),
+        tone: "body"
+      });
+      if (headers.length > maxCols) {
+        for (let idx = maxCols; idx < headers.length; idx += 1) {
+          lines.push({ text: `  ${headers[idx]}: ${truncatePlain(row[idx] || "", safeWidth - 4)}`, tone: "muted" });
+        }
+      }
+    }
+    return lines;
+  }
+
+  const lines = [];
+  for (const row of values) {
+    for (let idx = 0; idx < headers.length; idx += 1) {
+      const wrapped = wrapText(`${headers[idx]}: ${row[idx] || "-"}`, safeWidth - 2);
+      wrapped.forEach((line, lineIndex) => {
+        lines.push({ text: lineIndex === 0 ? `• ${line}` : `  ${line}`, tone: lineIndex === 0 ? "body" : "muted" });
+      });
+    }
+    lines.push({ text: "─".repeat(Math.max(12, safeWidth - 4)), tone: "muted" });
+  }
+  if (lines.length > 0) lines.pop();
+  return lines;
+}
+
+function docToBlocks(doc, width) {
+  const blocks = [];
+  for (const section of doc.sections || []) {
+    const lines = [{ text: section.title, tone: "heading" }];
+    for (const block of section.blocks || []) {
+      if (block.type === "kv") {
+        const keyWidth = (block.entries || []).reduce((max, [key]) => Math.max(max, String(key).length), 0);
+        for (const [key, value] of block.entries || []) {
+          const prefix = `${padEndPlain(String(key), keyWidth)} : `;
+          const wrapped = wrapText(String(value || "-"), Math.max(16, width - prefix.length));
+          wrapped.forEach((line, index) => {
+            lines.push({
+              text: index === 0 ? `${prefix}${line}` : `${" ".repeat(prefix.length)}${line}`,
+              tone: index === 0 ? "body" : "muted"
+            });
+          });
+        }
+      } else if (block.type === "table") {
+        lines.push(...renderAdaptiveTableLines({ columns: block.columns || [], rows: block.rows || [], width }));
+      } else if (block.type === "list") {
+        for (const item of block.items || []) {
+          const bullet = block.bullet || "•";
+          const wrapped = wrapText(String(item), Math.max(20, width - 4));
+          wrapped.forEach((line, index) => {
+            lines.push({ text: index === 0 ? `${bullet} ${line}` : `  ${line}`, tone: index === 0 ? "body" : "muted" });
+          });
+        }
+      } else if (block.type === "status") {
+        const icon = block.level === "success" ? "✓" : block.level === "warn" ? "!" : block.level === "error" ? "x" : "i";
+        lines.push({ text: `${icon} ${block.message}`, tone: block.level || "info" });
+        if (block.detail) {
+          wrapText(String(block.detail), Math.max(20, width - 2)).forEach((line) => lines.push({ text: `  ${line}`, tone: "muted" }));
+        }
+      } else if (block.type === "text") {
+        wrapText(String(block.text || ""), width).forEach((line) => lines.push({ text: line, tone: "body" }));
+      }
+    }
+    blocks.push({ key: section.title, lines, lineCount: lines.length + 1 });
+  }
+  return blocks;
+}
+
+function toneToColor(tone) {
+  if (tone === "heading") return { color: "cyan", bold: true };
+  if (tone === "label") return { color: "cyan", bold: false };
+  if (tone === "muted") return { color: "gray", bold: false };
+  if (tone === "success") return { color: "green", bold: false };
+  if (tone === "warn") return { color: "yellow", bold: false };
+  if (tone === "error") return { color: "red", bold: false };
+  if (tone === "info") return { color: "cyan", bold: false };
+  return { color: "white", bold: false };
+}
+
+function ResultDocPanel({ title, blocks, busy, maxLines, blockOffset, lineOffset }) {
+  const availableLines = Math.max(6, maxLines - 4);
+  const safeBlock = clamp(blockOffset, 0, Math.max(0, blocks.length - 1));
+  const flatLines = [];
+  const blockStarts = [];
+
+  for (let idx = 0; idx < blocks.length; idx += 1) {
+    blockStarts.push(flatLines.length);
+    flatLines.push(...blocks[idx].lines);
+    if (idx < blocks.length - 1) {
+      flatLines.push({ text: "", tone: "muted" });
+    }
+  }
+
+  const maxOffset = Math.max(0, flatLines.length - availableLines);
+  const safeOffset = clamp(lineOffset || 0, 0, maxOffset);
+  const visible = flatLines.slice(safeOffset, safeOffset + availableLines);
+  const from = flatLines.length ? safeOffset + 1 : 0;
+  const to = safeOffset + visible.length;
+
+  return React.createElement(
+    Box,
+    { flexDirection: "column", borderStyle: "round", borderColor: "cyan", paddingX: 1, flexGrow: 1 },
+    React.createElement(Text, { color: "cyan", bold: true }, title),
+    busy ? React.createElement(Text, { color: "yellow" }, "Working...") : null,
+    ...visible.map((line, idx) => {
+      const style = toneToColor(line.tone);
+      return React.createElement(Text, { key: `result-doc-line-${idx}`, color: style.color, bold: style.bold }, line.text);
+    }),
+    React.createElement(Text, { color: "cyan" }, "─".repeat(Math.max(12, 56))),
+    React.createElement(Text, { color: "gray" }, `Lines ${from}-${to} of ${flatLines.length}  |  Block ${safeBlock + 1} of ${blocks.length}  |  ↑/↓ menu  j/k scroll`)
   );
 }
 
@@ -283,9 +479,11 @@ function AgentPickerPanel({ agents, cursor, selected, maxLines }) {
   );
 }
 
-function ConfirmPanel({ title, preview, options, selectedIndex, width, maxLines, offset }) {
+function ConfirmPanel({ title, preview, previewDoc, options, selectedIndex, width, maxLines, offset }) {
   const previewWidth = Math.max(24, (width || 80) - 10);
-  const previewLines = formatConfirmPreviewLines(preview, previewWidth);
+  const previewLines = previewDoc
+    ? formatConfirmPreviewFromDoc(previewDoc, previewWidth)
+    : formatConfirmPreviewLines(preview, previewWidth);
   const viewport = Math.max(5, maxLines - 14);
   const maxOffset = Math.max(0, previewLines.length - viewport);
   const safeOffset = clamp(offset, 0, maxOffset);
@@ -322,6 +520,7 @@ function ConfirmPanel({ title, preview, options, selectedIndex, width, maxLines,
 function App({ appVersion, actions, onResolve }) {
   const menuItems = [
     { value: "install", label: "Install" },
+    { value: "native-setup", label: "Native Setup" },
     { value: "detect", label: "Detect" },
     { value: "list", label: "List" },
     { value: "doctor", label: "Doctor" },
@@ -334,7 +533,10 @@ function App({ appVersion, actions, onResolve }) {
   const [menuIndex, setMenuIndex] = useState(0);
   const [resultTitle, setResultTitle] = useState("Ready");
   const [resultBody, setResultBody] = useState("Choose a command from the left.");
+  const [resultDoc, setResultDoc] = useState(null);
   const [resultOffset, setResultOffset] = useState(0);
+  const [resultBlockOffset, setResultBlockOffset] = useState(0);
+  const [resultDocLineOffset, setResultDocLineOffset] = useState(0);
 
   const [installSkills, setInstallSkills] = useState([]);
   const [installAgents, setInstallAgents] = useState([]);
@@ -343,6 +545,7 @@ function App({ appVersion, actions, onResolve }) {
   const [cursorIndex, setCursorIndex] = useState(0);
   const [confirmChoice, setConfirmChoice] = useState(0);
   const [installPreview, setInstallPreview] = useState("");
+  const [installPreviewDoc, setInstallPreviewDoc] = useState(null);
   const [confirmPreviewOffset, setConfirmPreviewOffset] = useState(0);
 
   const { busy, run } = useAsyncAction();
@@ -351,6 +554,20 @@ function App({ appVersion, actions, onResolve }) {
   const contentWidth = Math.max(60, stdoutWidth - 36);
   const panelMaxLines = Math.max(12, stdoutRows - 10);
   const resultLines = useMemo(() => wrapText(resultBody, contentWidth - 6), [resultBody, contentWidth]);
+  const resultDocBlocks = useMemo(() => {
+    if (!isResultDoc(resultDoc)) return [];
+    return docToBlocks(resultDoc, Math.max(24, contentWidth - 8));
+  }, [resultDoc, contentWidth]);
+  const resultDocBlockStarts = useMemo(() => {
+    const starts = [];
+    let cursor = 0;
+    for (let idx = 0; idx < resultDocBlocks.length; idx += 1) {
+      starts.push(cursor);
+      cursor += resultDocBlocks[idx].lines.length;
+      if (idx < resultDocBlocks.length - 1) cursor += 1;
+    }
+    return starts;
+  }, [resultDocBlocks]);
   const resultViewport = Math.max(6, panelMaxLines - 4);
   const resultMaxOffset = Math.max(0, resultLines.length - resultViewport);
 
@@ -376,6 +593,7 @@ function App({ appVersion, actions, onResolve }) {
         setSelectedAgents(preAgents);
         setCursorIndex(0);
         setConfirmPreviewOffset(0);
+        setInstallPreviewDoc(null);
         setMode("install-skills");
       });
       return;
@@ -388,10 +606,16 @@ function App({ appVersion, actions, onResolve }) {
     }
 
     await run(async () => {
-      const body = await actions.runCommand(value);
-      setResultTitle(value[0].toUpperCase() + value.slice(1));
-      setResultBody(body);
+      const bundle = actions.runCommandBundle ? await actions.runCommandBundle(value) : null;
+      const doc = bundle?.doc ?? (actions.runCommandDoc ? await actions.runCommandDoc(value) : null);
+      const body = bundle?.text ?? await actions.runCommand(value);
+      const menuLabel = menuItems.find((item) => item.value === value)?.label || value;
+      setResultTitle(menuLabel);
+      setResultBody(stripAnsi(body));
+      setResultDoc(isResultDoc(doc) ? doc : null);
       setResultOffset(0);
+      setResultBlockOffset(0);
+      setResultDocLineOffset(0);
       setMode("result");
     });
   }
@@ -439,11 +663,39 @@ function App({ appVersion, actions, onResolve }) {
         return;
       }
       if (input === "j") {
-        setResultOffset((current) => clamp(current + 1, 0, resultMaxOffset));
+        if (isResultDoc(resultDoc)) {
+          const totalLines = resultDocBlocks.reduce((sum, block) => sum + block.lines.length, 0) + Math.max(0, resultDocBlocks.length - 1);
+          const maxLineOffset = Math.max(0, totalLines - Math.max(6, panelMaxLines - 4));
+          setResultDocLineOffset((current) => {
+            const next = clamp(current + 1, 0, maxLineOffset);
+            for (let idx = resultDocBlockStarts.length - 1; idx >= 0; idx -= 1) {
+              if (next >= (resultDocBlockStarts[idx] || 0)) {
+                setResultBlockOffset(idx);
+                break;
+              }
+            }
+            return next;
+          });
+        } else {
+          setResultOffset((current) => clamp(current + 1, 0, resultMaxOffset));
+        }
         return;
       }
       if (input === "k") {
-        setResultOffset((current) => clamp(current - 1, 0, resultMaxOffset));
+        if (isResultDoc(resultDoc)) {
+          setResultDocLineOffset((current) => {
+            const next = clamp(current - 1, 0, Number.MAX_SAFE_INTEGER);
+            for (let idx = resultDocBlockStarts.length - 1; idx >= 0; idx -= 1) {
+              if (next >= (resultDocBlockStarts[idx] || 0)) {
+                setResultBlockOffset(idx);
+                break;
+              }
+            }
+            return next;
+          });
+        } else {
+          setResultOffset((current) => clamp(current - 1, 0, resultMaxOffset));
+        }
         return;
       }
       return;
@@ -485,11 +737,12 @@ function App({ appVersion, actions, onResolve }) {
         });
       } else if (key.return) {
         void run(async () => {
-          const preview = await actions.previewInstall({
-            selectedSkillIds: [...selectedSkills],
-            selectedAgents: [...selectedAgents]
-          });
-          setInstallPreview(preview);
+          const payload = { selectedSkillIds: [...selectedSkills], selectedAgents: [...selectedAgents] };
+          const bundle = actions.previewInstallBundle ? await actions.previewInstallBundle(payload) : null;
+          const preview = bundle?.text ?? await actions.previewInstall(payload);
+          const doc = bundle?.doc ?? (actions.previewInstallDoc ? await actions.previewInstallDoc(payload) : null);
+          setInstallPreview(stripAnsi(preview));
+          setInstallPreviewDoc(isResultDoc(doc) ? doc : null);
           setConfirmPreviewOffset(0);
           setConfirmChoice(0);
           setMode("confirm-install");
@@ -506,17 +759,26 @@ function App({ appVersion, actions, onResolve }) {
       if (key.upArrow || key.downArrow) setConfirmChoice((current) => (current === 0 ? 1 : 0));
       else if (key.return) {
         if (confirmChoice === 1) {
+          setResultTitle("Ready");
+          setResultBody("Choose a command from the left.");
+          setResultDoc(null);
+          setResultOffset(0);
+          setResultBlockOffset(0);
+          setResultDocLineOffset(0);
           setMode("menu");
           return;
         }
         void run(async () => {
-          const output = await actions.applyInstall({
-            selectedSkillIds: [...selectedSkills],
-            selectedAgents: [...selectedAgents]
-          });
+          const payload = { selectedSkillIds: [...selectedSkills], selectedAgents: [...selectedAgents] };
+          const bundle = actions.applyInstallBundle ? await actions.applyInstallBundle(payload) : null;
+          const output = bundle?.text ?? await actions.applyInstall(payload);
+          const doc = bundle?.doc ?? (actions.applyInstallDoc ? await actions.applyInstallDoc(payload) : null);
           setResultTitle("Install");
-          setResultBody(output);
+          setResultBody(stripAnsi(output));
+          setResultDoc(isResultDoc(doc) ? doc : null);
           setResultOffset(0);
+          setResultBlockOffset(0);
+          setResultDocLineOffset(0);
           setMode("result");
         });
       } else if (key.backspace || key.escape) {
@@ -537,10 +799,15 @@ function App({ appVersion, actions, onResolve }) {
           return;
         }
         void run(async () => {
-          const output = await actions.runCommand("uninstall");
+          const bundle = actions.runCommandBundle ? await actions.runCommandBundle("uninstall") : null;
+          const doc = bundle?.doc ?? (actions.runCommandDoc ? await actions.runCommandDoc("uninstall") : null);
+          const output = bundle?.text ?? await actions.runCommand("uninstall");
           setResultTitle("Uninstall");
-          setResultBody(output);
+          setResultBody(stripAnsi(output));
+          setResultDoc(isResultDoc(doc) ? doc : null);
           setResultOffset(0);
+          setResultBlockOffset(0);
+          setResultDocLineOffset(0);
           setMode("result");
         });
       } else if (key.backspace || key.escape) {
@@ -553,13 +820,22 @@ function App({ appVersion, actions, onResolve }) {
     }
   });
 
-  let rightPanel = React.createElement(ResultPanel, {
-    title: resultTitle,
-    lines: resultLines,
-    busy,
-    maxLines: panelMaxLines,
-    offset: resultOffset
-  });
+  let rightPanel = isResultDoc(resultDoc)
+    ? React.createElement(ResultDocPanel, {
+      title: resultTitle,
+      blocks: resultDocBlocks,
+      busy,
+      maxLines: panelMaxLines,
+      blockOffset: resultBlockOffset,
+      lineOffset: resultDocLineOffset
+    })
+    : React.createElement(ResultPanel, {
+      title: resultTitle,
+      lines: resultLines,
+      busy,
+      maxLines: panelMaxLines,
+      offset: resultOffset
+    });
 
   if (mode === "install-skills") {
     rightPanel = React.createElement(SkillPickerPanel, {
@@ -580,6 +856,7 @@ function App({ appVersion, actions, onResolve }) {
     rightPanel = React.createElement(ConfirmPanel, {
       title: "Confirm Installation",
       preview: installPreview,
+      previewDoc: installPreviewDoc,
       options: ["Apply changes", "Cancel"],
       selectedIndex: confirmChoice,
       width: contentWidth,

@@ -58,6 +58,9 @@ test("interactive launcher routes through Ink UI actions", async () => {
         launched = true;
         const detectBlock = await actions.runCommand("detect");
         assert.match(detectBlock, /Detection Summary/);
+        const nativeSetupBlock = await actions.runCommand("native-setup");
+        assert.match(nativeSetupBlock, /Native setup completed/);
+        assert.doesNotMatch(nativeSetupBlock, /portable AI skill orchestration/);
 
         const context = await actions.prepareInstall();
         assert.equal(context.skills.length, 2);
@@ -91,6 +94,16 @@ test("interactive launcher routes through Ink UI actions", async () => {
           skillIds: options.selectedSkillIds || []
         }),
         applied: options.dryRun ? false : true
+      }),
+      setupNativeProject: async ({ cwd }) => ({
+        applied: true,
+        plan: {
+          cwd,
+          installRoot: path.join(cwd, ".skilly-hand"),
+          agents: ["codex"],
+          nativeStatus: [{ agent: "codex", status: "configured", target: ".codex/rules/skilly-hand.md", remediation: "No action needed." }]
+        },
+        nativeStatus: [{ agent: "codex", status: "configured", target: ".codex/rules/skilly-hand.md", remediation: "No action needed." }]
       }),
       runDoctor: async () => ({ cwd: "/tmp", installed: false, catalogIssues: [], fileStatus: [] }),
       uninstallProject: async () => ({ removed: false, reason: "No installation found." }),
@@ -147,6 +160,7 @@ test("interactive launcher install flow remains stable with long skill metadata"
           selectedAgents: ["codex"]
         });
         assert.match(preview, /Dry run complete/);
+        assert.doesNotMatch(preview, /portable AI skill orchestration/);
 
         calls.push("apply");
         const applied = await actions.applyInstall({
@@ -171,6 +185,16 @@ test("interactive launcher install flow remains stable with long skill metadata"
           skillIds: options.selectedSkillIds || []
         }),
         applied: options.dryRun ? false : true
+      }),
+      setupNativeProject: async ({ cwd }) => ({
+        applied: true,
+        plan: {
+          cwd,
+          installRoot: path.join(cwd, ".skilly-hand"),
+          agents: ["codex"],
+          nativeStatus: [{ agent: "codex", status: "configured", target: ".codex/rules/skilly-hand.md", remediation: "No action needed." }]
+        },
+        nativeStatus: [{ agent: "codex", status: "configured", target: ".codex/rules/skilly-hand.md", remediation: "No action needed." }]
       }),
       runDoctor: async () => ({ cwd: "/tmp", installed: false, catalogIssues: [], fileStatus: [] }),
       uninstallProject: async () => ({ removed: false, reason: "No installation found." }),
