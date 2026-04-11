@@ -1,6 +1,6 @@
 {
   "name": "@skilly-hand/skilly-hand",
-  "version": "0.21.1",
+  "version": "0.22.0",
   "license": "CC-BY-NC-4.0",
   "type": "module",
   "publishConfig": {
