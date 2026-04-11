@@ -5,17 +5,17 @@ import path from "node:path";
 import { mkdtemp, writeFile } from "node:fs/promises";
 import { runDependencySecurityCheck } from "../scripts/dependency-security-check.mjs";
 
-async function makeProject({ withLockfile = true } = {}) {
+async function makeProject({ lockfile = "package-lock.json" } = {}) {
   const tmpDir = await mkdtemp(path.join(os.tmpdir(), "skilly-hand-deps-"));
   await writeFile(path.join(tmpDir, "package.json"), JSON.stringify({ name: "tmp", version: "1.0.0" }, null, 2), "utf8");
-  if (withLockfile) {
-    await writeFile(path.join(tmpDir, "package-lock.json"), "{}\n", "utf8");
+  if (lockfile) {
+    await writeFile(path.join(tmpDir, lockfile), "{}\n", "utf8");
   }
   return tmpDir;
 }
 
 test("dependency check warns in non-strict mode for high vulnerabilities", async () => {
-  const cwd = await makeProject({ withLockfile: true });
+  const cwd = await makeProject({ lockfile: "package-lock.json" });
 
   const result = await runDependencySecurityCheck({
     cwd,
@@ -38,7 +38,7 @@ test("dependency check warns in non-strict mode for high vulnerabilities", async
 });
 
 test("dependency check blocks in strict mode for high vulnerabilities", async () => {
-  const cwd = await makeProject({ withLockfile: true });
+  const cwd = await makeProject({ lockfile: "package-lock.json" });
 
   const result = await runDependencySecurityCheck({
     cwd,
@@ -61,7 +61,7 @@ test("dependency check blocks in strict mode for high vulnerabilities", async ()
 });
 
 test("dependency check fails closed in strict mode when lockfile is missing", async () => {
-  const cwd = await makeProject({ withLockfile: false });
+  const cwd = await makeProject({ lockfile: null });
 
   const result = await runDependencySecurityCheck({
     cwd,
@@ -72,4 +72,19 @@ test("dependency check fails closed in strict mode when lockfile is missing", as
   assert.equal(result.valid, false);
   assert.equal(result.lockfilePresent, false);
   assert.equal(result.issues.some((issue) => /lockfile/.test(issue)), true);
+});
+
+test("dependency check accepts npm-shrinkwrap lockfile for npm projects", async () => {
+  const cwd = await makeProject({ lockfile: "npm-shrinkwrap.json" });
+
+  const result = await runDependencySecurityCheck({
+    cwd,
+    strict: true,
+    runCommandImpl: async () => ({ exitCode: 0, stdout: "{}", stderr: "" })
+  });
+
+  assert.equal(result.valid, true);
+  assert.equal(result.manager, "npm");
+  assert.equal(result.lockfile, "npm-shrinkwrap.json");
+  assert.equal(result.lockfilePresent, true);
 });

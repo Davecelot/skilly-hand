@@ -18,7 +18,7 @@ const PACKAGE_MANAGERS = {
     outdatedCmd: ["yarn", ["outdated", "--json"]]
   },
   npm: {
-    lockfile: "package-lock.json",
+    lockfile: ["npm-shrinkwrap.json", "package-lock.json"],
     auditCmd: ["npm", ["audit", "--json"]],
     outdatedCmd: ["npm", ["outdated", "--json"]]
   }
@@ -84,15 +84,19 @@ async function detectPackageManager(cwd) {
   }
 
   for (const manager of ["pnpm", "yarn", "npm"]) {
-    const lockfile = PACKAGE_MANAGERS[manager].lockfile;
-    if (await exists(path.join(cwd, lockfile))) {
-      return {
-        manager,
-        hasPackageJson: true,
-        lockfile,
-        lockfilePresent: true,
-        reason: ""
-      };
+    const lockfiles = Array.isArray(PACKAGE_MANAGERS[manager].lockfile)
+      ? PACKAGE_MANAGERS[manager].lockfile
+      : [PACKAGE_MANAGERS[manager].lockfile];
+    for (const lockfile of lockfiles) {
+      if (await exists(path.join(cwd, lockfile))) {
+        return {
+          manager,
+          hasPackageJson: true,
+          lockfile,
+          lockfilePresent: true,
+          reason: ""
+        };
+      }
     }
   }
 
@@ -290,7 +294,7 @@ export async function runDependencySecurityCheck({
   }
 
   if (!detection.lockfilePresent) {
-    const message = "Dependency security check requires a lockfile (pnpm-lock.yaml, yarn.lock, or package-lock.json).";
+    const message = "Dependency security check requires a lockfile (pnpm-lock.yaml, yarn.lock, npm-shrinkwrap.json, or package-lock.json).";
     if (strict) {
       issues.push(message);
       result.valid = false;

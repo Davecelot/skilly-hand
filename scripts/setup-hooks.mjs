@@ -7,16 +7,47 @@ const renderer = createTerminalRenderer();
 
 const INSTALLER_MARKER = "# Installed by: npm run setup:hooks";
 
-const HOOK_CONTENT = `#!/bin/sh
+const PRE_COMMIT_CONTENT = `#!/bin/sh
 ${INSTALLER_MARKER}
-# Checks that all packages/* versions match the root package.json version.
+# Fast dependency safety checks before each commit.
 npm run verify:versions --silent
+npm run deps:policy:check --silent
 `;
+
+const PRE_PUSH_CONTENT = `#!/bin/sh
+${INSTALLER_MARKER}
+# Full dependency/update gate before each push.
+npm run verify:publish --silent
+npm run deps:policy:check --silent
+`;
+
+async function ensureHook({
+  hookPath,
+  hookName,
+  content,
+  force
+}) {
+  try {
+    const existing = await readFile(hookPath, "utf8");
+    if (!existing.includes(INSTALLER_MARKER) && !force) {
+      throw new Error(
+        `A ${hookName} hook already exists and was not installed by this script.\n` +
+        `Run with --force to overwrite it, or inspect it first: cat .git/hooks/${hookName}`
+      );
+    }
+  } catch (err) {
+    if (err.code !== "ENOENT") throw err;
+  }
+
+  await writeFile(hookPath, content, "utf8");
+  await chmod(hookPath, 0o755);
+}
 
 export async function setupHooks({ cwd = process.cwd(), force = false } = {}) {
   const resolvedCwd = path.resolve(cwd);
   const hooksDir = path.join(resolvedCwd, ".git", "hooks");
-  const hookPath = path.join(hooksDir, "pre-commit");
+  const preCommitPath = path.join(hooksDir, "pre-commit");
+  const prePushPath = path.join(hooksDir, "pre-push");
 
   // Verify this is a git repo
   try {
@@ -25,25 +56,27 @@ export async function setupHooks({ cwd = process.cwd(), force = false } = {}) {
     throw new Error("No .git directory found. Run this from the repository root.");
   }
 
-  // Detect pre-existing hook installed by a different tool
-  try {
-    const existing = await readFile(hookPath, "utf8");
-    if (!existing.includes(INSTALLER_MARKER) && !force) {
-      throw new Error(
-        "A pre-commit hook already exists and was not installed by this script.\n" +
-        "Run with --force to overwrite it, or inspect it first: cat .git/hooks/pre-commit"
-      );
-    }
-  } catch (err) {
-    if (err.code !== "ENOENT") throw err;
-    // ENOENT = no existing hook, safe to proceed
-  }
-
   await mkdir(hooksDir, { recursive: true });
-  await writeFile(hookPath, HOOK_CONTENT, "utf8");
-  await chmod(hookPath, 0o755);
+  await ensureHook({
+    hookPath: preCommitPath,
+    hookName: "pre-commit",
+    content: PRE_COMMIT_CONTENT,
+    force
+  });
+  await ensureHook({
+    hookPath: prePushPath,
+    hookName: "pre-push",
+    content: PRE_PUSH_CONTENT,
+    force
+  });
 
-  return { hookPath: path.relative(resolvedCwd, hookPath) };
+  return {
+    hookPath: path.relative(resolvedCwd, preCommitPath),
+    hookPaths: [
+      path.relative(resolvedCwd, preCommitPath),
+      path.relative(resolvedCwd, prePushPath)
+    ]
+  };
 }
 
 function parseArgs(argv) {
@@ -65,7 +98,7 @@ function printHelp() {
   renderer.write(renderer.joinBlocks([
     renderer.status("info", "setup-hooks"),
     renderer.section("Usage", renderer.list(["node scripts/setup-hooks.mjs [--force] [--json]"], { bullet: "-" })),
-    renderer.section("Description", "Installs a git pre-commit hook that runs verify:versions before each commit.\nSafe to re-run. Use --force to overwrite a pre-existing hook from another tool.")
+    renderer.section("Description", "Installs git pre-commit and pre-push hooks to enforce dependency update gates.\nSafe to re-run. Use --force to overwrite a pre-existing hook from another tool.")
   ]));
 }
 
@@ -84,8 +117,8 @@ if (isEntryPoint) {
         renderer.writeJson({ command: "setup-hooks", ok: true, ...result });
       } else {
         renderer.write(renderer.joinBlocks([
-          renderer.status("success", "Git pre-commit hook installed."),
-          renderer.kv([["Hook path", result.hookPath]])
+          renderer.status("success", "Git hooks installed."),
+          renderer.kv([["Hook paths", result.hookPaths.join(", ")]])
         ]));
       }
     }

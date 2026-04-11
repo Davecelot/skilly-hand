@@ -16,6 +16,27 @@ All notable changes to this project are documented in this file.
 ### Removed
 - _None._
 
+## [0.20.0] - 2026-04-11
+[View on npm](https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.20.0)
+
+### Added
+- Added `scripts/dependency-policy-check.mjs` and `deps:policy:check` to enforce exact runtime dependency pins plus synchronized `package-lock.json`/`npm-shrinkwrap.json`.
+- Added `scripts/dependency-update-safe.mjs` and `deps:update:safe` to enforce safe dependency upgrades with full validation gates.
+- Added `npm-shrinkwrap.json` to the repository and release workflow for npm lockfile parity.
+- Added regression test coverage for dependency policy checks, safe dependency update flow, and managed git hook installation behavior.
+
+### Changed
+- Updated `verify:publish` to run dependency policy checks before security, catalog, test, and packlist gates.
+- Updated `scripts/setup-hooks.mjs` to install both managed `pre-commit` and `pre-push` hooks with safety checks for foreign hooks.
+- Updated `scripts/dependency-security-check.mjs` to recognize `npm-shrinkwrap.json` as a valid npm lockfile.
+- Updated docs with dependency update policy guidance and hook setup requirements.
+
+### Fixed
+- Expanded script JSON contract tests to cover `dependency-policy-check`.
+
+### Removed
+- _None._
+
 ## [0.19.0] - 2026-04-11
 [View on npm](https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.19.0)
 

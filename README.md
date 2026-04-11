@@ -105,6 +105,10 @@ See [catalog/README.md](./catalog/README.md) for generated skill metadata.
 
 - `npm run security:check` runs repository secret/config checks plus strict dependency security checks.
 - `npm run security:deps` runs strict dependency audit + outdated reporting only.
+- `npm run deps:policy:check` enforces exact runtime dependency pins and lockfile sync (`package-lock.json` + `npm-shrinkwrap.json`).
+- `npm run deps:update:safe -- <pkg[@version]>` is the required dependency update path; it pins exact versions, syncs shrinkwrap, and blocks completion unless all validation gates pass.
+- Do not use raw `npm install` for dependency upgrades in this repo; use `deps:update:safe` so tests and security gates run before accepting version changes.
+- Run `npm run setup:hooks` once per clone to install `pre-commit` (fast checks) and `pre-push` (full gate) hooks.
 
 ---
 
