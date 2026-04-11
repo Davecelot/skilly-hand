@@ -16,6 +16,21 @@ All notable changes to this project are documented in this file.
 ### Removed
 - _None._
 
+## [0.21.0] - 2026-04-11
+[View on npm](https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.21.0)
+
+### Added
+- Added portable skill `user-story-crafting` with integrated sub-agents for story writing, INVEST-based structuring, story splitting, and lightweight story mapping.
+
+### Changed
+- _None._
+
+### Fixed
+- _None._
+
+### Removed
+- _None._
+
 ## [0.20.0] - 2026-04-11
 [View on npm](https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.20.0)
 
