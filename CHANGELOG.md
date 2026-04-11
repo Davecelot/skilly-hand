@@ -16,6 +16,21 @@ All notable changes to this project are documented in this file.
 ### Removed
 - _None._
 
+## [0.21.1] - 2026-04-11
+[View on npm](https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.21.1)
+
+### Added
+- _None._
+
+### Changed
+- _None._
+
+### Fixed
+- Added missing `user-story-crafting` to the README portable catalog list.
+
+### Removed
+- _None._
+
 ## [0.21.0] - 2026-04-11
 [View on npm](https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.21.0)
 

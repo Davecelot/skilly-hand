@@ -83,6 +83,7 @@ The catalog currently includes:
 - `spec-driven-development`
 - `test-driven-development`
 - `token-optimizer`
+- `user-story-crafting`
 
 See [catalog/README.md](./catalog/README.md) for generated skill metadata.
 

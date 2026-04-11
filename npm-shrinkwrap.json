@@ -1,12 +1,12 @@
 {
   "name": "@skilly-hand/skilly-hand",
-  "version": "0.21.0",
+  "version": "0.21.1",
   "lockfileVersion": 3,
   "requires": true,
   "packages": {
     "": {
       "name": "@skilly-hand/skilly-hand",
-      "version": "0.21.0",
+      "version": "0.21.1",
       "license": "CC-BY-NC-4.0",
       "workspaces": [
         "packages/*"
@@ -743,22 +743,22 @@
     },
     "packages/catalog": {
       "name": "@skilly-hand/catalog",
-      "version": "0.21.0"
+      "version": "0.21.1"
     },
     "packages/cli": {
       "name": "@skilly-hand/cli",
-      "version": "0.21.0",
+      "version": "0.21.1",
       "bin": {
         "skilly-hand": "src/bin.js"
       }
     },
     "packages/core": {
       "name": "@skilly-hand/core",
-      "version": "0.21.0"
+      "version": "0.21.1"
     },
     "packages/detectors": {
       "name": "@skilly-hand/detectors",
-      "version": "0.21.0"
+      "version": "0.21.1"
     }
   }
 }
