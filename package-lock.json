@@ -12,8 +12,8 @@
         "packages/*"
       ],
       "dependencies": {
-        "ink": "^5.2.1",
-        "react": "^18.3.1"
+        "ink": "5.2.1",
+        "react": "18.3.1"
       },
       "bin": {
         "skilly-hand": "packages/cli/src/bin.js"
@@ -743,22 +743,22 @@
     },
     "packages/catalog": {
       "name": "@skilly-hand/catalog",
-      "version": "0.19.0"
+      "version": "0.21.0"
     },
     "packages/cli": {
       "name": "@skilly-hand/cli",
-      "version": "0.19.0",
+      "version": "0.21.0",
       "bin": {
         "skilly-hand": "src/bin.js"
       }
     },
     "packages/core": {
       "name": "@skilly-hand/core",
-      "version": "0.19.0"
+      "version": "0.21.0"
     },
     "packages/detectors": {
       "name": "@skilly-hand/detectors",
-      "version": "0.19.0"
+      "version": "0.21.0"
     }
   }
 }
