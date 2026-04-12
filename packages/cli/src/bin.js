@@ -53,7 +53,7 @@ export function parseArgs(argv) {
     verbose: false,
     json: false,
     classic: false,
-    agents: [],
+    agents: null,
     include: [],
     exclude: []
   };
@@ -78,7 +78,7 @@ export function parseArgs(argv) {
     else if (token === "--verbose" || token === "-v") flags.verbose = true;
     else if (token === "--json") flags.json = true;
     else if (token === "--classic") flags.classic = true;
-    else if (token === "--agent" || token === "-a") flags.agents.push(takeFlagValue(token));
+    else if (token === "--agent" || token === "-a") { if (!flags.agents) flags.agents = []; flags.agents.push(takeFlagValue(token)); }
     else if (token === "--cwd") flags.cwd = takeFlagValue(token);
     else if (token === "--include") flags.include.push(takeFlagValue(token));
     else if (token === "--exclude") flags.exclude.push(takeFlagValue(token));

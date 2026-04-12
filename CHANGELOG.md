@@ -16,6 +16,22 @@ All notable changes to this project are documented in this file.
 ### Removed
 - _None._
 
+## [0.22.2] - 2026-04-12
+[View on npm](https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.22.2)
+
+### Added
+- _None._
+
+### Changed
+- Updated native setup agent selection flow to preserve previously configured agents when `--agent` flags are omitted.
+
+### Fixed
+- Fixed CLI argument parsing so `--agent` defaults can distinguish between omitted flags and explicit empty selections.
+- Fixed native setup defaults to avoid unexpectedly resetting managed agent targets.
+
+### Removed
+- _None._
+
 ## [0.22.1] - 2026-04-12
 [View on npm](https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.22.1)
 

@@ -183,8 +183,12 @@ function retainNativeProfilesForAgents(previousLock, selectedAgents) {
 }
 
 function normalizeAgentList(agents) {
-  if (!agents || agents.length === 0) {
+  if (agents == null) {
     return [...DEFAULT_AGENTS];
+  }
+
+  if (agents.length === 0) {
+    return [];
   }
 
   return uniq(agents.flatMap((item) => String(item).split(",")).map((item) => item.trim()).filter(Boolean));
@@ -483,12 +487,12 @@ export async function setupNativeProject({
   agents,
   dryRun = false
 }) {
-  const selectedAgents = normalizeAgentList(agents);
   const generatedAt = nowIso();
   const installRoot = path.join(cwd, ".skilly-hand");
   const backupsDir = path.join(installRoot, "backups");
   const lockPath = path.join(installRoot, "manifest.lock.json");
   const previousLock = await exists(lockPath) ? await readJson(lockPath) : null;
+  const selectedAgents = normalizeAgentList(agents ?? previousLock?.agents);
   const selectedNativeTargets = selectedAgents
     .map((agent) => NATIVE_ADAPTER_REGISTRY[agent])
     .filter((adapter) => adapter && adapter.supported)
