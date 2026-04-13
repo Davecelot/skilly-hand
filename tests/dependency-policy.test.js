@@ -2,7 +2,8 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import os from "node:os";
 import path from "node:path";
-import { mkdtemp, writeFile } from "node:fs/promises";
+import { mkdtemp, readFile, writeFile } from "node:fs/promises";
+import { fileURLToPath } from "node:url";
 import { runDependencyPolicyCheck } from "../scripts/dependency-policy-check.mjs";
 
 async function makeProject({
@@ -54,7 +55,7 @@ test("dependency policy check fails when npm-shrinkwrap.json is missing", async 
 });
 
 test("dependency policy check passes with exact versions and synced lockfiles", async () => {
-  const cwd = await makeProject({ deps: { react: "18.3.1", ink: "5.2.1" } });
+  const cwd = await makeProject({ deps: { inquirer: "13.4.1" } });
   const result = await runDependencyPolicyCheck({ cwd });
   assert.equal(result.valid, true);
   assert.equal(result.lockfilesSynchronized, true);
@@ -75,4 +76,15 @@ test("dependency policy check fails when lockfiles are not synchronized", async 
   assert.equal(result.valid, false);
   assert.equal(result.lockfilesSynchronized, false);
   assert.equal(result.issues.some((issue) => /out of sync/.test(issue)), true);
+});
+
+test("runtime dependencies do not include react or ink", async () => {
+  const here = path.dirname(fileURLToPath(import.meta.url));
+  const packageJsonPath = path.resolve(here, "../package.json");
+  const packageJson = JSON.parse(await readFile(packageJsonPath, "utf8"));
+  const deps = packageJson.dependencies || {};
+
+  assert.equal(Boolean(deps.react), false);
+  assert.equal(Boolean(deps.ink), false);
+  assert.equal(typeof deps.inquirer, "string");
 });

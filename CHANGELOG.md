@@ -16,6 +16,26 @@ All notable changes to this project are documented in this file.
 ### Removed
 - _None._
 
+## [0.23.1] - 2026-04-13
+[View on npm](https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.23.1)
+
+### Added
+- Added an Inquirer-powered guided home launcher with searchable command discovery and a built-in Command Guide.
+- Added shared CLI command metadata in `packages/cli/src/command-registry.js` and wired help/interactive flows to consume it.
+- Added `scripts/review-rangers-check.mjs` plus `npm run review:rangers`, and integrated it into `verify:publish`.
+
+### Changed
+- Updated CLI help output to include a dedicated Commands section sourced from the shared command registry.
+- Updated docs to describe the new interactive launcher and mark `--classic` as a deprecated compatibility flag.
+- Updated dependency policy and script contract tests for the new release gates and runtime dependency set.
+
+### Fixed
+- Added guard tests to prevent reintroducing `react`/`ink` runtime dependencies after the interactive stack migration.
+
+### Removed
+- Removed the legacy Ink full-screen UI implementation (`packages/cli/src/ink-ui.js`) and related tests.
+- Removed runtime dependencies on `ink` and `react` in favor of `inquirer`.
+
 ## [0.23.0] - 2026-04-12
 [View on npm](https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.23.0)
 

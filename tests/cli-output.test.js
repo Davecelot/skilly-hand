@@ -51,8 +51,10 @@ test("help output is structured and includes JSON mode", () => {
   const result = runCli(["--help"]);
   assert.equal(result.status, 0);
   assert.match(result.stdout, /Usage/);
+  assert.match(result.stdout, /Commands/);
   assert.match(result.stdout, /Flags/);
   assert.match(result.stdout, /--json/);
+  assert.match(result.stdout, /Install portable skills into the current project/);
   assert.match(result.stdout, /antigravity/);
   assert.match(result.stdout, /windsurf/);
   assert.match(result.stdout, /trae/);

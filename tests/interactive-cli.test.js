@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import path from "node:path";
 import { runCli } from "../packages/cli/src/bin.js";
+import { createInquirerInteractiveUi } from "../packages/cli/src/inquirer-ui.js";
 
 function createWritable(isTTY) {
   let buffer = "";
@@ -34,7 +35,7 @@ function createInstallResult({ cwd, detections, agents, skillIds }) {
   };
 }
 
-test("interactive launcher routes through Ink UI actions", async () => {
+test("interactive launcher routes through interactive UI actions", async () => {
   const stdout = createWritable(true);
   const stderr = createWritable(true);
 
@@ -346,7 +347,7 @@ test("--json mode stays non-interactive even when stdout is TTY", async () => {
   assert.equal(payload.applied, false);
 });
 
-test("--classic skips full-screen TUI and uses plain command flow", async () => {
+test("--classic skips launcher mode and uses plain command flow", async () => {
   const stdout = createWritable(true);
   const stderr = createWritable(true);
 
@@ -384,4 +385,117 @@ test("--classic skips full-screen TUI and uses plain command flow", async () => 
   });
 
   assert.match(stdout.value(), /Install Preflight/);
+});
+
+test("inquirer launcher flow runs in React-host projects without React hook failures", async () => {
+  const stdout = createWritable(true);
+  const stderr = createWritable(true);
+  const writes = [];
+  const prompts = [
+    { command: "command-guide" },
+    { command: "detect" },
+    { command: "exit" }
+  ];
+
+  const interactiveUi = createInquirerInteractiveUi({
+    prompt: async () => {
+      const next = prompts.shift();
+      if (!next) throw new Error("Prompt queue exhausted");
+      return next;
+    },
+    write: (value) => {
+      writes.push(String(value));
+    }
+  });
+
+  await runCli({
+    argv: [],
+    stdin: { isTTY: true },
+    stdout,
+    stderr,
+    env: { NO_COLOR: "1", TERM: "xterm-256color" },
+    platform: "darwin",
+    interactiveUi,
+    services: {
+      detectProject: async () => [{ technology: "react", confidence: 1, reasons: [], recommendedSkillIds: ["react-guidelines"] }],
+      loadAllSkills: async () => [],
+      resolveSkillSelection: () => [],
+      installProject: async (options) => createInstallResult({
+        cwd: options.cwd,
+        detections: [],
+        agents: [],
+        skillIds: []
+      }),
+      setupNativeProject: async ({ cwd }) => ({
+        applied: true,
+        plan: {
+          cwd,
+          installRoot: path.join(cwd, ".skilly-hand"),
+          agents: ["codex"],
+          nativeStatus: [{ agent: "codex", status: "configured", target: ".codex/rules/skilly-hand.md", remediation: "No action needed." }]
+        },
+        nativeStatus: [{ agent: "codex", status: "configured", target: ".codex/rules/skilly-hand.md", remediation: "No action needed." }]
+      }),
+      runDoctor: async () => ({ cwd: "/tmp", installed: false, catalogIssues: [], fileStatus: [] }),
+      uninstallProject: async () => ({ removed: false, reason: "No installation found." }),
+      defaultAgents: ["codex"]
+    },
+    appVersion: "0.4.0",
+    cwdResolver: () => "/tmp/react-host-project"
+  });
+
+  const combined = `${stdout.value()}\n${writes.join("\n")}`;
+  assert.match(combined, /Guided Home/);
+  assert.match(combined, /Command Guide/);
+  assert.match(combined, /Aliases:/);
+  assert.match(combined, /Detection Summary/);
+  assert.doesNotMatch(combined, /Invalid hook call/);
+  assert.doesNotMatch(combined, /reading 'useState'/);
+});
+
+test("inquirer launcher install flow renders contextual micro-help and next hint", async () => {
+  const writes = [];
+  const prompts = [
+    { command: "install" },
+    { selectedSkillIds: ["token-optimizer"] },
+    { selectedAgents: ["codex"] },
+    { installDecision: "apply" },
+    { command: "exit" }
+  ];
+
+  const interactiveUi = createInquirerInteractiveUi({
+    prompt: async () => {
+      const next = prompts.shift();
+      if (!next) throw new Error("Prompt queue exhausted");
+      return next;
+    },
+    write: (value) => writes.push(String(value))
+  });
+
+  await interactiveUi.launch({
+    appVersion: "0.23.0",
+    actions: {
+      async prepareInstall() {
+        return {
+          skills: [{ id: "token-optimizer", title: "Token Optimizer", tags: ["core"], agentSupport: ["codex"], checked: true }],
+          agents: [{ value: "codex", checked: true }]
+        };
+      },
+      async previewInstallBundle() {
+        return { text: "preview" };
+      },
+      async applyInstallBundle() {
+        return { text: "applied" };
+      },
+      async runCommandBundle() {
+        return { text: "ok" };
+      }
+    }
+  });
+
+  const combined = writes.join("\n");
+  assert.match(combined, /Install Tips/);
+  assert.match(combined, /Assistant Target Tips/);
+  assert.match(combined, /Next Hint/);
+  assert.match(combined, /doctor/);
 });

@@ -1,6 +1,6 @@
 {
   "name": "@skilly-hand/skilly-hand",
-  "version": "0.23.0",
+  "version": "0.23.1",
   "license": "CC-BY-NC-4.0",
   "type": "module",
   "publishConfig": {
@@ -35,7 +35,8 @@
     "security:check": "node ./scripts/security-check.mjs --strict-deps",
     "verify:packlist": "node ./scripts/verify-packlist.mjs",
     "verify:versions": "node ./scripts/verify-versions.mjs",
-    "verify:publish": "npm run verify:versions && npm run deps:policy:check && npm run security:check && npm run catalog:check && npm test && npm run verify:packlist",
+    "review:rangers": "node ./scripts/review-rangers-check.mjs",
+    "verify:publish": "npm run verify:versions && npm run deps:policy:check && npm run security:check && npm run catalog:check && npm test && npm run review:rangers && npm run verify:packlist",
     "publish:prepare": "npm run verify:publish && npm pack --dry-run --json",
     "publish:otp": "node ./scripts/publish-with-otp.mjs",
     "publish:next": "node ./scripts/publish-with-otp.mjs --tag next",
@@ -49,7 +50,6 @@
     "doctor": "node ./packages/cli/src/bin.js doctor"
   },
   "dependencies": {
-    "ink": "7.0.0",
-    "react": "19.2.5"
+    "inquirer": "13.4.1"
   }
 }

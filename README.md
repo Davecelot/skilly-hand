@@ -36,7 +36,8 @@
 npx skilly-hand
 ```
 
-`npx skilly-hand` opens a full-screen skilly-hand terminal UI when running in a TTY.
+`npx skilly-hand` opens an interactive prompt workflow when running in a TTY.
+The guided home supports type-to-filter command discovery and includes a built-in Command Guide.
 
 ---
 
@@ -55,7 +56,7 @@ npx skilly-hand
 | Flag | Description |
 | ---- | ----------- |
 | `--json` | Emit machine-readable output and disable interactive prompts |
-| `--classic` | Force plain text command mode and skip full-screen TUI |
+| `--classic` | Deprecated compatibility flag that keeps plain command mode (launcher disabled) |
 | `--yes`, `-y` | Skip confirmation prompts for mutating commands (`install`, `uninstall`) |
 | `--dry-run` | Preview install plan without writing files |
 | `--agent`, `-a <name>` | Target a specific assistant (repeatable; e.g. `--agent claude --agent cursor`) |

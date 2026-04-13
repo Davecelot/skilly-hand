@@ -14,7 +14,8 @@ import {
 } from "../../core/src/index.js";
 import { createTerminalRenderer } from "../../core/src/terminal.js";
 import { detectProject } from "../../detectors/src/index.js";
-import { confirmWithInk, launchInkApp } from "./ink-ui.js";
+import { createInquirerInteractiveUi } from "./inquirer-ui.js";
+import { formatHelpUsageLines, getCliCommands, getInteractiveCommands } from "./command-registry.js";
 import {
   createResultDoc,
   kvBlock,
@@ -90,20 +91,17 @@ export function parseArgs(argv) {
 }
 
 function buildHelpText(renderer, appVersion) {
-  const usage = renderer.section("Usage", renderer.list([
-    "npx skilly-hand                  # interactive launcher when running in a TTY",
-    "npx skilly-hand install",
-    "npx skilly-hand native setup",
-    "npx skilly-hand detect",
-    "npx skilly-hand list",
-    "npx skilly-hand doctor",
-    "npx skilly-hand uninstall"
-  ], { bullet: "-" }));
+  const usage = renderer.section("Usage", renderer.list(formatHelpUsageLines(), { bullet: "-" }));
+
+  const commands = renderer.section("Commands", renderer.list(
+    getCliCommands().map((command) => `${command.usage}  # ${command.description}`),
+    { bullet: "-" }
+  ));
 
   const flags = renderer.section("Flags", renderer.list([
     "--dry-run                     Show install plan without writing files",
     "--json                        Emit stable JSON output for automation",
-    "--classic                     Force plain text command mode (skip full-screen TUI)",
+    "--classic                     Deprecated alias for plain command mode (launcher disabled)",
     "--yes, -y                     Skip install/uninstall confirmations",
     "--verbose, -v                 Reserved for future debug detail",
     "--agent, -a <name>            standard|codex|claude|cursor|gemini|copilot|antigravity|windsurf|trae (repeatable)",
@@ -125,6 +123,7 @@ function buildHelpText(renderer, appVersion) {
   return renderer.joinBlocks([
     renderer.banner(appVersion),
     usage,
+    commands,
     flags,
     examples
   ]);
@@ -474,8 +473,11 @@ async function runInteractiveSession({
   appVersion,
   interactiveUi
 }) {
+  const interactiveCommands = getInteractiveCommands();
+
   await interactiveUi.launch({
     appVersion,
+    commands: interactiveCommands,
     actions: {
       async runCommandBundle(command) {
         if (command === "native-setup") {
@@ -738,10 +740,7 @@ export async function runCli({
   env = process.env,
   platform = process.platform,
   services: providedServices = {},
-  interactiveUi = {
-    launch: ({ appVersion, actions }) => launchInkApp({ appVersion, actions }),
-    confirm: ({ message, defaultValue }) => confirmWithInk({ message, defaultValue })
-  },
+  interactiveUi = createInquirerInteractiveUi(),
   appVersion = version,
   cwdResolver = process.cwd
 } = {}) {
@@ -754,15 +753,7 @@ export async function runCli({
       renderer.writeJson({
         command: command || "install",
         help: true,
-        usage: [
-          "npx skilly-hand",
-          "npx skilly-hand install",
-          "npx skilly-hand native setup",
-          "npx skilly-hand detect",
-          "npx skilly-hand list",
-          "npx skilly-hand doctor",
-          "npx skilly-hand uninstall"
-        ]
+        usage: formatHelpUsageLines().map((line) => line.split("#")[0].trim())
       });
       return;
     }
@@ -772,6 +763,10 @@ export async function runCli({
   }
 
   const cwd = path.resolve(flags.cwd || cwdResolver());
+
+  if (flags.classic && !flags.json) {
+    renderer.write(renderer.status("info", "`--classic` is deprecated and kept only for backwards compatibility."));
+  }
 
   if (isInteractiveLauncherMode({ command, flags, stdout, stdin })) {
     try {

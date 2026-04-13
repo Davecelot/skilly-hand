@@ -8,6 +8,7 @@ This document covers maintainer-only workflows for releasing and securing `@skil
 2. Keep `CHANGELOG.md` up to date under `## [Unreleased]` as work lands.
 3. Regenerate derived files when needed: `npm run build && npm run catalog:sync && npm run agentic:self:sync`.
 4. Run publish gate: `npm run verify:publish`.
+   - Includes final `review-rangers` verification to catch UX copy/flow regressions and missing discoverability safeguards.
 5. Inspect package payload: `npm pack --dry-run --json`.
 6. Bump version intentionally: `npm version patch|minor|major` (this auto-rotates `CHANGELOG.md`, creates a dated release section, and inserts a version-specific npm link).
 7. Publish with assisted 2FA flow: `npm run publish:otp` (or `npm run publish:next` for prereleases).

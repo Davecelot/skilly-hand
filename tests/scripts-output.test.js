@@ -158,6 +158,17 @@ test("dependency-policy-check exposes --json contract", () => {
   assert.equal(typeof payload.lockfilesSynchronized, "boolean");
 });
 
+test("review-rangers-check exposes --json contract", () => {
+  const result = runScript("scripts/review-rangers-check.mjs", ["--json"]);
+  assert.equal(result.status, 0);
+  const payload = JSON.parse(result.stdout);
+  assert.equal(payload.command, "review-rangers-check");
+  assert.equal(typeof payload.ok, "boolean");
+  assert.equal(typeof payload.criticalCount, "number");
+  assert.equal(typeof payload.highCount, "number");
+  assert.equal(typeof payload.checks, "object");
+});
+
 test("publish-with-otp provides non-interactive OTP guidance in JSON mode", async () => {
   const tmpDir = await mkdtemp(path.join(os.tmpdir(), "skilly-hand-publish-"));
   const fakeNpmPath = path.join(tmpDir, "npm");
