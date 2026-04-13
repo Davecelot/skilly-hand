@@ -13,7 +13,7 @@
 
 [![npm](https://img.shields.io/npm/v/%40skilly-hand%2Fskilly-hand?style=flat-square&color=black&label=npm)](https://www.npmjs.com/package/@skilly-hand/skilly-hand)
 [![license](https://img.shields.io/badge/license-CC--BY--NC--4.0-black?style=flat-square)](./LICENSE)
-[![node](https://img.shields.io/badge/node-%E2%89%A520-black?style=flat-square)](https://nodejs.org)
+[![node](https://img.shields.io/badge/node-%E2%89%A522-black?style=flat-square)](https://nodejs.org)
 [![ESM](https://img.shields.io/badge/ESM-native-black?style=flat-square)](https://nodejs.org/api/esm.html)
 
 </div>

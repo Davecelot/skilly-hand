@@ -1,6 +1,6 @@
 {
   "name": "@skilly-hand/skilly-hand",
-  "version": "0.22.2",
+  "version": "0.23.0",
   "license": "CC-BY-NC-4.0",
   "type": "module",
   "publishConfig": {
@@ -21,7 +21,7 @@
     "packages/*"
   ],
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=22.0.0"
   },
   "scripts": {
     "build": "node ./scripts/build-catalog-index.mjs",
@@ -49,7 +49,7 @@
     "doctor": "node ./packages/cli/src/bin.js doctor"
   },
   "dependencies": {
-    "ink": "5.2.1",
-    "react": "18.3.1"
+    "ink": "7.0.0",
+    "react": "19.2.5"
   }
 }

@@ -16,6 +16,23 @@ All notable changes to this project are documented in this file.
 ### Removed
 - _None._
 
+## [0.23.0] - 2026-04-12
+[View on npm](https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.23.0)
+
+### Added
+- _None._
+
+### Changed
+- Raised Node.js engine floor to `>=22.0.0`.
+- Upgraded runtime dependencies: `ink` `5.2.1` -> `7.0.0` and `react` `18.3.1` -> `19.2.5`.
+- Updated README Node badge from `>=20` to `>=22`.
+
+### Fixed
+- _None._
+
+### Removed
+- _None._
+
 ## [0.22.2] - 2026-04-12
 [View on npm](https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.22.2)
 
