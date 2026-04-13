@@ -5,10 +5,10 @@ All notable changes to this project are documented in this file.
 ## [Unreleased]
 
 ### Added
-- _None._
+- Added regression coverage in interactive CLI tests to assert the explicit next-action prompt copy shown after install confirmation.
 
 ### Changed
-- _None._
+- Updated the interactive install decision prompt text to make `apply` and `menu` actions explicit for guided launcher users.
 
 ### Fixed
 - _None._

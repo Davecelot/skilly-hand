@@ -161,7 +161,7 @@ export function createInquirerInteractiveUi({
           {
             type: "list",
             name: "installDecision",
-            message: "Next action",
+            message: "Next action (type 'apply' to install, or 'menu' to go back)",
             choices: [
               { name: "Apply installation", value: "apply" },
               { name: "Back to command menu", value: "menu" }

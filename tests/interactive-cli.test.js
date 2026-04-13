@@ -455,6 +455,7 @@ test("inquirer launcher flow runs in React-host projects without React hook fail
 
 test("inquirer launcher install flow renders contextual micro-help and next hint", async () => {
   const writes = [];
+  const askedMessages = [];
   const prompts = [
     { command: "install" },
     { selectedSkillIds: ["token-optimizer"] },
@@ -464,7 +465,8 @@ test("inquirer launcher install flow renders contextual micro-help and next hint
   ];
 
   const interactiveUi = createInquirerInteractiveUi({
-    prompt: async () => {
+    prompt: async (questions) => {
+      askedMessages.push(...(questions || []).map((question) => String(question?.message || "")));
       const next = prompts.shift();
       if (!next) throw new Error("Prompt queue exhausted");
       return next;
@@ -498,4 +500,8 @@ test("inquirer launcher install flow renders contextual micro-help and next hint
   assert.match(combined, /Assistant Target Tips/);
   assert.match(combined, /Next Hint/);
   assert.match(combined, /doctor/);
+  assert.equal(
+    askedMessages.includes("Next action (type 'apply' to install, or 'menu' to go back)"),
+    true
+  );
 });
