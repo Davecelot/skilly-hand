@@ -5,6 +5,21 @@ All notable changes to this project are documented in this file.
 ## [Unreleased]
 
 ### Added
+- _None._
+
+### Changed
+- _None._
+
+### Fixed
+- _None._
+
+### Removed
+- _None._
+
+## [0.23.2] - 2026-04-13
+[View on npm](https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.23.2)
+
+### Added
 - Added regression coverage in interactive CLI tests to assert the explicit next-action prompt copy shown after install confirmation.
 
 ### Changed
