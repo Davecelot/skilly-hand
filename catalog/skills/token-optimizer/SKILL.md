@@ -1,4 +1,5 @@
 ---
+name: "token-optimizer"
 description: "Classify task complexity and right-size reasoning depth, context gathering, and response detail to reduce wasted tokens."
 skillMetadata:
   author: "skilly-hand"

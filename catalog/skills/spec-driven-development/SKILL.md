@@ -1,4 +1,5 @@
 ---
+name: "spec-driven-development"
 description: "Plan, execute, and verify multi-step work through versioned specs with small, testable tasks."
 skillMetadata:
   author: "skilly-hand"

@@ -1,4 +1,5 @@
 ---
+name: "skill-creator"
 description: "Create and standardize AI skills with reusable structure, metadata rules, and templates."
 skillMetadata:
   author: "skilly-hand"
@@ -115,7 +116,7 @@ Top-level `SKILL.md` files now include managed YAML frontmatter mirrored from `m
 Rules:
 
 - `manifest.json` is the single source of truth.
-- Mirror only `description` and `skillMetadata.{author,last-edit,license,version,changelog,auto-invoke,allowed-tools}`.
+- Mirror only `name` (from `manifest.id`), `description`, and `skillMetadata.{author,last-edit,license,version,changelog,auto-invoke,allowed-tools}`.
 - Do not manually edit mirrored frontmatter in `SKILL.md`; run sync automation instead.
 - Keep instruction body content in `SKILL.md` focused on workflow guidance.
 

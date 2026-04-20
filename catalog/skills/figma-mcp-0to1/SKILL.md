@@ -1,4 +1,5 @@
 ---
+name: "figma-mcp-0to1"
 description: "Guide users from Figma MCP installation and authentication through first canvas creation, with function-level tool coverage and operational recovery patterns."
 skillMetadata:
   author: "skilly-hand"

@@ -16,6 +16,21 @@ All notable changes to this project are documented in this file.
 ### Removed
 - _None._
 
+## [0.23.3] - 2026-04-20
+[View on npm](https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.23.3)
+
+### Added
+- Mirrored each skill `manifest.id` into top-level `name` frontmatter across catalog `SKILL.md` files.
+
+### Changed
+- Updated catalog frontmatter rendering to include `name` and require a non-empty `manifest.id` during frontmatter validation.
+
+### Fixed
+- Expanded frontmatter sync tests to catch stale or missing `name` metadata regressions and enforce manifest id requirements.
+
+### Removed
+- _None._
+
 ## [0.23.2] - 2026-04-13
 [View on npm](https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.23.2)
 

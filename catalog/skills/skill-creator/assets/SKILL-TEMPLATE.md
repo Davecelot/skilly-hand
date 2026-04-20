@@ -1,7 +1,7 @@
 # {Name of the Skill} Guide
 
 <!--
-Managed frontmatter is mirrored from manifest.json by automation.
+Managed frontmatter is mirrored from manifest.json by automation (`name` is derived from `manifest.id`).
 Do not hand-author frontmatter in this template.
 -->
 

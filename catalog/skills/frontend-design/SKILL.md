@@ -1,4 +1,5 @@
 ---
+name: "frontend-design"
 description: "Project-aware frontend design skill that detects the existing tech stack, UI libraries, CSS variables, and design tokens before proposing any UI work. Supports greenfield projects via DESIGN.md context setup, and includes post-generation motion and visual refinement phases."
 skillMetadata:
   author: "skilly-hand"

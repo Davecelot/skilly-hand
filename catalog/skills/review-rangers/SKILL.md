@@ -1,4 +1,5 @@
 ---
+name: "review-rangers"
 description: "Review code, decisions, and artifacts through a multi-perspective committee and a domain expert safety guard, then synthesize a structured verdict."
 skillMetadata:
   author: "skilly-hand"

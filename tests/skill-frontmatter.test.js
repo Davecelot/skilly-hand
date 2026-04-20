@@ -37,6 +37,7 @@ test("frontmatter sync inserts frontmatter when missing", () => {
   const next = applyManifestFrontmatterToSkill(content, manifest);
 
   assert.match(next, /^---\n/);
+  assert.match(next, /name: "sample-skill"/);
   assert.match(next, /\n# Sample Skill Guide/);
   assert.deepEqual(verifySkillFrontmatterContent(next, manifest), { ok: true, reason: null });
 });
@@ -44,9 +45,11 @@ test("frontmatter sync inserts frontmatter when missing", () => {
 test("frontmatter sync updates stale frontmatter", () => {
   const oldManifest = sampleManifest();
   const stale = `${renderSkillFrontmatter(oldManifest)}# Sample Skill Guide\n`;
-  const manifest = sampleManifest({ description: "Updated description" });
+  const manifest = sampleManifest({ id: "updated-skill", title: "Updated Skill", description: "Updated description" });
   const next = applyManifestFrontmatterToSkill(stale, manifest);
 
+  assert.match(next, /name: "updated-skill"/);
+  assert.equal(next.includes('name: "sample-skill"'), false);
   assert.match(next, /description: "Updated description"/);
   assert.equal(next.includes('description: "Sample description"'), false);
   assert.deepEqual(verifySkillFrontmatterContent(next, manifest), { ok: true, reason: null });
@@ -91,7 +94,6 @@ test("frontmatter validator fails on missing, malformed, and mismatch", () => {
 test("frontmatter render mirrors only selected manifest fields", () => {
   const base = sampleManifest();
   const changedNonMirrored = sampleManifest({
-    id: "different-id",
     title: "Different title",
     tags: ["frontend"],
     detectors: ["react"],
@@ -103,8 +105,15 @@ test("frontmatter render mirrors only selected manifest fields", () => {
 
   assert.equal(baseRendered, changedRendered);
   assert.equal(baseRendered.includes("id:"), false);
-  assert.equal(baseRendered.includes("title:"), false);
+  assert.equal(baseRendered.includes('name: "sample-skill"'), true);
   assert.equal(baseRendered.includes("tags:"), false);
+});
+
+test("frontmatter renderer requires non-empty manifest id", () => {
+  assert.throws(
+    () => renderSkillFrontmatter(sampleManifest({ id: "" })),
+    /missing required manifest\.id/
+  );
 });
 
 test("sync preserves markdown body when malformed frontmatter is missing a close delimiter", () => {

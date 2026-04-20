@@ -1,4 +1,5 @@
 ---
+name: "project-teacher"
 description: "Scan the active project and teach any concept, code path, or decision using verified information, interactive questions, and simple explanations. Trigger: user asks to explain, understand, clarify, or learn about anything in the project or codebase."
 skillMetadata:
   author: "skilly-hand"

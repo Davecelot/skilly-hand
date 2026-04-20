@@ -128,6 +128,10 @@ function assertFrontmatterFields(manifest) {
     throw new Error("Invalid manifest while building SKILL.md frontmatter");
   }
 
+  if (typeof manifest.id !== "string" || manifest.id.trim().length === 0) {
+    throw new Error(`Skill "${manifest.id}" is missing required manifest.id for frontmatter mirroring`);
+  }
+
   if (typeof manifest.description !== "string" || manifest.description.length === 0) {
     throw new Error(`Skill "${manifest.id}" is missing required manifest.description for frontmatter mirroring`);
   }
@@ -163,6 +167,7 @@ function assertFrontmatterFields(manifest) {
 export function buildSkillFrontmatterPayload(manifest) {
   assertFrontmatterFields(manifest);
   return {
+    name: manifest.id,
     description: manifest.description,
     skillMetadata: {
       author: manifest.skillMetadata.author,
@@ -178,6 +183,7 @@ export function buildSkillFrontmatterPayload(manifest) {
 
 function renderSkillFrontmatterInner(payload) {
   const lines = [
+    `name: ${yamlQuote(payload.name)}`,
     `description: ${yamlQuote(payload.description)}`,
     "skillMetadata:",
     `  author: ${yamlQuote(payload.skillMetadata.author)}`,
@@ -206,6 +212,7 @@ export function splitSkillMarkdown(content) {
   const source = normalized.startsWith("\uFEFF") ? normalized.slice(1) : normalized;
   const lines = splitLinesWithOffsets(source);
   const mirroredKeys = new Set([
+    "name",
     "description",
     "skillMetadata",
     "author",

@@ -1,4 +1,5 @@
 ---
+name: "test-driven-development"
 description: "Guide implementation using the RED → GREEN → REFACTOR TDD cycle: write a failing test first, write the minimum code to pass, then refactor while tests stay green."
 skillMetadata:
   author: "skilly-hand"

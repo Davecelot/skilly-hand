@@ -1,4 +1,5 @@
 ---
+name: "angular-guidelines"
 description: "Guide Angular code generation and review using latest stable Angular verification and modern framework best practices."
 skillMetadata:
   author: "skilly-hand"

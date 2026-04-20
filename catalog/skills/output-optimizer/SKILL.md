@@ -1,4 +1,5 @@
 ---
+name: "output-optimizer"
 description: "Optimize output token consumption through compact interpreter modes with controlled expansion when complexity, ambiguity, or risk requires more detail. Trigger: minimizing response verbosity while preserving clarity and correctness."
 skillMetadata:
   author: "skilly-hand"

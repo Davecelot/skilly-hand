@@ -1,4 +1,5 @@
 ---
+name: "user-story-crafting"
 description: "Create and refine user stories with structured quality gates, splitting heuristics, and lightweight story mapping for release slicing. Trigger: writing, restructuring, splitting, or sequencing user stories for delivery-ready backlog work."
 skillMetadata:
   author: "skilly-hand"

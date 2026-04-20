@@ -1,4 +1,5 @@
 ---
+name: "agents-root-orchestrator"
 description: "Author root AGENTS.md as a Where/What/When orchestrator that routes tasks and skill invocation clearly."
 skillMetadata:
   author: "skilly-hand"

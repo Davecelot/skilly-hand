@@ -1,4 +1,5 @@
 ---
+name: "accessibility-audit"
 description: "Audit web accessibility against W3C WCAG 2.2 Level AA using framework-agnostic checks, remediation patterns, and portable command-line scanning."
 skillMetadata:
   author: "skilly-hand"

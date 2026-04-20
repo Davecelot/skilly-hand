@@ -1,4 +1,5 @@
 ---
+name: "react-guidelines"
 description: "Guide React code generation and review using latest stable React verification and modern framework best practices."
 skillMetadata:
   author: "skilly-hand"
