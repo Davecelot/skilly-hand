@@ -1,4 +1,6 @@
 node_modules
+.DS_Store
+site/dist
 .skilly-hand
 catalog/catalog-index.json
 .npm-cache

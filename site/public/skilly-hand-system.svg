@@ -1,0 +1,31 @@
+<svg width="960" height="720" viewBox="0 0 960 720" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">skilly-hand system map</title>
+  <desc id="desc">A command flows through detection, catalog skills, installation targets, and doctor verification.</desc>
+  <rect width="960" height="720" fill="#FBFAF7"/>
+  <path d="M80 90H880V630H80V90Z" fill="#FFFFFF" stroke="#111111" stroke-width="3"/>
+  <path d="M80 150H880" stroke="#111111" stroke-width="3"/>
+  <circle cx="116" cy="120" r="11" fill="#0D766E"/>
+  <circle cx="154" cy="120" r="11" fill="#D8F3EE" stroke="#111111" stroke-width="2"/>
+  <circle cx="192" cy="120" r="11" fill="#F2EFE8" stroke="#111111" stroke-width="2"/>
+  <text x="118" y="226" fill="#111111" font-family="Menlo, Consolas, monospace" font-size="28" font-weight="700">$ npx skilly-hand</text>
+  <rect x="118" y="262" width="260" height="74" fill="#F2EFE8" stroke="#111111" stroke-width="2"/>
+  <text x="142" y="307" fill="#0D766E" font-family="Menlo, Consolas, monospace" font-size="24" font-weight="700">detect stack</text>
+  <path d="M394 299H504" stroke="#111111" stroke-width="3"/>
+  <path d="M504 299L486 287V311L504 299Z" fill="#111111"/>
+  <rect x="528" y="224" width="294" height="226" fill="#FFFFFF" stroke="#111111" stroke-width="2"/>
+  <text x="554" y="270" fill="#111111" font-family="Menlo, Consolas, monospace" font-size="22" font-weight="700">catalog/skills</text>
+  <rect x="554" y="302" width="112" height="42" fill="#D8F3EE" stroke="#111111" stroke-width="2"/>
+  <rect x="684" y="302" width="112" height="42" fill="#F2EFE8" stroke="#111111" stroke-width="2"/>
+  <rect x="554" y="362" width="112" height="42" fill="#F2EFE8" stroke="#111111" stroke-width="2"/>
+  <rect x="684" y="362" width="112" height="42" fill="#D8F3EE" stroke="#111111" stroke-width="2"/>
+  <text x="576" y="329" fill="#111111" font-family="Menlo, Consolas, monospace" font-size="16" font-weight="700">react</text>
+  <text x="706" y="329" fill="#111111" font-family="Menlo, Consolas, monospace" font-size="16" font-weight="700">sdd</text>
+  <text x="576" y="389" fill="#111111" font-family="Menlo, Consolas, monospace" font-size="16" font-weight="700">figma</text>
+  <text x="706" y="389" fill="#111111" font-family="Menlo, Consolas, monospace" font-size="16" font-weight="700">audit</text>
+  <path d="M676 462V524" stroke="#111111" stroke-width="3"/>
+  <path d="M676 524L688 506H664L676 524Z" fill="#111111"/>
+  <rect x="118" y="524" width="704" height="72" fill="#111111"/>
+  <text x="142" y="568" fill="#FFFFFF" font-family="Menlo, Consolas, monospace" font-size="22" font-weight="700">install -> Codex / Claude / Cursor / Copilot / Gemini</text>
+  <path d="M248 348V468" stroke="#0D766E" stroke-width="4" stroke-dasharray="10 10"/>
+  <text x="142" y="432" fill="#0D766E" font-family="Menlo, Consolas, monospace" font-size="24" font-weight="700">doctor</text>
+</svg>

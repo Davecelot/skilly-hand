@@ -18,7 +18,8 @@
     "SECURITY.md"
   ],
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "site"
   ],
   "engines": {
     "node": ">=22.0.0"
@@ -47,7 +48,10 @@
     "cli": "node ./packages/cli/src/bin.js",
     "detect": "node ./packages/cli/src/bin.js detect",
     "list": "node ./packages/cli/src/bin.js list",
-    "doctor": "node ./packages/cli/src/bin.js doctor"
+    "doctor": "node ./packages/cli/src/bin.js doctor",
+    "site:dev": "npm run dev -w @skilly-hand/site",
+    "site:build": "npm run build -w @skilly-hand/site",
+    "site:preview": "npm run preview -w @skilly-hand/site"
   },
   "dependencies": {
     "inquirer": "13.4.1"
