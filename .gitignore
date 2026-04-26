@@ -9,4 +9,6 @@ catalog/catalog-index.json
 !/sandbox/package.json
 .claude
 .env*
-/.sdd
+/.sdd/*
+!/.sdd/to-show/
+!/.sdd/to-show/**
