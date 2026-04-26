@@ -76,6 +76,8 @@ test("install dry-run provides structured text output", () => {
   const result = runCli(["install", "--dry-run", "--cwd", path.join(fixturesDir, "react-vite")]);
   assert.equal(result.status, 0);
   assert.match(result.stdout, /Install Preflight/);
+  assert.match(result.stdout, /Decisions registry/);
+  assert.match(result.stdout, /\.ai\/DECISIONS\.md \(will create\)/);
   assert.match(result.stdout, /Skill Plan/);
   assert.match(result.stdout, /Dry run complete/);
 });

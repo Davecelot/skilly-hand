@@ -29,6 +29,9 @@ test("dry run returns install plan without writing files", async () => {
 
   assert.equal(result.applied, false);
   assert.equal(result.plan.skills.length, 12);
+  assert.equal(result.plan.decisionsRegistry.relativePath, ".ai/DECISIONS.md");
+  assert.equal(result.plan.decisionsRegistry.willCreate, true);
+  await assert.rejects(access(path.join(projectDir, ".ai", "DECISIONS.md")), "expected dry run to avoid creating decisions registry");
   assert.deepEqual(ids, [
     "accessibility-audit",
     "agents-root-orchestrator",
@@ -43,6 +46,71 @@ test("dry run returns install plan without writing files", async () => {
     "test-driven-development",
     "token-optimizer"
   ]);
+});
+
+test("install creates user-owned decisions registry with changelog", async () => {
+  const projectDir = await makeFixtureCopy("no-stack");
+  const installResult = await installProject({ cwd: projectDir, agents: ["standard"] });
+
+  assert.equal(installResult.applied, true);
+  assert.equal(installResult.plan.decisionsRegistry.created, true);
+
+  const decisionsPath = path.join(projectDir, ".ai", "DECISIONS.md");
+  const decisions = await readFile(decisionsPath, "utf8");
+  assert.match(decisions, /^# AI Decisions/);
+  assert.match(decisions, /breaking changes, mid\/high-interest solutions/);
+  assert.match(decisions, /Do not add minimal, obvious, one-off, or insignificant changes/);
+  assert.match(decisions, /Every change to this file must update the changelog/);
+  assert.match(decisions, /## YYYY-MM-DD - Short Decision Title/);
+  assert.match(decisions, /- Interest level: Mid \| High \| Breaking/);
+  assert.match(decisions, /\n## Changelog\n/);
+  assert.equal(decisions.trim().endsWith('- YYYY-MM-DD: Created/updated entry "<title>" because <why>.'), true);
+});
+
+test("install writes decisions registry inside an existing .ai directory", async () => {
+  const projectDir = await makeFixtureCopy("no-stack");
+  await mkdir(path.join(projectDir, ".ai"));
+
+  await installProject({ cwd: projectDir, agents: ["standard"] });
+
+  const decisions = await readFile(path.join(projectDir, ".ai", "DECISIONS.md"), "utf8");
+  assert.match(decisions, /^# AI Decisions/);
+});
+
+test("reinstall preserves existing decisions registry content", async () => {
+  const projectDir = await makeFixtureCopy("no-stack");
+  const decisionsPath = path.join(projectDir, ".ai", "DECISIONS.md");
+  const customContent = "# AI Decisions\n\nCustom project memory.\n\n## Changelog\n\n- 2026-04-26: Created custom entry because test setup.\n";
+  await mkdir(path.dirname(decisionsPath), { recursive: true });
+  await writeFile(decisionsPath, customContent, "utf8");
+
+  const installResult = await installProject({ cwd: projectDir, agents: ["standard"] });
+
+  assert.equal(installResult.plan.decisionsRegistry.exists, true);
+  assert.equal(installResult.plan.decisionsRegistry.created, undefined);
+  assert.equal(await readFile(decisionsPath, "utf8"), customContent);
+});
+
+test("uninstall preserves user-owned decisions registry", async () => {
+  const projectDir = await makeFixtureCopy("no-stack");
+  await installProject({ cwd: projectDir, agents: ["standard"] });
+
+  const decisionsPath = path.join(projectDir, ".ai", "DECISIONS.md");
+  const decisionsBefore = await readFile(decisionsPath, "utf8");
+  const uninstallResult = await uninstallProject(projectDir);
+
+  assert.equal(uninstallResult.removed, true);
+  assert.equal(await readFile(decisionsPath, "utf8"), decisionsBefore);
+});
+
+test("install rejects non-directory .ai registry parent", async () => {
+  const projectDir = await makeFixtureCopy("no-stack");
+  await writeFile(path.join(projectDir, ".ai"), "not a directory\n", "utf8");
+
+  await assert.rejects(
+    installProject({ cwd: projectDir, agents: ["standard"] }),
+    /Cannot create decisions registry because \.ai exists and is not a directory/
+  );
 });
 
 test("dry run includes core skills even for no-stack projects", async () => {

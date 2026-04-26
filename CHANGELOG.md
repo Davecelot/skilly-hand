@@ -5,13 +5,15 @@ All notable changes to this project are documented in this file.
 ## [Unreleased]
 
 ### Added
-- _None._
+- Added install-time creation of the user-owned `.ai/DECISIONS.md` decisions registry, including entry criteria, an entry template, and a required registry changelog section.
+- Added CLI install output that reports the `.ai/DECISIONS.md` decisions registry status during dry runs and applied installs.
+- Added regression coverage for decisions registry planning, creation, existing-registry preservation, uninstall preservation, and invalid `.ai` parent handling.
 
 ### Changed
-- _None._
+- Updated `review-rangers` to own decisions registry read/write guidance and bumped the skill metadata version to `1.1.0`.
 
 ### Fixed
-- _None._
+- Preserved existing user-owned decisions registry content across reinstalls and uninstalls.
 
 ### Removed
 - _None._

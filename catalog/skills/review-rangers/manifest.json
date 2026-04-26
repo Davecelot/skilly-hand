@@ -10,13 +10,15 @@
   "agentSupport": ["codex", "claude", "cursor", "gemini", "copilot", "antigravity", "windsurf", "trae"],
   "skillMetadata": {
     "author": "skilly-hand",
-    "last-edit": "2026-04-04",
+    "last-edit": "2026-04-26",
     "license": "Apache-2.0",
-    "version": "1.0.0",
-    "changelog": "Added multi-perspective review skill with committee + safety guard synthesis; enables adversarial evaluation without permanent agent files; affects catalog skill coverage for review and quality workflows",
+    "version": "1.1.0",
+    "changelog": "Added DECISIONS.md registry ownership guidance; preserves durable review insights and anti-slop decisions across sessions; affects review-rangers workflow, install scaffolding, and project memory usage",
     "auto-invoke": "Reviewing code, decisions, or artifacts where adversarial multi-perspective evaluation adds value",
     "allowed-tools": [
       "Read",
+      "Edit",
+      "Write",
       "Grep",
       "Glob",
       "Bash",

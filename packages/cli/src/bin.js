@@ -131,11 +131,24 @@ function buildHelpText(renderer, appVersion) {
 
 function buildInstallResultDoc(result, flags, detectionGridText = "") {
   const mode = flags.dryRun ? "dry-run" : "apply";
+  const decisionsRegistry = result.plan.decisionsRegistry || {
+    relativePath: ".ai/DECISIONS.md",
+    exists: false,
+    willCreate: false
+  };
+  const decisionsRegistryStatus = decisionsRegistry.created
+    ? "created"
+    : decisionsRegistry.exists
+      ? "existing"
+      : decisionsRegistry.willCreate
+        ? "will create"
+        : "not reported";
   return createResultDoc("Install", [
     section("Install Preflight", [
       kvBlock([
         ["Project", result.plan.cwd],
         ["Install root", result.plan.installRoot],
+        ["Decisions registry", `${decisionsRegistry.relativePath} (${decisionsRegistryStatus})`],
         ["Agents", result.plan.agents.join(", ") || "none"],
         ["Include tags", flags.include.join(", ") || "none"],
         ["Exclude tags", flags.exclude.join(", ") || "none"],

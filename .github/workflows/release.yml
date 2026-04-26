@@ -101,9 +101,9 @@ jobs:
             NEW="$MAJ.$MIN.$((PAT+1))"
           fi
 
-          # Update root and all workspace package.json files in-place,
+          # Update root, workspace package.json files, and lockfiles in-place,
           # preserving formatting by replacing only the version field value.
-          for PKG in package.json packages/*/package.json; do
+          for PKG in package.json packages/*/package.json package-lock.json npm-shrinkwrap.json; do
             sed -i "s/\"version\": \"$CURRENT\"/\"version\": \"$NEW\"/" "$PKG"
           done
 
@@ -131,7 +131,7 @@ jobs:
       - name: Commit, tag, and push
         run: |
           VERSION="${{ steps.version.outputs.version }}"
-          git add package.json packages/*/package.json CHANGELOG.md
+          git add package.json packages/*/package.json package-lock.json npm-shrinkwrap.json CHANGELOG.md
           git commit -m "chore(release): v$VERSION"
           git tag "v$VERSION"
           git push origin main --follow-tags

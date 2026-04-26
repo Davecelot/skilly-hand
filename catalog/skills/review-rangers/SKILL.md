@@ -3,13 +3,15 @@ name: "review-rangers"
 description: "Review code, decisions, and artifacts through a multi-perspective committee and a domain expert safety guard, then synthesize a structured verdict."
 skillMetadata:
   author: "skilly-hand"
-  last-edit: "2026-04-04"
+  last-edit: "2026-04-26"
   license: "Apache-2.0"
-  version: "1.0.0"
-  changelog: "Added multi-perspective review skill with committee + safety guard synthesis; enables adversarial evaluation without permanent agent files; affects catalog skill coverage for review and quality workflows"
+  version: "1.1.0"
+  changelog: "Added DECISIONS.md registry ownership guidance; preserves durable review insights and anti-slop decisions across sessions; affects review-rangers workflow, install scaffolding, and project memory usage"
   auto-invoke: "Reviewing code, decisions, or artifacts where adversarial multi-perspective evaluation adds value"
   allowed-tools:
     - "Read"
+    - "Edit"
+    - "Write"
     - "Grep"
     - "Glob"
     - "Bash"
@@ -38,14 +40,16 @@ Do not use this skill for:
 ## Core Workflow
 
 1. Identify the target (code, decision, artifact) and its domain.
-2. Determine committee size: 3 members for routine reviews, 5 for high-risk or cross-domain targets.
-3. Spawn N committee members using `assets/committee-member-template.md`. Assign each a distinct evaluation lens. Run them independently — no member sees another's output.
-4. Determine the expert domain for the safety guard.
-5. Spawn 1 safety guard using `assets/safety-guard-template.md`. It evaluates the target from an authoritative expert position.
-6. Run the committee and safety guard in parallel.
-7. Collect all outputs.
-8. Synthesize a structured verdict following the Synthesis Rules.
-9. Emit the final verdict with confidence tier, top findings, and recommended action.
+2. Read `.ai/DECISIONS.md` if it exists. Treat it as project memory for avoiding repeated mistakes and reusing documented decisions.
+3. Determine committee size: 3 members for routine reviews, 5 for high-risk or cross-domain targets.
+4. Spawn N committee members using `assets/committee-member-template.md`. Assign each a distinct evaluation lens. Run them independently — no member sees another's output.
+5. Determine the expert domain for the safety guard.
+6. Spawn 1 safety guard using `assets/safety-guard-template.md`. It evaluates the target from an authoritative expert position.
+7. Run the committee and safety guard in parallel.
+8. Collect all outputs.
+9. Synthesize a structured verdict following the Synthesis Rules.
+10. Emit the final verdict with confidence tier, top findings, and recommended action.
+11. Decide whether any insight qualifies for `.ai/DECISIONS.md`; if yes, update the registry and its changelog in the same edit.
 
 ---
 
@@ -139,6 +143,56 @@ TOP FINDINGS:
 RECOMMENDED ACTION:
 {Approve | Approve with caveats | Block — remediate before resubmit | Hard block}
 ```
+
+---
+
+## Decisions Registry Protocol
+
+`review-rangers` owns `.ai/DECISIONS.md` maintenance when the registry exists. Use it as both:
+
+- A documentary source before solving or reviewing relevant problems.
+- A durable memory target after review when a finding has future value.
+
+### Read Rules
+
+- Read `.ai/DECISIONS.md` near the start of relevant review or problem-solving work.
+- Apply documented decisions and "avoid repeating" notes as project constraints.
+- If the file does not exist, continue the review without creating it unless the current task is installation or explicit registry setup.
+
+### Write Criteria
+
+Write to `.ai/DECISIONS.md` only for:
+
+- Breaking changes.
+- Mid-interest or high-interest solutions.
+- Architectural decisions.
+- Repeated issue patterns.
+- Project-specific conventions likely to matter in future sessions.
+
+Do not write entries for minimal cleanup, obvious one-off bugs, insignificant changes, local-only implementation details, or full review transcripts.
+
+### Write Format
+
+Insert new entries above the final `## Changelog` section so the changelog remains the last section.
+
+```md
+## YYYY-MM-DD - Short Decision Title
+
+- Interest level: Mid | High | Breaking
+- Context:
+- Decision / Insight:
+- Rationale:
+- Avoid repeating:
+- Source:
+```
+
+Every change to `.ai/DECISIONS.md` must update `## Changelog` in the same edit.
+
+```md
+- YYYY-MM-DD: Created/updated entry "<title>" because <why>.
+```
+
+If the changelog section is missing, add it as the final section before making any other registry change.
 
 ---
 

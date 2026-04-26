@@ -6,6 +6,35 @@ import { detectProject, inspectProjectFiles } from "../../detectors/src/index.js
 export const DEFAULT_AGENTS = ["standard", "codex", "claude", "cursor", "gemini", "copilot", "antigravity", "windsurf", "trae"];
 const MANAGED_MARKER = "<!-- Managed by skilly-hand.";
 const NATIVE_SETUP_MARKER = "<!-- Managed by skilly-hand native setup.";
+const DECISIONS_REGISTRY_RELATIVE_PATH = ".ai/DECISIONS.md";
+const DECISIONS_REGISTRY_TEMPLATE = `# AI Decisions
+
+Durable project memory for \`review-rangers\`. Use this file to record breaking changes, mid/high-interest solutions, and important review insights that future agents should reuse.
+
+## Entry Criteria
+
+- Add entries only for breaking changes, mid/high-interest solutions, architectural decisions, repeated issue patterns, or project-specific conventions with future value.
+- Do not add minimal, obvious, one-off, or insignificant changes.
+- Do not paste full review transcripts.
+- Every change to this file must update the changelog at the end.
+
+## Entry Template
+
+\`\`\`md
+## YYYY-MM-DD - Short Decision Title
+
+- Interest level: Mid | High | Breaking
+- Context:
+- Decision / Insight:
+- Rationale:
+- Avoid repeating:
+- Source:
+\`\`\`
+
+## Changelog
+
+- YYYY-MM-DD: Created/updated entry "<title>" because <why>.
+`;
 const AGENT_INSTALL_PROFILES = {
   standard: {
     instructionFiles: [["AGENTS.md"]],
@@ -263,7 +292,57 @@ export function buildInstallPlan({ cwd, detections, skills, agents }) {
       tags: skill.tags
     })),
     installRoot: path.join(cwd, ".skilly-hand"),
+    decisionsRegistry: {
+      path: path.join(cwd, ".ai", "DECISIONS.md"),
+      relativePath: DECISIONS_REGISTRY_RELATIVE_PATH,
+      exists: false,
+      willCreate: true
+    },
     generatedAt: nowIso()
+  };
+}
+
+async function planDecisionsRegistry(cwd) {
+  const aiDir = path.join(cwd, ".ai");
+  const registryPath = path.join(cwd, ".ai", "DECISIONS.md");
+
+  if (await exists(aiDir)) {
+    const info = await lstat(aiDir);
+    if (!info.isDirectory()) {
+      throw new Error("Cannot create decisions registry because .ai exists and is not a directory.");
+    }
+  }
+
+  let registryExists = false;
+  if (await exists(registryPath)) {
+    const info = await lstat(registryPath);
+    if (!info.isFile()) {
+      throw new Error("Cannot use decisions registry because .ai/DECISIONS.md exists and is not a file.");
+    }
+    registryExists = true;
+  }
+
+  return {
+    path: registryPath,
+    relativePath: DECISIONS_REGISTRY_RELATIVE_PATH,
+    exists: registryExists,
+    willCreate: !registryExists
+  };
+}
+
+async function ensureDecisionsRegistry(cwd) {
+  const registry = await planDecisionsRegistry(cwd);
+  if (registry.exists) {
+    return registry;
+  }
+
+  await mkdir(path.dirname(registry.path), { recursive: true });
+  await writeFile(registry.path, DECISIONS_REGISTRY_TEMPLATE, "utf8");
+  return {
+    ...registry,
+    exists: true,
+    willCreate: false,
+    created: true
   };
 }
 
@@ -600,6 +679,7 @@ export async function installProject({
         excludeTags: parseTags(excludeTags)
       });
   const plan = buildInstallPlan({ cwd, detections, skills, agents: selectedAgents });
+  plan.decisionsRegistry = await planDecisionsRegistry(cwd);
 
   if (dryRun) {
     return { plan, applied: false };
@@ -621,6 +701,8 @@ export async function installProject({
   await mkdir(installRoot, { recursive: true });
   await mkdir(targetCatalogDir, { recursive: true });
   await mkdir(backupsDir, { recursive: true });
+  const decisionsRegistry = await ensureDecisionsRegistry(cwd);
+  plan.decisionsRegistry = decisionsRegistry;
 
   for (const skill of skills) {
     await copySkillTo(targetCatalogDir, skill.id);
