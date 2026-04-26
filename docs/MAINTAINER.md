@@ -2,19 +2,50 @@
 
 This document covers maintainer-only workflows for releasing and securing `@skilly-hand/skilly-hand`.
 
-## Release Workflow (npm)
+## Release Workflow
+
+Releases are automated via GitHub Actions. The manual OTP path still works as an emergency fallback.
+
+### Automated (normal path)
+
+**Prerequisites (one-time setup):**
+- npm Trusted Publisher configured at npmjs.com → package settings → Trusted Publishers, pointing to `davecelot/skilly-hand` → `release.yml`. This enables OIDC-based publish from CI with no stored npm token.
+
+**Before triggering a release:**
+1. Keep `CHANGELOG.md` up to date under `## [Unreleased]` as work lands.
+2. Regenerate derived files when needed: `npm run build && npm run catalog:sync && npm run agentic:self:sync`.
+3. Ensure all changes are merged to `main`.
+
+**Trigger the release:**
+1. Go to **Actions → Release → Run workflow** on GitHub.
+2. Select the bump type: `patch`, `minor`, or `major`.
+3. Click **Run workflow**.
+
+**What the workflow does automatically:**
+- Runs the full pre-publish gate chain: version sync → dependency policy → security check → catalog check → tests → `review-rangers` → packlist.
+- Bumps the version in all workspace `package.json` files.
+- Rotates `CHANGELOG.md` — moves `[Unreleased]` entries into a dated release section with an npm link, and resets the template.
+- Commits and tags the release on `main`.
+- Publishes to npm with provenance attestation via OIDC (no OTP, no stored token).
+- Creates a GitHub Release with the changelog notes as the release body.
+
+**After the workflow completes:**
+- Smoke test: `npx @skilly-hand/skilly-hand@<version> --help`.
+- Verify npm metadata (README render, changelog, license, executable bin).
+
+### Manual / Emergency fallback (OTP)
+
+Use this if the automated workflow is broken or unavailable.
 
 1. Confirm session: `npm whoami` (or `npm login`).
-2. Keep `CHANGELOG.md` up to date under `## [Unreleased]` as work lands.
+2. Keep `CHANGELOG.md` up to date under `## [Unreleased]`.
 3. Regenerate derived files when needed: `npm run build && npm run catalog:sync && npm run agentic:self:sync`.
 4. Run publish gate: `npm run verify:publish`.
-   - Includes final `review-rangers` verification to catch UX copy/flow regressions and missing discoverability safeguards.
 5. Inspect package payload: `npm pack --dry-run --json`.
-6. Bump version intentionally: `npm version patch|minor|major` (this auto-rotates `CHANGELOG.md`, creates a dated release section, and inserts a version-specific npm link).
-7. Publish with assisted 2FA flow: `npm run publish:otp` (or `npm run publish:next` for prereleases).
-   - The script runs the publish gate, asks for OTP with hidden input, and if left blank lets npm trigger your default security method.
-8. Smoke test after publish: `npx @skilly-hand/skilly-hand@<version> --help`.
-9. Verify npm metadata (README render, changelog, license, executable bin).
+6. Bump version: `npm version patch|minor|major` (auto-rotates `CHANGELOG.md` and creates the git commit + tag).
+7. Publish: `npm run publish:otp` (or `npm run publish:next` for prereleases).
+8. Push commit and tag: `git push origin main --follow-tags`.
+9. Smoke test: `npx @skilly-hand/skilly-hand@<version> --help`.
 
 ## Security and Dependency Automation
 
