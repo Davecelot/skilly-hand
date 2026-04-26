@@ -5,6 +5,21 @@ All notable changes to this project are documented in this file.
 ## [Unreleased]
 
 ### Added
+- _None._
+
+### Changed
+- _None._
+
+### Fixed
+- _None._
+
+### Removed
+- _None._
+
+## [0.24.0] - 2026-04-26
+[View on npm](https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.24.0)
+
+### Added
 - Added install-time creation of the user-owned `.ai/DECISIONS.md` decisions registry, including entry criteria, an entry template, and a required registry changelog section.
 - Added CLI install output that reports the `.ai/DECISIONS.md` decisions registry status during dry runs and applied installs.
 - Added regression coverage for decisions registry planning, creation, existing-registry preservation, uninstall preservation, and invalid `.ai` parent handling.
