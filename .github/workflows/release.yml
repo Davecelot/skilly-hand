@@ -133,8 +133,8 @@ jobs:
           VERSION="${{ steps.version.outputs.version }}"
           git add package.json packages/*/package.json package-lock.json npm-shrinkwrap.json CHANGELOG.md
           git commit -m "chore(release): v$VERSION"
-          git tag "v$VERSION"
-          git push origin main --follow-tags
+          git tag -a "v$VERSION" -m "Release v$VERSION"
+          git push origin main "v$VERSION"
 
   publish:
     name: Publish to npm and create GitHub Release
