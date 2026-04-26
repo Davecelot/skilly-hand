@@ -1,0 +1,187 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: 'Version bump type'
+        required: true
+        type: choice
+        options: [patch, minor, major]
+
+jobs:
+  gates:
+    name: Pre-release gates
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify versions
+        run: node scripts/verify-versions.mjs
+
+      - name: Dependency policy
+        run: npm run deps:policy:check
+
+      - name: Security check
+        run: npm run security:check
+
+      - name: Catalog check
+        run: npm run catalog:check
+
+      - name: Tests
+        run: npm test
+        env:
+          NO_COLOR: '1'
+
+      - name: Review rangers
+        run: npm run review:rangers
+        env:
+          NO_COLOR: '1'
+
+      - name: Packlist
+        run: npm run verify:packlist
+
+  bump:
+    name: Bump version and push tag
+    needs: gates
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      tag: ${{ steps.version.outputs.tag }}
+      changelog_notes: ${{ steps.extract.outputs.notes }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # Use a PAT instead of GITHUB_TOKEN if you need the release commit
+          # to trigger ci.yml (GITHUB_TOKEN pushes do not re-trigger workflows).
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Calculate and apply version bump
+        id: version
+        env:
+          BUMP: ${{ inputs.bump }}
+        run: |
+          CURRENT=$(node -p "JSON.parse(require('fs').readFileSync('package.json','utf8')).version")
+          IFS='.' read -r MAJ MIN PAT <<< "$CURRENT"
+          if [ "$BUMP" = "major" ]; then
+            NEW="$((MAJ+1)).0.0"
+          elif [ "$BUMP" = "minor" ]; then
+            NEW="$MAJ.$((MIN+1)).0"
+          else
+            NEW="$MAJ.$MIN.$((PAT+1))"
+          fi
+
+          # Update root and all workspace package.json files in-place,
+          # preserving formatting by replacing only the version field value.
+          for PKG in package.json packages/*/package.json; do
+            sed -i "s/\"version\": \"$CURRENT\"/\"version\": \"$NEW\"/" "$PKG"
+          done
+
+          echo "version=$NEW" >> "$GITHUB_OUTPUT"
+          echo "tag=v$NEW" >> "$GITHUB_OUTPUT"
+
+      - name: Rotate changelog
+        run: |
+          node scripts/release-changelog.mjs \
+            --version "${{ steps.version.outputs.version }}" \
+            --date "$(date -u +%Y-%m-%d)" \
+            --no-stage
+
+      - name: Extract changelog notes
+        id: extract
+        run: |
+          {
+            echo 'notes<<EOF_CHANGELOG_NOTES'
+            node scripts/extract-changelog-section.mjs \
+              --version "${{ steps.version.outputs.version }}" \
+              --raw
+            echo 'EOF_CHANGELOG_NOTES'
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Commit, tag, and push
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          git add package.json packages/*/package.json CHANGELOG.md
+          git commit -m "chore(release): v$VERSION"
+          git tag "v$VERSION"
+          git push origin main --follow-tags
+
+  publish:
+    name: Publish to npm and create GitHub Release
+    needs: bump
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - name: Checkout at release tag
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.bump.outputs.tag }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check if version already published
+        id: check_npm
+        run: |
+          VERSION="${{ needs.bump.outputs.version }}"
+          PUBLISHED=$(npm view "@skilly-hand/skilly-hand@$VERSION" version 2>/dev/null || true)
+          if [ "$PUBLISHED" = "$VERSION" ]; then
+            echo "Version $VERSION is already on npm — skipping publish."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Publish to npm
+        if: steps.check_npm.outputs.skip != 'true'
+        run: npm publish --provenance --access public
+        env:
+          NO_COLOR: '1'
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.bump.outputs.tag }}
+          name: v${{ needs.bump.outputs.version }}
+          body: ${{ needs.bump.outputs.changelog_notes }}
+          draft: false
+          prerelease: false
