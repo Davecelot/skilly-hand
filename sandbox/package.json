@@ -1,0 +1,8 @@
+{
+  "name": "sandbox",
+  "private": true,
+  "version": "1.0.0",
+  "dependencies": {
+    "@skilly-hand/skilly-hand": "file:.."
+  }
+}

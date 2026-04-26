@@ -5,7 +5,8 @@ site/dist
 catalog/catalog-index.json
 .npm-cache
 /source/
-/sandbox
+/sandbox/*
+!/sandbox/package.json
 .claude
 .env*
 /.sdd
