@@ -3,15 +3,26 @@ name: Release
 on:
   workflow_dispatch:
     inputs:
+      mode:
+        description: 'Release workflow mode'
+        required: true
+        type: choice
+        options: [bump-and-publish, publish-existing]
+        default: bump-and-publish
       bump:
-        description: 'Version bump type'
+        description: 'Version bump type (used by bump-and-publish)'
         required: true
         type: choice
         options: [patch, minor, major]
+      version:
+        description: 'Existing version to publish, for example 0.24.0 (used by publish-existing)'
+        required: false
+        type: string
 
 jobs:
   gates:
     name: Pre-release gates
+    if: inputs.mode == 'bump-and-publish'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -55,6 +66,7 @@ jobs:
 
   bump:
     name: Bump version and push tag
+    if: inputs.mode == 'bump-and-publish'
     needs: gates
     runs-on: ubuntu-latest
     permissions:
@@ -138,6 +150,7 @@ jobs:
 
   publish:
     name: Publish to npm and create GitHub Release
+    if: inputs.mode == 'bump-and-publish'
     needs: bump
     runs-on: ubuntu-latest
     permissions:
@@ -152,12 +165,20 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           registry-url: https://registry.npmjs.org
           cache: npm
 
+      - name: Use npm with trusted publishing support
+        run: npm install -g npm@latest
+
       - name: Install dependencies
         run: npm ci
+
+      - name: Show publish toolchain
+        run: |
+          node --version
+          npm --version
 
       - name: Check if version already published
         id: check_npm
@@ -173,7 +194,7 @@ jobs:
 
       - name: Publish to npm
         if: steps.check_npm.outputs.skip != 'true'
-        run: npm publish --provenance --access public
+        run: npm publish --access public
         env:
           NO_COLOR: '1'
 
@@ -183,5 +204,81 @@ jobs:
           tag_name: ${{ needs.bump.outputs.tag }}
           name: v${{ needs.bump.outputs.version }}
           body: ${{ needs.bump.outputs.changelog_notes }}
+          draft: false
+          prerelease: false
+
+  publish_existing:
+    name: Publish existing release to npm
+    if: inputs.mode == 'publish-existing'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - name: Validate version input
+        run: |
+          if ! echo "${{ inputs.version }}" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "version input must be a semantic version like 0.24.0"
+            exit 1
+          fi
+
+      - name: Checkout at release tag
+        uses: actions/checkout@v4
+        with:
+          ref: v${{ inputs.version }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+          cache: npm
+
+      - name: Use npm with trusted publishing support
+        run: npm install -g npm@latest
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Show publish toolchain
+        run: |
+          node --version
+          npm --version
+
+      - name: Check if version already published
+        id: check_npm
+        run: |
+          VERSION="${{ inputs.version }}"
+          PUBLISHED=$(npm view "@skilly-hand/skilly-hand@$VERSION" version 2>/dev/null || true)
+          if [ "$PUBLISHED" = "$VERSION" ]; then
+            echo "Version $VERSION is already on npm — skipping publish."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Publish to npm
+        if: steps.check_npm.outputs.skip != 'true'
+        run: npm publish --access public
+        env:
+          NO_COLOR: '1'
+
+      - name: Extract changelog notes
+        id: extract
+        run: |
+          {
+            echo 'notes<<EOF_CHANGELOG_NOTES'
+            node scripts/extract-changelog-section.mjs \
+              --version "${{ inputs.version }}" \
+              --raw
+            echo 'EOF_CHANGELOG_NOTES'
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ inputs.version }}
+          name: v${{ inputs.version }}
+          body: ${{ steps.extract.outputs.notes }}
           draft: false
           prerelease: false
