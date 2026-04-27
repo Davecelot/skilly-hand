@@ -5,6 +5,21 @@ All notable changes to this project are documented in this file.
 ## [Unreleased]
 
 ### Added
+- _None._
+
+### Changed
+- _None._
+
+### Fixed
+- _None._
+
+### Removed
+- _None._
+
+## [0.25.0] - 2026-04-27
+[View on npm](https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.25.0)
+
+### Added
 - Added the `roaster` planning challenge skill to critique plans, assumptions, sequencing, risks, and verification before implementation.
 - Added native skill hook/rule metadata support so installed skills can surface required guidance in generated native adapter files.
 
