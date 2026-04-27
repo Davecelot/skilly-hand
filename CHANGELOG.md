@@ -11,7 +11,7 @@ All notable changes to this project are documented in this file.
 - _None._
 
 ### Fixed
-- _None._
+- Updated the root README portable catalog list to include the `roaster` skill.
 
 ### Removed
 - _None._

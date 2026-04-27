@@ -80,6 +80,7 @@ The catalog currently includes:
 - `project-teacher`
 - `react-guidelines`
 - `review-rangers`
+- `roaster`
 - `skill-creator`
 - `spec-driven-development`
 - `test-driven-development`
