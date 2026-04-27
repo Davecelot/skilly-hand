@@ -5,10 +5,12 @@ All notable changes to this project are documented in this file.
 ## [Unreleased]
 
 ### Added
-- _None._
+- Added the `roaster` planning challenge skill to critique plans, assumptions, sequencing, risks, and verification before implementation.
+- Added native skill hook/rule metadata support so installed skills can surface required guidance in generated native adapter files.
 
 ### Changed
-- _None._
+- Updated native setup output and CLI guidance to describe rule/hook adapters alongside native instruction files.
+- Exported deterministic native hook collection from core and included `nativeHooks` plus `nativeHooksStatus` in native setup plan output.
 
 ### Fixed
 - _None._

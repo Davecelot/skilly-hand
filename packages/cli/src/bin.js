@@ -186,7 +186,7 @@ function buildInstallResultDoc(result, flags, detectionGridText = "") {
         result.applied
           ? [
               "Review generated AGENTS and assistant instruction files.",
-              "Run `npx skilly-hand native setup` to scaffold native instruction/rule adapters.",
+              "Run `npx skilly-hand native setup` to scaffold native instruction/rule/hook adapters.",
               "Run `npx skilly-hand doctor` to validate installation health.",
               "Use `npx skilly-hand uninstall` to restore backed-up files if needed."
             ]
@@ -228,7 +228,7 @@ function buildNativeSetupResultDoc(result, flags) {
     ]),
     section("Status", [
       result.applied
-        ? statusBlock("success", "Native setup completed.", "Native rule/instruction files are synchronized.")
+        ? statusBlock("success", "Native setup completed.", "Native rule/hook/instruction files are synchronized.")
         : statusBlock("info", "Native setup dry run complete.", "No files were written.")
     ]),
     section("Next Steps", [
@@ -236,10 +236,10 @@ function buildNativeSetupResultDoc(result, flags) {
         result.applied
           ? [
               "Run `npx skilly-hand doctor` to verify native coverage.",
-              "Re-run `npx skilly-hand native setup` after changing agent targets."
+              "Re-run `npx skilly-hand native setup` after changing agent targets or skill hook metadata."
             ]
           : [
-              "Run `npx skilly-hand native setup` to apply these native adapter changes."
+              "Run `npx skilly-hand native setup` to apply these native rule/hook adapter changes."
             ]
       )
     ])

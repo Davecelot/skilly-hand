@@ -1,0 +1,41 @@
+{
+  "id": "roaster",
+  "title": "Roaster",
+  "description": "Challenge plans with constructive roast-style critique that exposes weak assumptions, missing angles, shallow sequencing, and unclear success criteria. Trigger: when the user proposes, requests, or evaluates a plan of any kind.",
+  "portable": true,
+  "tags": ["core", "workflow", "planning", "quality"],
+  "detectors": ["always"],
+  "detectionTriggers": ["always"],
+  "installsFor": ["all"],
+  "agentSupport": ["codex", "claude", "cursor", "gemini", "copilot", "antigravity", "windsurf", "trae"],
+  "nativeHooks": [
+    {
+      "id": "plan-challenge",
+      "trigger": "When the user proposes, requests, or evaluates a plan of any kind",
+      "instruction": "Invoke roaster to critique assumptions, scope, sequencing, risks, and verification before agreeing with the plan.",
+      "priority": 30,
+      "enforcement": "required"
+    }
+  ],
+  "skillMetadata": {
+    "author": "skilly-hand",
+    "last-edit": "2026-04-27",
+    "license": "Apache-2.0",
+    "version": "1.0.0",
+    "changelog": "Added roaster planning challenge skill; improves plan quality by forcing constructive skepticism before agreement; affects planning critique workflows and auto-invoke routing",
+    "auto-invoke": "When the user proposes, requests, or evaluates a plan of any kind",
+    "allowed-tools": [
+      "Read",
+      "Edit",
+      "Write",
+      "Glob",
+      "Grep",
+      "Bash",
+      "Task"
+    ]
+  },
+  "files": [
+    { "path": "SKILL.md", "kind": "instruction" }
+  ],
+  "dependencies": []
+}

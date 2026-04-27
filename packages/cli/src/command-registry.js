@@ -10,7 +10,7 @@ const CLI_COMMANDS = [
   {
     value: "native-setup",
     label: "Native Setup",
-    description: "Sync native assistant adapters and instruction files.",
+    description: "Sync native assistant adapters, rules, hooks, and instruction files.",
     bestFor: "After install or when assistant targets change",
     aliases: ["native", "adapters"],
     usage: "npx skilly-hand native setup"
@@ -105,4 +105,3 @@ export function formatHelpUsageLines() {
     ...CLI_COMMANDS.map((command) => command.usage)
   ];
 }
-

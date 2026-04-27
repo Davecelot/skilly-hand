@@ -5,6 +5,7 @@ import path from "node:path";
 import { access, cp, mkdir, mkdtemp, readFile, realpath, writeFile } from "node:fs/promises";
 import {
   NATIVE_ADAPTER_REGISTRY,
+  collectNativeHooks,
   evaluateNativeCoverage,
   installProject,
   resolveSkillSelectionByIds,
@@ -28,7 +29,7 @@ test("dry run returns install plan without writing files", async () => {
   const ids = result.plan.skills.map((skill) => skill.id);
 
   assert.equal(result.applied, false);
-  assert.equal(result.plan.skills.length, 12);
+  assert.equal(result.plan.skills.length, 13);
   assert.equal(result.plan.decisionsRegistry.relativePath, ".ai/DECISIONS.md");
   assert.equal(result.plan.decisionsRegistry.willCreate, true);
   await assert.rejects(access(path.join(projectDir, ".ai", "DECISIONS.md")), "expected dry run to avoid creating decisions registry");
@@ -41,6 +42,7 @@ test("dry run returns install plan without writing files", async () => {
     "project-teacher",
     "react-guidelines",
     "review-rangers",
+    "roaster",
     "skill-creator",
     "spec-driven-development",
     "test-driven-development",
@@ -119,8 +121,8 @@ test("dry run includes core skills even for no-stack projects", async () => {
   const ids = result.plan.skills.map((skill) => skill.id);
 
   assert.equal(result.applied, false);
-  assert.equal(result.plan.skills.length, 9);
-  assert.deepEqual(ids, ["agents-root-orchestrator", "output-optimizer", "project-security", "project-teacher", "review-rangers", "skill-creator", "spec-driven-development", "test-driven-development", "token-optimizer"]);
+  assert.equal(result.plan.skills.length, 10);
+  assert.deepEqual(ids, ["agents-root-orchestrator", "output-optimizer", "project-security", "project-teacher", "review-rangers", "roaster", "skill-creator", "spec-driven-development", "test-driven-development", "token-optimizer"]);
 });
 
 test("dry run includes angular-guidelines for angular projects", async () => {
@@ -138,6 +140,7 @@ test("dry run includes angular-guidelines for angular projects", async () => {
     "project-security",
     "project-teacher",
     "review-rangers",
+    "roaster",
     "skill-creator",
     "spec-driven-development",
     "test-driven-development",
@@ -392,6 +395,35 @@ test("resolveSkillSelectionByIds rejects non-portable skills", () => {
   );
 });
 
+test("collectNativeHooks sorts hooks deterministically", () => {
+  const hooks = collectNativeHooks({
+    skillIds: ["bravo", "alpha"],
+    catalog: [
+      {
+        id: "bravo",
+        title: "Bravo",
+        nativeHooks: [
+          { id: "late", trigger: "late", instruction: "late", priority: 20, enforcement: "recommended" }
+        ]
+      },
+      {
+        id: "alpha",
+        title: "Alpha",
+        nativeHooks: [
+          { id: "second", trigger: "second", instruction: "second", priority: 10, enforcement: "required" },
+          { id: "first", trigger: "first", instruction: "first", priority: 10, enforcement: "required" }
+        ]
+      }
+    ]
+  });
+
+  assert.deepEqual(hooks.map((hook) => `${hook.priority}:${hook.skillId}/${hook.id}`), [
+    "10:alpha/first",
+    "10:alpha/second",
+    "20:bravo/late"
+  ]);
+});
+
 test("native adapter registry covers all default agents and has unique target paths", () => {
   const adapters = Object.entries(NATIVE_ADAPTER_REGISTRY);
   assert.equal(adapters.length, 9);
@@ -425,11 +457,17 @@ test("native setup creates managed native files and doctor reports coverage stat
     agents: ["codex", "cursor", "standard"]
   });
   assert.equal(result.applied, true);
+  assert.equal(result.plan.nativeHooksStatus, "loaded");
+  assert.deepEqual(result.plan.nativeHooks.map((hook) => `${hook.skillId}/${hook.id}`), ["roaster/plan-challenge"]);
 
   const codexRule = await readFile(path.join(projectDir, ".codex", "rules", "skilly-hand.md"), "utf8");
   const cursorRule = await readFile(path.join(projectDir, ".cursor", "rules", "skilly-hand.mdc"), "utf8");
   assert.match(codexRule, /Managed by skilly-hand native setup/);
+  assert.match(codexRule, /## Skill Hooks \/ Rules/);
+  assert.match(codexRule, /\[required\] roaster\/plan-challenge/);
+  assert.match(codexRule, /Invoke roaster to critique assumptions, scope, sequencing, risks, and verification before agreeing with the plan/);
   assert.match(cursorRule, /Managed by skilly-hand native setup/);
+  assert.match(cursorRule, /\[required\] roaster\/plan-challenge/);
 
   const lockPath = path.join(projectDir, ".skilly-hand", "manifest.lock.json");
   const lockData = JSON.parse(await readFile(lockPath, "utf8"));
@@ -443,6 +481,22 @@ test("native setup creates managed native files and doctor reports coverage stat
   assert.equal(byAgent.get("codex")?.status, "configured");
   assert.equal(byAgent.get("cursor")?.status, "configured");
   assert.equal(byAgent.get("standard")?.status, "not-supported");
+});
+
+test("native setup before install reports no installed skill hooks", async () => {
+  const projectDir = await makeFixtureCopy("no-stack");
+  const result = await setupNativeProject({
+    cwd: projectDir,
+    agents: ["codex"]
+  });
+
+  assert.equal(result.applied, true);
+  assert.equal(result.plan.nativeHooksStatus, "not-installed");
+  assert.deepEqual(result.plan.nativeHooks, []);
+
+  const codexRule = await readFile(path.join(projectDir, ".codex", "rules", "skilly-hand.md"), "utf8");
+  assert.match(codexRule, /No installed skill hooks found/);
+  assert.match(codexRule, /Run `npx skilly-hand install` before native setup/);
 });
 
 test("native setup reconciles agent narrowing and uninstall removes managed native files", async () => {

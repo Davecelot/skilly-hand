@@ -80,6 +80,8 @@ export function validateSkillManifest(manifest) {
     throw new Error(`Skill "${manifest.id}" must declare files`);
   }
 
+  validateNativeHooks(manifest);
+
   const hasSkillInstruction = manifest.files.some((file) => file.path === "SKILL.md" && file.kind === "instruction");
   if (!hasSkillInstruction) {
     throw new Error(`Skill "${manifest.id}" must include files entry for SKILL.md as instruction`);
@@ -88,6 +90,36 @@ export function validateSkillManifest(manifest) {
   assertFrontmatterFields(manifest);
 
   return true;
+}
+
+function validateNativeHooks(manifest) {
+  if (!("nativeHooks" in manifest)) {
+    return;
+  }
+
+  if (!Array.isArray(manifest.nativeHooks)) {
+    throw new Error(`Skill "${manifest.id}" must declare nativeHooks as an array when present`);
+  }
+
+  for (const hook of manifest.nativeHooks) {
+    if (!hook || typeof hook !== "object" || Array.isArray(hook)) {
+      throw new Error(`Skill "${manifest.id}" has invalid nativeHooks entry; expected an object`);
+    }
+
+    for (const key of ["id", "trigger", "instruction", "enforcement"]) {
+      if (typeof hook[key] !== "string" || hook[key].trim().length === 0) {
+        throw new Error(`Skill "${manifest.id}" has invalid nativeHooks.${key}; expected a non-empty string`);
+      }
+    }
+
+    if (!["required", "recommended"].includes(hook.enforcement)) {
+      throw new Error(`Skill "${manifest.id}" has invalid nativeHooks.enforcement; expected required or recommended`);
+    }
+
+    if (!Number.isFinite(hook.priority)) {
+      throw new Error(`Skill "${manifest.id}" has invalid nativeHooks.priority; expected a finite number`);
+    }
+  }
 }
 
 function toLf(text) {

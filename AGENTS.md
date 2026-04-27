@@ -7,7 +7,7 @@
 
 - Scope: repository root and all descendant folders unless a deeper AGENTS guide overrides locally.
 - Generated at: self-sync
-- Detected technologies: nodejs, react
+- Detected technologies: nodejs
 - Escalation boundary: when work changes global architecture, CI/CD, release, or security policy, escalate before implementation.
 
 ## What
@@ -26,6 +26,7 @@
 | `project-teacher` | Scan the active project and teach any concept, code path, or decision using verified information, interactive questions, and simple explanations. Trigger: user asks to explain, understand, clarify, or learn about anything in the project or codebase. | core, workflow, education |
 | `react-guidelines` | Guide React code generation and review using latest stable React verification and modern framework best practices. | react, frontend, workflow, best-practices |
 | `review-rangers` | Review code, decisions, and artifacts through a multi-perspective committee and a domain expert safety guard, then synthesize a structured verdict. | core, workflow, review, quality |
+| `roaster` | Challenge plans with constructive roast-style critique that exposes weak assumptions, missing angles, shallow sequencing, and unclear success criteria. Trigger: when the user proposes, requests, or evaluates a plan of any kind. | core, workflow, planning, quality |
 | `skill-creator` | Create and standardize AI skills with reusable structure, metadata rules, and templates. | core, workflow, authoring |
 | `spec-driven-development` | Plan, execute, and verify multi-step work through versioned specs with small, testable tasks. | core, workflow, planning |
 | `test-driven-development` | Guide implementation using the RED → GREEN → REFACTOR TDD cycle: write a failing test first, write the minimum code to pass, then refactor while tests stay green. | testing, workflow, quality, core |
@@ -72,6 +73,7 @@ This gate has global precedence and applies to every user interaction across all
 | User needs to understand, explain, or learn about any aspect of the project or codebase | `project-teacher` |
 | Generating, reviewing, or refactoring React code artifacts in React projects | `react-guidelines` |
 | Reviewing code, decisions, or artifacts where adversarial multi-perspective evaluation adds value | `review-rangers` |
+| When the user proposes, requests, or evaluates a plan of any kind | `roaster` |
 | Creating a new skill | `skill-creator` |
 | Planning or executing feature work, bug fixes, and multi-phase implementation | `spec-driven-development` |
 | Implementing features, services, or components using test-driven development (TDD) or RED→GREEN→REFACTOR cycles | `test-driven-development` |

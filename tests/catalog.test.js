@@ -7,7 +7,7 @@ test("catalog manifests are portable and complete", async () => {
   const issues = await verifyCatalogFiles();
   const ids = skills.map((skill) => skill.id);
 
-  assert.equal(skills.length, 15);
+  assert.equal(skills.length, 16);
   assert.deepEqual(ids, [
     "accessibility-audit",
     "agents-root-orchestrator",
@@ -19,6 +19,7 @@ test("catalog manifests are portable and complete", async () => {
     "project-teacher",
     "react-guidelines",
     "review-rangers",
+    "roaster",
     "skill-creator",
     "spec-driven-development",
     "test-driven-development",
@@ -35,4 +36,9 @@ test("catalog manifests are portable and complete", async () => {
     assert.equal(skill.agentSupport.includes("windsurf"), true);
     assert.equal(skill.agentSupport.includes("trae"), true);
   }
+
+  const roaster = skills.find((skill) => skill.id === "roaster");
+  assert.equal(Array.isArray(roaster.nativeHooks), true);
+  assert.deepEqual(roaster.nativeHooks.map((hook) => hook.id), ["plan-challenge"]);
+  assert.equal(roaster.nativeHooks[0].enforcement, "required");
 });

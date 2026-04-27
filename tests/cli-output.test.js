@@ -55,6 +55,7 @@ test("help output is structured and includes JSON mode", () => {
   assert.match(result.stdout, /Flags/);
   assert.match(result.stdout, /--json/);
   assert.match(result.stdout, /Install portable skills into the current project/);
+  assert.match(result.stdout, /rules, hooks, and instruction files/);
   assert.match(result.stdout, /antigravity/);
   assert.match(result.stdout, /windsurf/);
   assert.match(result.stdout, /trae/);
@@ -87,6 +88,7 @@ test("native setup dry-run provides structured text output", () => {
   assert.equal(result.status, 0);
   assert.match(result.stdout, /Native Setup Preflight/);
   assert.match(result.stdout, /Native Coverage/);
+  assert.match(result.stdout, /rule\/hook adapter changes/);
   assert.match(result.stdout, /dry run complete/i);
 });
 
@@ -96,6 +98,8 @@ test("native setup supports --json output", () => {
   const payload = parseJsonPayload(result.stdout);
   assert.equal(payload.command, "native setup");
   assert.equal(Array.isArray(payload.nativeStatus), true);
+  assert.equal(Array.isArray(payload.plan.nativeHooks), true);
+  assert.equal(typeof payload.plan.nativeHooksStatus, "string");
 });
 
 test("non-interactive no-command invocation defaults to install output", () => {

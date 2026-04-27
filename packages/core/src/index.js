@@ -178,18 +178,56 @@ function resolveNativeAdapterTarget(cwd, adapter) {
   return path.join(cwd, ...adapter.targetPath);
 }
 
-function buildNativeRuleContent(agent, adapter) {
+export function collectNativeHooks({ catalog, skillIds = [] }) {
+  const selected = new Set(skillIds);
+  return catalog
+    .filter((skill) => selected.has(skill.id))
+    .flatMap((skill) => (skill.nativeHooks || []).map((hook) => ({
+      skillId: skill.id,
+      skillTitle: skill.title,
+      id: hook.id,
+      trigger: hook.trigger,
+      instruction: hook.instruction,
+      priority: hook.priority,
+      enforcement: hook.enforcement
+    })))
+    .sort((a, b) => (
+      a.priority - b.priority ||
+      a.skillId.localeCompare(b.skillId) ||
+      a.id.localeCompare(b.id)
+    ));
+}
+
+function renderNativeHookLines(nativeHooks, nativeHooksStatus) {
+  if (nativeHooks.length === 0) {
+    const emptyMessage = nativeHooksStatus === "not-installed"
+      ? "No installed skill hooks found. Run `npx skilly-hand install` before native setup to enable skill-driven rules."
+      : "No installed skills declare native hooks or rules.";
+    return [`- ${emptyMessage}`];
+  }
+
+  return nativeHooks.flatMap((hook) => [
+    `- [${hook.enforcement}] ${hook.skillId}/${hook.id}`,
+    `  - Trigger: ${hook.trigger}`,
+    `  - Rule: ${hook.instruction}`
+  ]);
+}
+
+function buildNativeRuleContent(agent, adapter, nativeHooks = [], nativeHooksStatus = "not-installed") {
   const trigger = "Run token-optimizer before review-rangers when doing risk-heavy review passes.";
   return [
     `${NATIVE_SETUP_MARKER} Re-run \`npx skilly-hand native setup\` to regenerate. -->`,
     `# skilly-hand Native Bootstrap (${agent})`,
     "",
-    `This file is managed by skilly-hand to keep native ${adapter.mode.replace("_", " ")} behavior consistent.`,
+    `This file is managed by skilly-hand to keep native ${adapter.mode.replace("_", " ")} rules/hooks consistent.`,
     "",
     "## Always-On Defaults",
     "- Apply AGENTS guidance from the repository root before task routing.",
     "- Enforce optimizer gate order: `token-optimizer` then `output-optimizer`.",
     "- Keep output concise by default (`step-brief`) unless user asks otherwise.",
+    "",
+    "## Skill Hooks / Rules",
+    ...renderNativeHookLines(nativeHooks, nativeHooksStatus),
     "",
     "## Token-Safe Review Stage",
     `- ${trigger}`,
@@ -572,6 +610,10 @@ export async function setupNativeProject({
   const lockPath = path.join(installRoot, "manifest.lock.json");
   const previousLock = await exists(lockPath) ? await readJson(lockPath) : null;
   const selectedAgents = normalizeAgentList(agents ?? previousLock?.agents);
+  const catalog = await loadAllSkills();
+  const installedSkillIds = previousLock?.skills || [];
+  const nativeHooks = collectNativeHooks({ catalog, skillIds: installedSkillIds });
+  const nativeHooksStatus = installedSkillIds.length > 0 ? "loaded" : "not-installed";
   const selectedNativeTargets = selectedAgents
     .map((agent) => NATIVE_ADAPTER_REGISTRY[agent])
     .filter((adapter) => adapter && adapter.supported)
@@ -584,7 +626,9 @@ export async function setupNativeProject({
     generatedAt,
     agents: selectedAgents,
     installRoot,
-    nativeStatus: nativeStatusBefore
+    nativeStatus: nativeStatusBefore,
+    nativeHooks,
+    nativeHooksStatus
   };
 
   if (dryRun) {
@@ -637,7 +681,7 @@ export async function setupNativeProject({
     }
 
     const targetPath = resolveNativeAdapterTarget(cwd, adapter);
-    const content = buildNativeRuleContent(agent, adapter);
+    const content = buildNativeRuleContent(agent, adapter, nativeHooks, nativeHooksStatus);
     await ensureManagedTextFile(targetPath, content, backupsDir, lockData, "managedNativeFiles");
     lockData.nativeProfiles[agent] = {
       status: "configured",
