@@ -1,5 +1,7 @@
 node_modules
 .DS_Store
+.playwright-cli/
+/output/playwright/
 site/dist
 .skilly-hand
 catalog/catalog-index.json
