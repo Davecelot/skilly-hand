@@ -31,6 +31,136 @@ const setupSteps = [
   ["03", "Run doctor", "Checks the install so routing stays predictable."]
 ];
 
+function useReducedMotion() {
+  const [shouldReduceMotion, setShouldReduceMotion] = useState(false);
+
+  useEffect(() => {
+    const query = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setShouldReduceMotion(query.matches);
+
+    function updatePreference(event) {
+      setShouldReduceMotion(event.matches);
+    }
+
+    query.addEventListener("change", updatePreference);
+    return () => query.removeEventListener("change", updatePreference);
+  }, []);
+
+  return shouldReduceMotion;
+}
+
+function useReveal({ threshold = 0.22, rootMargin = "0px 0px -8% 0px" } = {}) {
+  const ref = useRef(null);
+  const shouldReduceMotion = useReducedMotion();
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const node = ref.current;
+
+    if (!node || shouldReduceMotion || !("IntersectionObserver" in window)) {
+      setIsVisible(true);
+      return undefined;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.unobserve(entry.target);
+        }
+      },
+      { rootMargin, threshold }
+    );
+
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [rootMargin, shouldReduceMotion, threshold]);
+
+  return { ref, isVisible };
+}
+
+function Reveal({ as = "div", children, className = "", delay = 0, variant = "rise", ...props }) {
+  const { ref, isVisible } = useReveal();
+  const Component = as;
+  const revealClass = `reveal reveal-${variant}${isVisible ? " reveal-visible" : ""}${className ? ` ${className}` : ""}`;
+  const style = delay ? { ...props.style, "--reveal-delay": `${delay}ms` } : props.style;
+
+  return (
+    <Component ref={ref} className={revealClass} style={style} {...props}>
+      {children}
+    </Component>
+  );
+}
+
+function smoothScrollToHash(event, shouldReduceMotion) {
+  if (shouldReduceMotion || event.defaultPrevented || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+    return;
+  }
+
+  const anchor = event.currentTarget;
+  const hash = anchor.hash;
+
+  if (!hash || anchor.pathname !== window.location.pathname) {
+    return;
+  }
+
+  const target = document.querySelector(hash);
+
+  if (!target) {
+    return;
+  }
+
+  event.preventDefault();
+
+  const startY = window.scrollY;
+  const targetY = target.getBoundingClientRect().top + startY;
+  const distance = targetY - startY;
+  const duration = Math.min(950, Math.max(550, Math.abs(distance) * 0.52));
+  const startTime = performance.now();
+  let frameId = 0;
+  let isCancelled = false;
+
+  function cancel() {
+    isCancelled = true;
+    window.cancelAnimationFrame(frameId);
+    removeCancelListeners();
+  }
+
+  function removeCancelListeners() {
+    window.removeEventListener("wheel", cancel);
+    window.removeEventListener("touchstart", cancel);
+    window.removeEventListener("keydown", cancel);
+  }
+
+  window.addEventListener("wheel", cancel, { once: true, passive: true });
+  window.addEventListener("touchstart", cancel, { once: true, passive: true });
+  window.addEventListener("keydown", cancel, { once: true });
+
+  function easeOutCubic(progress) {
+    return 1 - Math.pow(1 - progress, 3);
+  }
+
+  function step(now) {
+    if (isCancelled) {
+      return;
+    }
+
+    const progress = Math.min(1, (now - startTime) / duration);
+    window.scrollTo(0, startY + distance * easeOutCubic(progress));
+
+    if (progress < 1) {
+      frameId = window.requestAnimationFrame(step);
+      return;
+    }
+
+    removeCancelListeners();
+    history.pushState(null, "", hash);
+    target.focus?.({ preventScroll: true });
+  }
+
+  frameId = window.requestAnimationFrame(step);
+}
+
 function CopyCommand({ command, label }) {
   const [copied, setCopied] = useState(false);
   const [pulseId, setPulseId] = useState(0);
@@ -90,29 +220,29 @@ function TargetCarousel() {
 function HeroBento() {
   return (
     <div className="hero-bento" aria-label="skilly-hand setup overview">
-      <div className="bento-card command-card">
+      <Reveal as="div" className="bento-card command-card" delay={120}>
         <p className="eyebrow">Setup command</p>
         <CopyCommand label="run" command="npx skilly-hand install" />
-      </div>
-      <div className="bento-card impact-card">
+      </Reveal>
+      <Reveal as="div" className="bento-card impact-card" delay={210}>
         <span>{skills.length}</span>
         <p>portable workflow skills routed into assistant-native files.</p>
-      </div>
-      <div className="bento-card flow-card">
+      </Reveal>
+      <Reveal as="div" className="bento-card flow-card" delay={300}>
         <div className="flow-map" aria-label="Workflow from detection to verification">
           {workflow.map(([title, body], index) => (
-            <article className="flow-node" key={title}>
+            <Reveal as="article" className="flow-node" delay={index * 45} key={title}>
               <span>{String(index + 1).padStart(2, "0")}</span>
               <strong>{title}</strong>
               <p>{body}</p>
-            </article>
+            </Reveal>
           ))}
         </div>
-      </div>
-      <div className="bento-card target-card">
+      </Reveal>
+      <Reveal as="div" className="bento-card target-card" delay={390}>
         <p className="eyebrow">Targets</p>
         <TargetCarousel />
-      </div>
+      </Reveal>
     </div>
   );
 }
@@ -120,24 +250,24 @@ function HeroBento() {
 function InstallSetup() {
   return (
     <section className="install-setup" id="install" aria-labelledby="install-title">
-      <div className="section-heading">
+      <Reveal className="section-heading">
         <p className="eyebrow">Install setup</p>
         <h2 id="install-title">One command, then the repo knows how agents should work.</h2>
-      </div>
+      </Reveal>
       <div className="setup-grid">
-        <div className="setup-command">
+        <Reveal className="setup-command" delay={120}>
           <CopyCommand label="install" command="npx skilly-hand install" />
           <p>Run it from the project root. Use <code>doctor</code> after setup when you want a quick health check.</p>
-        </div>
+        </Reveal>
         <ol className="setup-steps">
-          {setupSteps.map(([number, title, body]) => (
-            <li key={title}>
+          {setupSteps.map(([number, title, body], index) => (
+            <Reveal as="li" key={title} delay={180 + index * 70}>
               <span>{number}</span>
               <div>
                 <h3>{title}</h3>
                 <p>{body}</p>
               </div>
-            </li>
+            </Reveal>
           ))}
         </ol>
       </div>
@@ -147,10 +277,11 @@ function InstallSetup() {
 
 function ReleaseBanner() {
   const [isHovered, setIsHovered] = useState(false);
+  const shouldReduceMotion = useReducedMotion();
 
   return (
     <section className="release-band" id="release" aria-labelledby="release-title">
-      <div
+      <Reveal
         className="release-card"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
@@ -162,14 +293,14 @@ function ReleaseBanner() {
               colorFront="#7ee0d4"
               shape="warp"
               type="4x4"
-              speed={isHovered ? 0.55 : 0.18}
+              speed={shouldReduceMotion ? 0 : isHovered ? 0.55 : 0.18}
               className="release-shader"
               minPixelRatio={1}
             />
           </Suspense>
         </div>
 
-        <div className="release-summary">
+        <Reveal className="release-summary" delay={120}>
           <p className="eyebrow">Latest release</p>
           <h2 id="release-title">v{release.version}</h2>
           <p>Current changelog notes, generated from the matching release entry before the site ships.</p>
@@ -180,25 +311,25 @@ function ReleaseBanner() {
           <a className="release-link" href={release.npmUrl}>
             View npm release
           </a>
-        </div>
+        </Reveal>
 
-        <div className="release-notes" aria-label={`Changes in skilly-hand ${release.version}`}>
+        <Reveal className="release-notes" delay={220} aria-label={`Changes in skilly-hand ${release.version}`}>
           {release.sections.length > 0 ? (
-            release.sections.map((section) => (
-              <article className="release-note-group" key={section.title}>
+            release.sections.map((section, index) => (
+              <Reveal as="article" className="release-note-group" key={section.title} delay={index * 55}>
                 <h3>{section.title}</h3>
                 <ul>
                   {section.items.map((item) => (
                     <li key={item}>{item}</li>
                   ))}
                 </ul>
-              </article>
+              </Reveal>
             ))
           ) : (
             <p className="release-empty">No categorized changes were recorded for this release.</p>
           )}
-        </div>
-      </div>
+        </Reveal>
+      </Reveal>
     </section>
   );
 }
@@ -206,7 +337,7 @@ function ReleaseBanner() {
 function SkillDirectory({ filteredSkills, selectedSkill, onSelect, query, onQueryChange }) {
   return (
     <>
-      <div className="section-heading catalog-heading">
+      <Reveal className="section-heading catalog-heading">
         <div>
           <p className="eyebrow">Catalog</p>
           <h2 id="catalog-title">Skills you can scan like a directory.</h2>
@@ -220,13 +351,20 @@ function SkillDirectory({ filteredSkills, selectedSkill, onSelect, query, onQuer
             placeholder="React, Figma, security..."
           />
         </label>
-      </div>
+      </Reveal>
 
-      <div className="skills-shell">
-        <section className="skill-panel" aria-label="Skill list">
+      <Reveal className="skills-shell" delay={120}>
+        <Reveal as="section" className="skill-panel" delay={180} aria-label="Skill list">
           <div className="skill-list" role="list" aria-label="Available skills">
             {filteredSkills.map((skill, index) => (
-              <article className={skill.id === selectedSkill.id ? "skill-row selected" : "skill-row"} id={`skill-${skill.id}`} key={skill.id} role="listitem">
+              <Reveal
+                as="article"
+                className={skill.id === selectedSkill.id ? "skill-row selected" : "skill-row"}
+                delay={Math.min(index, 8) * 38}
+                id={`skill-${skill.id}`}
+                key={skill.id}
+                role="listitem"
+              >
                 <a className="skill-rank" href={`#skill-${skill.id}`} aria-label={`${skill.title} permalink`}>
                   {String(index + 1).padStart(2, "0")}
                 </a>
@@ -237,15 +375,15 @@ function SkillDirectory({ filteredSkills, selectedSkill, onSelect, query, onQuer
                 <button type="button" aria-pressed={skill.id === selectedSkill.id} onClick={() => onSelect(skill)}>
                   Deep dive
                 </button>
-              </article>
+              </Reveal>
             ))}
             {filteredSkills.length === 0 ? (
               <p className="empty-state">No skills match this search yet.</p>
             ) : null}
           </div>
-        </section>
+        </Reveal>
 
-        <aside className="skill-detail" aria-labelledby="skill-detail-title">
+        <Reveal as="aside" className="skill-detail" delay={260} aria-labelledby="skill-detail-title">
           <p className="eyebrow">Deep dive</p>
           <h3 id="skill-detail-title">{selectedSkill.title}</h3>
           <p>{selectedSkill.description}</p>
@@ -254,8 +392,8 @@ function SkillDirectory({ filteredSkills, selectedSkill, onSelect, query, onQuer
             <code>{selectedSkill.sourcePath}</code>
           </div>
           <pre className="skill-markdown">{selectedSkill.content}</pre>
-        </aside>
-      </div>
+        </Reveal>
+      </Reveal>
     </>
   );
 }
@@ -263,6 +401,7 @@ function SkillDirectory({ filteredSkills, selectedSkill, onSelect, query, onQuer
 function App() {
   const [query, setQuery] = useState("");
   const [selectedSkillId, setSelectedSkillId] = useState(skills[0]?.id);
+  const shouldReduceMotion = useReducedMotion();
 
   const filteredSkills = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
@@ -275,28 +414,31 @@ function App() {
     () => filteredSkills.find((skill) => skill.id === selectedSkillId) || filteredSkills[0] || skills[0],
     [filteredSkills, selectedSkillId]
   );
+  const handleSectionLinkClick = (event) => smoothScrollToHash(event, shouldReduceMotion);
 
   return (
     <main>
       <section className="hero" aria-labelledby="hero-title">
         <nav className="topbar" aria-label="Primary">
-          <a className="brand" href="#hero-title">skilly-hand</a>
+          <Reveal as="a" className="brand" href="#hero-title" onClick={handleSectionLinkClick}>
+            skilly-hand
+          </Reveal>
           <div>
-            <a href="#release">Release</a>
-            <a href="#catalog">Skills</a>
-            <a href="#install">Install</a>
+            <Reveal as="a" href="#release" delay={60} onClick={handleSectionLinkClick}>Release</Reveal>
+            <Reveal as="a" href="#catalog" delay={110} onClick={handleSectionLinkClick}>Skills</Reveal>
+            <Reveal as="a" href="#install" delay={160} onClick={handleSectionLinkClick}>Install</Reveal>
           </div>
         </nav>
 
         <div className="hero-grid">
           <div className="hero-copy">
-            <p className="eyebrow">Portable AI agent skills</p>
-            <h1 id="hero-title">skilly-hand</h1>
-            <p className="lede">Install curated, stack-aware workflows into the assistants already living in your repo.</p>
-            <div className="hero-actions" aria-label="Quick links">
-              <a className="button primary" href="#install">Install setup</a>
-              <a className="button secondary" href="#catalog">Browse skills</a>
-            </div>
+            <Reveal as="p" className="eyebrow">Portable AI agent skills</Reveal>
+            <Reveal as="h1" id="hero-title" delay={80}>skilly-hand</Reveal>
+            <Reveal as="p" className="lede" delay={170}>Install curated, stack-aware workflows into the assistants already living in your repo.</Reveal>
+            <Reveal className="hero-actions" delay={260} aria-label="Quick links">
+              <a className="button primary" href="#install" onClick={handleSectionLinkClick}>Install setup</a>
+              <a className="button secondary" href="#catalog" onClick={handleSectionLinkClick}>Browse skills</a>
+            </Reveal>
           </div>
 
           <HeroBento />
@@ -317,11 +459,11 @@ function App() {
         />
       </section>
       <footer className="site-footer" aria-label="Project links">
-        <span>skilly-hand</span>
+        <Reveal as="span">skilly-hand</Reveal>
         <nav aria-label="External links">
-          <a href="https://www.npmjs.com/package/@skilly-hand/skilly-hand">npx skilly-hand install</a>
-          <a href="https://github.com/Davecelot/skilly-hand">GitHub</a>
-          <a href="https://www.linkedin.com/in/villarroeldiego/">LinkedIn</a>
+          <Reveal as="a" delay={80} href="https://www.npmjs.com/package/@skilly-hand/skilly-hand">npx skilly-hand install</Reveal>
+          <Reveal as="a" delay={130} href="https://github.com/Davecelot/skilly-hand">GitHub</Reveal>
+          <Reveal as="a" delay={180} href="https://www.linkedin.com/in/villarroeldiego/">LinkedIn</Reveal>
         </nav>
       </footer>
     </main>

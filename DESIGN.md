@@ -130,11 +130,14 @@ For the website, imagery can be implemented as real raster assets, generated ass
 
 Motion should feel like pixels resolving into clarity:
 
+- The site uses a CSS-first local motion system for this pass: React may add reveal state and cancellable anchor scrolling, but no Lenis, GSAP, Framer Motion, or other animation dependency should be introduced unless a future redesign explicitly changes that decision.
+- Section, text, element, and actionable reveals should use expressive editorial pacing with small staggers, but remain purposeful and brief; no individual motion should exceed 800ms.
+- Progressive reveals should animate only opacity and transform, preserving layout stability and keeping content complete before and after animation.
 - Command copy feedback may use a short pixel scan or dither burst.
 - Skill filtering can subtly clarify selected rows without moving layout.
 - Target marquees may move slowly and pause on hover/focus.
 - Step progression can use line, pixel, or cursor cues.
-- Respect `prefers-reduced-motion`; all content must remain complete without animation.
+- Respect `prefers-reduced-motion`; all content must remain complete without animation, reveals should resolve immediately, and smooth scrolling should be disabled.
 
 Motion should be brief, purposeful, and tied to user action or system state.
 
