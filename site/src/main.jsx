@@ -1,7 +1,12 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { Suspense, lazy, useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
+import { release } from "./generated/release.js";
 import { skills } from "./generated/skills.js";
 import "./styles.css";
+
+const Dithering = lazy(() =>
+  import("@paper-design/shaders-react").then((module) => ({ default: module.Dithering }))
+);
 
 const workflow = [
   ["Detect", "Read the project stack and recommend the right workflows."],
@@ -140,6 +145,64 @@ function InstallSetup() {
   );
 }
 
+function ReleaseBanner() {
+  const [isHovered, setIsHovered] = useState(false);
+
+  return (
+    <section className="release-band" id="release" aria-labelledby="release-title">
+      <div
+        className="release-card"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        <div className="release-dither" aria-hidden="true">
+          <Suspense fallback={<div className="release-shader-fallback" />}>
+            <Dithering
+              colorBack="#00000000"
+              colorFront="#7ee0d4"
+              shape="warp"
+              type="4x4"
+              speed={isHovered ? 0.55 : 0.18}
+              className="release-shader"
+              minPixelRatio={1}
+            />
+          </Suspense>
+        </div>
+
+        <div className="release-summary">
+          <p className="eyebrow">Latest release</p>
+          <h2 id="release-title">v{release.version}</h2>
+          <p>Current changelog notes, generated from the matching release entry before the site ships.</p>
+          <div className="release-meta" aria-label="Release metadata">
+            <span>stable</span>
+            <time dateTime={release.date}>{release.date}</time>
+          </div>
+          <a className="release-link" href={release.npmUrl}>
+            View npm release
+          </a>
+        </div>
+
+        <div className="release-notes" aria-label={`Changes in skilly-hand ${release.version}`}>
+          {release.sections.length > 0 ? (
+            release.sections.map((section) => (
+              <article className="release-note-group" key={section.title}>
+                <h3>{section.title}</h3>
+                <ul>
+                  {section.items.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </article>
+            ))
+          ) : (
+            <p className="release-empty">No categorized changes were recorded for this release.</p>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function SkillDirectory({ filteredSkills, selectedSkill, onSelect, query, onQueryChange }) {
   return (
     <>
@@ -219,6 +282,7 @@ function App() {
         <nav className="topbar" aria-label="Primary">
           <a className="brand" href="#hero-title">skilly-hand</a>
           <div>
+            <a href="#release">Release</a>
             <a href="#catalog">Skills</a>
             <a href="#install">Install</a>
           </div>
@@ -238,6 +302,8 @@ function App() {
           <HeroBento />
         </div>
       </section>
+
+      <ReleaseBanner />
 
       <InstallSetup />
 

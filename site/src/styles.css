@@ -55,6 +55,7 @@ main {
 }
 
 .hero,
+.release-band,
 .install-setup,
 .catalog {
   padding: clamp(32px, 6vw, 80px);
@@ -64,7 +65,6 @@ main {
   min-height: 86vh;
   display: flex;
   flex-direction: column;
-  border-bottom: 1px solid var(--line);
 }
 
 .topbar {
@@ -283,6 +283,257 @@ h3 {
 .section-heading {
   max-width: 860px;
   margin-bottom: 28px;
+}
+
+.release-band {
+  position: relative;
+  padding-top: 80px;
+  padding-bottom: 176px;
+  background: transparent;
+}
+
+.release-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(260px, 0.72fr) minmax(0, 1fr);
+  gap: clamp(20px, 4vw, 54px);
+  align-items: center;
+  min-height: clamp(360px, 44vw, 520px);
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: clamp(22px, 4.5vw, 56px);
+  border: 1px solid var(--ink);
+  background: var(--ink);
+  box-shadow: 8px 8px 0 rgba(17, 17, 17, 0.22);
+  color: #ffffff;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.release-card::before,
+.release-card::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+
+.release-card::before {
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+    linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+  background-size: 28px 28px;
+  opacity: 0.36;
+  z-index: -2;
+}
+
+.release-card::after {
+  top: -10px;
+  right: 0;
+  width: 52px;
+  height: 52px;
+  border-top: 1px solid var(--ink);
+  border-right: 1px solid var(--ink);
+  pointer-events: none;
+}
+
+.release-dither {
+  position: absolute;
+  inset: 0 0 0 42%;
+  z-index: -1;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 48%, rgba(216, 243, 238, 0.32) 0 8%, rgba(13, 118, 110, 0.2) 24%, transparent 48%),
+    linear-gradient(135deg, rgba(13, 118, 110, 0.66), rgba(17, 17, 17, 0.1) 58%);
+}
+
+.release-shader,
+.release-shader-fallback {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.release-shader {
+  opacity: 0.5;
+  mix-blend-mode: screen;
+}
+
+.release-shader-fallback {
+  background:
+    radial-gradient(circle, rgba(126, 224, 212, 0.72) 0 2px, transparent 2px) 0 0 / 14px 14px,
+    linear-gradient(135deg, rgba(13, 118, 110, 0.38), transparent 60%);
+}
+
+.release-dither::before,
+.release-dither::after {
+  content: "";
+  position: absolute;
+  inset: -12%;
+}
+
+.release-dither::before {
+  background:
+    radial-gradient(circle, rgba(126, 224, 212, 0.34) 0 1px, transparent 1px) 0 0 / 14px 14px,
+    radial-gradient(circle, rgba(251, 250, 247, 0.2) 0 1px, transparent 1px) 7px 7px / 14px 14px;
+  mask-image: radial-gradient(ellipse at 52% 45%, #000 0 42%, transparent 72%);
+  opacity: 0.84;
+}
+
+.release-dither::after {
+  background:
+    repeating-linear-gradient(0deg, rgba(251, 250, 247, 0.18) 0 2px, transparent 2px 8px),
+    repeating-linear-gradient(90deg, rgba(17, 17, 17, 0.38) 0 2px, transparent 2px 8px);
+  mix-blend-mode: screen;
+  opacity: 0.32;
+}
+
+.release-summary {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  align-content: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.release-summary h2 {
+  margin: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: clamp(3rem, 5.9vw, 5.6rem);
+  line-height: 0.92;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow-wrap: normal;
+}
+
+.release-summary p {
+  max-width: 440px;
+  margin: 0;
+  color: #d8d5ce;
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+.release-summary .eyebrow {
+  color: #7ee0d4;
+}
+
+.release-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.release-meta span,
+.release-meta time {
+  min-height: 30px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 10px;
+  border: 1px solid rgba(216, 243, 238, 0.38);
+  color: #d8f3ee;
+  background: rgba(17, 17, 17, 0.42);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.8rem;
+  font-weight: 780;
+  text-transform: uppercase;
+}
+
+.release-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  justify-self: start;
+  min-height: 42px;
+  padding: 0 16px;
+  border: 1px solid #ffffff;
+  background: #ffffff;
+  color: var(--ink);
+  font-weight: 790;
+  text-decoration: none;
+  transition:
+    background-color 140ms ease-out,
+    color 140ms ease-out,
+    transform 140ms ease-out;
+}
+
+.release-link:hover {
+  background: #7ee0d4;
+  color: var(--ink);
+}
+
+.release-link:active {
+  transform: translate(1px, 1px);
+}
+
+.release-notes {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+  padding: 1px;
+  border: 1px solid rgba(255, 255, 255, 0.78);
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: 6px 6px 0 rgba(126, 224, 212, 0.38);
+}
+
+.release-note-group {
+  display: grid;
+  grid-template-columns: minmax(92px, 0.24fr) minmax(0, 1fr);
+  gap: 16px;
+  margin: 0;
+  padding: 18px;
+  background:
+    linear-gradient(135deg, rgba(216, 243, 238, 0.16), transparent 58%),
+    rgba(251, 250, 247, 0.94);
+  backdrop-filter: blur(2px);
+}
+
+.release-note-group h3 {
+  margin: 0;
+  color: var(--accent);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.8rem;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.release-note-group ul {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.release-note-group li {
+  position: relative;
+  min-width: 0;
+  padding-left: 18px;
+  color: var(--ink);
+  line-height: 1.45;
+}
+
+.release-note-group li::before {
+  content: "";
+  position: absolute;
+  top: 0.68em;
+  left: 0;
+  width: 7px;
+  height: 7px;
+  background: var(--accent);
+  transform: translateY(-50%);
+}
+
+.release-empty {
+  margin: 0;
+  padding: 18px;
+  background: var(--panel);
+  color: var(--muted);
+  line-height: 1.5;
 }
 
 .hero-bento {
@@ -970,9 +1221,14 @@ h3 {
 
 @media (max-width: 980px) {
   .hero-grid,
+  .release-card,
   .setup-grid,
   .catalog-heading {
     grid-template-columns: 1fr;
+  }
+
+  .release-dither {
+    inset: 40% 0 0 0;
   }
 
   .skills-shell {
@@ -988,9 +1244,15 @@ h3 {
 
 @media (max-width: 640px) {
   .hero,
+  .release-band,
   .catalog,
   .install-setup {
     padding: 24px 18px;
+  }
+
+  .release-band {
+    padding-top: 48px;
+    padding-bottom: 120px;
   }
 
   .topbar {
@@ -1035,6 +1297,15 @@ h3 {
   .command-card,
   .target-card {
     grid-column: auto;
+  }
+
+  .release-note-group {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .release-dither {
+    inset: 46% 0 0 0;
   }
 
   .skill-row {

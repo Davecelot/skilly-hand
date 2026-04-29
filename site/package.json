@@ -9,11 +9,13 @@
     "build": "vite build",
     "preview": "vite preview --host 127.0.0.1"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@paper-design/shaders-react": "0.0.76"
+  },
   "devDependencies": {
     "@vitejs/plugin-react": "6.0.1",
-    "vite": "8.0.10",
     "react": "19.2.5",
-    "react-dom": "19.2.5"
+    "react-dom": "19.2.5",
+    "vite": "8.0.10"
   }
 }

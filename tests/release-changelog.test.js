@@ -1,6 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { rotateChangelogContent } from "../scripts/release-changelog.mjs";
+import { readFile } from "node:fs/promises";
+import { extractReleaseMetadata } from "../site/scripts/release-metadata.mjs";
 
 function makeChangelogWithEntries() {
   return `# Changelog
@@ -94,4 +96,65 @@ test("fails when Unreleased section has no meaningful entries", () => {
       date: "2026-04-03"
     });
   }, /has no meaningful entries/);
+});
+
+test("extracts release metadata for the current package version", async () => {
+  const [packageJsonContent, changelogContent] = await Promise.all([
+    readFile(new URL("../package.json", import.meta.url), "utf8"),
+    readFile(new URL("../CHANGELOG.md", import.meta.url), "utf8")
+  ]);
+
+  const metadata = extractReleaseMetadata({ packageJsonContent, changelogContent });
+
+  assert.equal(metadata.version, JSON.parse(packageJsonContent).version);
+  assert.match(metadata.date, /^\d{4}-\d{2}-\d{2}$/);
+  assert.match(metadata.npmUrl, new RegExp(`/v/${metadata.version}$`));
+  assert.ok(metadata.sections.length > 0);
+});
+
+test("omits empty _None._ changelog groups from release metadata", () => {
+  const metadata = extractReleaseMetadata({
+    packageJsonContent: JSON.stringify({ version: "1.2.3" }),
+    changelogContent: `# Changelog
+
+## [1.2.3] - 2026-04-27
+[View on npm](https://example.com/package/v/1.2.3)
+
+### Added
+- _None._
+
+### Changed
+- Improved release metadata generation.
+
+### Fixed
+- _None._
+`
+  });
+
+  assert.deepEqual(metadata.sections, [
+    {
+      title: "Changed",
+      items: ["Improved release metadata generation."]
+    }
+  ]);
+});
+
+test("fails when package version has no released changelog section", () => {
+  assert.throws(() => {
+    extractReleaseMetadata({
+      packageJsonContent: JSON.stringify({ version: "9.9.9" }),
+      changelogContent: `# Changelog
+
+## [Unreleased]
+
+### Added
+- Future work.
+
+## [1.0.0] - 2026-04-01
+
+### Added
+- Initial release.
+`
+    });
+  }, /No released changelog section found for package version 9\.9\.9/);
 });

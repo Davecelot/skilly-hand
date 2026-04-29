@@ -379,6 +379,30 @@
         "url": "https://github.com/sponsors/Boshen"
       }
     },
+    "node_modules/@paper-design/shaders": {
+      "version": "0.0.76",
+      "resolved": "https://registry.npmjs.org/@paper-design/shaders/-/shaders-0.0.76.tgz",
+      "integrity": "sha512-AcNDY4J66YQHUfQYFInkCP7M9VOje0od7wLpOR7LtCmc532opJy6ll+h1W9zBovz8tt9U7OADUmJ/qKEXyOX/A==",
+      "license": "SEE LICENSE IN https://github.com/paper-design/shaders/blob/main/LICENSE"
+    },
+    "node_modules/@paper-design/shaders-react": {
+      "version": "0.0.76",
+      "resolved": "https://registry.npmjs.org/@paper-design/shaders-react/-/shaders-react-0.0.76.tgz",
+      "integrity": "sha512-uPJWrYRf6cJdO2H+fuXlahaqz0QjYglNAyUTaRfIInpzCa/d6guxBIK003soAZQFuQ035yg9FhtfFzKNWm+a5A==",
+      "license": "SEE LICENSE IN https://github.com/paper-design/shaders/blob/main/LICENSE",
+      "dependencies": {
+        "@paper-design/shaders": "0.0.76"
+      },
+      "peerDependencies": {
+        "@types/react": "^18 || ^19",
+        "react": "^18 || ^19"
+      },
+      "peerDependenciesMeta": {
+        "@types/react": {
+          "optional": true
+        }
+      }
+    },
     "node_modules/@rolldown/binding-android-arm64": {
       "version": "1.0.0-rc.17",
       "resolved": "https://registry.npmjs.org/@rolldown/binding-android-arm64/-/binding-android-arm64-1.0.0-rc.17.tgz",
@@ -1167,7 +1191,6 @@
       "version": "19.2.5",
       "resolved": "https://registry.npmjs.org/react/-/react-19.2.5.tgz",
       "integrity": "sha512-llUJLzz1zTUBrskt2pwZgLq59AemifIftw4aB7JxOqf1HY2FDaGDxgwpAPVzHU1kdWabH7FauP4i1oEeer2WCA==",
-      "dev": true,
       "license": "MIT",
       "peer": true,
       "engines": {
@@ -1405,6 +1428,9 @@
     "site": {
       "name": "@skilly-hand/site",
       "version": "0.0.0",
+      "dependencies": {
+        "@paper-design/shaders-react": "0.0.76"
+      },
       "devDependencies": {
         "@vitejs/plugin-react": "6.0.1",
         "react": "19.2.5",
