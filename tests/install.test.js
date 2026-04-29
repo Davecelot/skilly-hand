@@ -177,15 +177,22 @@ test("install creates managed files, symlinks, and restores originals on uninsta
   assert.match(managedAgents, /Always run `output-optimizer` immediately after `token-optimizer`/);
   assert.match(managedAgents, /Default: use `step-brief` when there is no explicit mode or strong phrasing signal/);
   assert.match(managedAgents, /Persistence: keep the explicitly requested mode active until the user asks for a different mode/);
+  assert.match(managedAgents, /### Mandatory Planning Challenge Gate \(Must Use \/ Must Read\)/);
+  assert.match(managedAgents, /Always run `roaster` before agreeing with or executing a plan/);
+  assert.match(managedAgents, /Use `roaster` to critique assumptions, scope, sequencing, risks, and verification/);
   assert.match(managedAgents, /## Chaining Notations/);
   assert.match(managedAgents, /`agents-root-orchestrator`/);
   assert.match(managedAgents, /SDD-first policy/);
   assert.match(managedAgents, /`spec-driven-development`/);
   assert.match(managedAgents, /### SDD-First Delivery Workflow/);
   assert.match(claudeInstructions, /### Mandatory Skill Gate \(Must Use \/ Must Read\)/);
+  assert.match(claudeInstructions, /### Mandatory Planning Challenge Gate \(Must Use \/ Must Read\)/);
   assert.match(cursorInstructions, /### Mandatory Skill Gate \(Must Use \/ Must Read\)/);
+  assert.match(cursorInstructions, /### Mandatory Planning Challenge Gate \(Must Use \/ Must Read\)/);
   assert.match(geminiInstructions, /### Mandatory Skill Gate \(Must Use \/ Must Read\)/);
+  assert.match(geminiInstructions, /### Mandatory Planning Challenge Gate \(Must Use \/ Must Read\)/);
   assert.match(copilotInstructions, /### Mandatory Skill Gate \(Must Use \/ Must Read\)/);
+  assert.match(copilotInstructions, /### Mandatory Planning Challenge Gate \(Must Use \/ Must Read\)/);
 
   const doctorResult = await runDoctor(projectDir);
   assert.equal(doctorResult.installed, true);

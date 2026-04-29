@@ -8,7 +8,7 @@ All notable changes to this project are documented in this file.
 - _None._
 
 ### Changed
-- _None._
+- Added mandatory optimizer and planning challenge gates to generated convention files so `token-optimizer`, `output-optimizer`, and `roaster` are consistently enforced across agent instruction targets.
 
 ### Fixed
 - _None._

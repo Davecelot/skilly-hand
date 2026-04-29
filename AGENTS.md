@@ -44,9 +44,18 @@ This gate has global precedence and applies to every user interaction across all
    - Override: if user explicitly requests a mode (for example `mode: step-brief`), that explicit mode wins.
    - Persistence: keep the explicitly requested mode active until the user asks for a different mode.
 
+### Mandatory Planning Challenge Gate (Must Use / Must Read)
+
+This gate is mandatory whenever the user proposes, requests, or evaluates a plan of any kind.
+
+1. Always run `roaster` before agreeing with or executing a plan.
+2. Use `roaster` to critique assumptions, scope, sequencing, risks, and verification.
+3. Keep the critique constructive and actionable; target the plan, not the person.
+4. Skip only for emergencies, trivial one-step tasks, or sensitive contexts where roast tone would be inappropriate.
+
 ### Task Routing
 
-**Mandatory-gate precedence:** apply the mandatory optimizer gate before task-routing chains below.
+**Mandatory-gate precedence:** apply the mandatory optimizer gate first, then apply the mandatory planning challenge gate when the task includes planning.
 
 **SDD-first policy:** for feature delivery, bug fixes, or any multi-step implementation, start with `spec-driven-development` unless the task is clearly trivial and one-step.
 
