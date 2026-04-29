@@ -11,11 +11,11 @@
   --accent-wash: #eef8f5;
   --focus: #a54512;
   --shadow: 0 18px 60px rgba(17, 17, 17, 0.08);
-  --motion-ease: cubic-bezier(0.16, 1, 0.3, 1);
-  --motion-snap: cubic-bezier(0.2, 0.8, 0.2, 1);
-  --motion-fast: 220ms;
-  --motion-medium: 500ms;
-  --motion-slow: 900ms;
+  --motion-ease: cubic-bezier(0.25, 1, 0.5, 1);
+  --motion-snap: cubic-bezier(0.37, 0, 0.63, 1);
+  --motion-fast: 300ms;
+  --motion-medium: 650ms;
+  --motion-slow: 1200ms;
   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   background: var(--paper);
   color: var(--ink);
@@ -239,19 +239,19 @@ h3 {
 }
 
 .command-row.copied.pulse-0::before {
-  animation: pixel-scan-a 700ms steps(6, end);
+  animation: pixel-scan-a 900ms steps(6, end);
 }
 
 .command-row.copied.pulse-1::before {
-  animation: pixel-scan-b 700ms steps(6, end);
+  animation: pixel-scan-b 900ms steps(6, end);
 }
 
 .command-row.copied.pulse-0::after {
-  animation: dither-burst-a 700ms steps(5, end);
+  animation: dither-burst-a 900ms steps(5, end);
 }
 
 .command-row.copied.pulse-1::after {
-  animation: dither-burst-b 700ms steps(5, end);
+  animation: dither-burst-b 900ms steps(5, end);
 }
 
 .command-row span {
@@ -280,10 +280,10 @@ h3 {
   cursor: pointer;
   text-decoration: none;
   transition:
-    background-color 140ms ease-out,
-    color 140ms ease-out,
-    box-shadow 140ms ease-out,
-    transform 140ms ease-out;
+    background-color 220ms ease-out,
+    color 220ms ease-out,
+    box-shadow 220ms ease-out,
+    transform 220ms ease-out;
 }
 
 .command-row button {
@@ -514,10 +514,10 @@ h3 {
   font-weight: 790;
   text-decoration: none;
   transition:
-    background-color 140ms ease-out,
-    color 140ms ease-out,
-    box-shadow 140ms ease-out,
-    transform 140ms ease-out;
+    background-color 220ms ease-out,
+    color 220ms ease-out,
+    box-shadow 220ms ease-out,
+    transform 220ms ease-out;
 }
 
 .release-link:hover {
@@ -822,7 +822,7 @@ h3 {
   display: flex;
   width: max-content;
   padding-inline: clamp(16px, 2.4vw, 24px);
-  animation: target-marquee 28s linear infinite;
+  animation: target-marquee 38s linear infinite;
 }
 
 .target-marquee:hover .target-track,
