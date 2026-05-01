@@ -1401,7 +1401,13 @@ h3 {
 }
 
 .skill-page {
+  display: flex;
+  flex-direction: column;
   min-height: 100dvh;
+}
+
+.skill-page-inner {
+  flex: 1;
   padding: clamp(24px, 5vw, 64px);
 }
 
@@ -1409,19 +1415,8 @@ h3 {
   margin-top: clamp(32px, 6vw, 80px);
 }
 
-.detail-topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 18px;
+.skill-page-inner > .topbar {
   margin-bottom: clamp(32px, 5vw, 64px);
-}
-
-.detail-topbar a {
-  color: inherit;
-  font-weight: 780;
-  text-decoration-color: rgba(91, 95, 102, 0.35);
-  text-underline-offset: 4px;
 }
 
 .back-link {
@@ -1590,6 +1585,11 @@ h3 {
   grid-template-rows: auto 1fr;
 }
 
+.not-found-page .skill-page-inner {
+  display: grid;
+  grid-template-rows: auto 1fr;
+}
+
 .not-found-panel {
   align-self: center;
   display: grid;
@@ -1743,7 +1743,7 @@ h3 {
   .release-band,
   .catalog,
   .install-setup,
-  .skill-page {
+  .skill-page-inner {
     padding: 24px 18px;
   }
 
@@ -1788,8 +1788,7 @@ h3 {
     box-shadow: 4px 4px 0 var(--ink);
   }
 
-  .skill-section-head,
-  .detail-topbar {
+  .skill-section-head {
     align-items: flex-start;
     flex-direction: column;
   }

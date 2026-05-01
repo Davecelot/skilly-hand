@@ -10,6 +10,18 @@ const Dithering = lazy(() =>
 
 const appBasePath = normalizeBasePath(import.meta.env.BASE_URL);
 
+const siteNavLinks = [
+  ["Release", "#release", 60],
+  ["Skills", "#catalog", 110],
+  ["Install", "#install", 160]
+];
+
+const siteFooterLinks = [
+  ["npx skilly-hand install", "https://www.npmjs.com/package/@skilly-hand/skilly-hand"],
+  ["GitHub", "https://github.com/Davecelot/skilly-hand"],
+  ["LinkedIn", "https://www.linkedin.com/in/villarroeldiego/"]
+];
+
 const workflow = [
   ["Detect", "Read the project stack and recommend the right workflows."],
   ["Choose", "Filter the portable catalog by stack, tags, or team intent."],
@@ -262,6 +274,52 @@ function CopyCommand({ command, label }) {
   );
 }
 
+function SiteNavbar({ onSectionLinkClick, useReveal = false }) {
+  const LinkComponent = useReveal ? Reveal : "a";
+  const linkProps = useReveal ? { as: "a" } : {};
+
+  return (
+    <nav className="topbar" aria-label="Primary">
+      <LinkComponent
+        {...linkProps}
+        className="brand"
+        href={homePath("#hero-title")}
+        onClick={onSectionLinkClick}
+      >
+        skilly-hand
+      </LinkComponent>
+      <div>
+        {siteNavLinks.map(([label, hash, delay]) => (
+          <LinkComponent
+            {...linkProps}
+            href={homePath(hash)}
+            delay={useReveal ? delay : undefined}
+            key={label}
+            onClick={onSectionLinkClick}
+          >
+            {label}
+          </LinkComponent>
+        ))}
+      </div>
+    </nav>
+  );
+}
+
+function SiteFooter() {
+  return (
+    <footer className="site-footer" aria-label="Project links">
+      <span>skilly-hand</span>
+      <nav aria-label="External links">
+        {siteFooterLinks.map(([label, href]) => (
+          <a href={href} key={label}>
+            {label}
+          </a>
+        ))}
+      </nav>
+    </footer>
+  );
+}
+
 function TargetCarousel() {
   const assetBase = import.meta.env.BASE_URL;
 
@@ -504,86 +562,74 @@ function SkillDetailPage({ skill, onNavigateHome }) {
 
   return (
     <main className="skill-page">
-      <nav className="detail-topbar" aria-label="Skill detail">
-        <a className="brand" href={homePath()} onClick={(event) => onNavigateHome(event)}>
-          skilly-hand
+      <div className="skill-page-inner">
+        <SiteNavbar onSectionLinkClick={onNavigateHome} />
+
+        <a className="back-link" href={homePath("#catalog")} onClick={(event) => onNavigateHome(event, "#catalog")}>
+          ← Back to catalog
         </a>
-        <a href={homePath("#catalog")} onClick={(event) => onNavigateHome(event, "#catalog")}>
-          Catalog
-        </a>
-      </nav>
 
-      <a className="back-link" href={homePath("#catalog")} onClick={(event) => onNavigateHome(event, "#catalog")}>
-        ← Back to catalog
-      </a>
+        <article className="skill-page-layout" aria-labelledby="skill-page-title">
+          <header className="skill-page-hero">
+            <p className="skill-breadcrumb">
+              <a href={homePath("#catalog")} onClick={(event) => onNavigateHome(event, "#catalog")}>
+                skills
+              </a>
+              <span>/</span>
+              <span>{skill.id}</span>
+            </p>
+            <p className="eyebrow">Skill detail</p>
+            <h1 id="skill-page-title">{skill.title}</h1>
+            <p className="detail-summary">{skill.description}</p>
+            <CopyCommand label="install" command="npx skilly-hand install" />
+          </header>
 
-      <article className="skill-page-layout" aria-labelledby="skill-page-title">
-        <header className="skill-page-hero">
-          <p className="skill-breadcrumb">
-            <a href={homePath("#catalog")} onClick={(event) => onNavigateHome(event, "#catalog")}>
-              skills
-            </a>
-            <span>/</span>
-            <span>{skill.id}</span>
-          </p>
-          <p className="eyebrow">Skill detail</p>
-          <h1 id="skill-page-title">{skill.title}</h1>
-          <p className="detail-summary">{skill.description}</p>
-          <CopyCommand label="install" command="npx skilly-hand install" />
-        </header>
-
-        <aside className="skill-page-meta" aria-label={`${skill.title} metadata`}>
-          <div className="skill-tags" aria-label={`${skill.title} tags`}>
-            {skill.tags.map((tag) => (
-              <span key={tag}>{tag}</span>
-            ))}
-          </div>
-          <dl className="metadata-grid">
-            {metadataEntries.map(([label, value]) => (
-              <div key={label}>
-                <dt>{label}</dt>
-                <dd>{Array.isArray(value) ? value.join(", ") : value}</dd>
-              </div>
-            ))}
-          </dl>
-          {skill.files?.length > 0 && (
-            <div className="metadata-files">
-              <p className="metadata-files-label">Files</p>
-              <ul className="metadata-files-tree">
-                {skill.files.map(f => (
-                  <li key={f.name} data-type={f.type}>
-                    <span>{f.name}{f.type === "dir" ? "/" : ""}</span>
-                    {f.children?.length > 0 && (
-                      <ul>
-                        {f.children.map(c => (
-                          <li key={c.name} data-type={c.type}>{c.name}</li>
-                        ))}
-                      </ul>
-                    )}
-                  </li>
-                ))}
-              </ul>
+          <aside className="skill-page-meta" aria-label={`${skill.title} metadata`}>
+            <div className="skill-tags" aria-label={`${skill.title} tags`}>
+              {skill.tags.map((tag) => (
+                <span key={tag}>{tag}</span>
+              ))}
             </div>
-          )}
-        </aside>
+            <dl className="metadata-grid">
+              {metadataEntries.map(([label, value]) => (
+                <div key={label}>
+                  <dt>{label}</dt>
+                  <dd>{Array.isArray(value) ? value.join(", ") : value}</dd>
+                </div>
+              ))}
+            </dl>
+            {skill.files?.length > 0 && (
+              <div className="metadata-files">
+                <p className="metadata-files-label">Files</p>
+                <ul className="metadata-files-tree">
+                  {skill.files.map(f => (
+                    <li key={f.name} data-type={f.type}>
+                      <span>{f.name}{f.type === "dir" ? "/" : ""}</span>
+                      {f.children?.length > 0 && (
+                        <ul>
+                          {f.children.map(c => (
+                            <li key={c.name} data-type={c.type}>{c.name}</li>
+                          ))}
+                        </ul>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </aside>
 
-        <section className="skill-page-content" aria-labelledby="skill-markdown-title">
-          <div className="skill-section-head">
-            <p className="eyebrow">SKILL.md</p>
-            <h2 id="skill-markdown-title">Source content</h2>
-          </div>
-          <pre className="skill-markdown detail-markdown">{skill.content}</pre>
-        </section>
-      </article>
+          <section className="skill-page-content" aria-labelledby="skill-markdown-title">
+            <div className="skill-section-head">
+              <p className="eyebrow">SKILL.md</p>
+              <h2 id="skill-markdown-title">Source content</h2>
+            </div>
+            <pre className="skill-markdown detail-markdown">{skill.content}</pre>
+          </section>
+        </article>
+      </div>
 
-      <footer className="site-footer" aria-label="Project links">
-        <span>skilly-hand</span>
-        <nav aria-label="External links">
-          <a href="https://www.npmjs.com/package/@skilly-hand/skilly-hand">npx skilly-hand install</a>
-          <a href="https://github.com/Davecelot/skilly-hand">GitHub</a>
-          <a href="https://www.linkedin.com/in/villarroeldiego/">LinkedIn</a>
-        </nav>
-      </footer>
+      <SiteFooter />
     </main>
   );
 }
@@ -591,26 +637,24 @@ function SkillDetailPage({ skill, onNavigateHome }) {
 function SkillNotFoundPage({ skillId, onNavigateHome }) {
   return (
     <main className="skill-page not-found-page">
-      <nav className="detail-topbar" aria-label="Skill detail">
-        <a className="brand" href={homePath()} onClick={(event) => onNavigateHome(event)}>
-          skilly-hand
-        </a>
-      </nav>
-      <section className="not-found-panel" aria-labelledby="not-found-title">
-        <p className="skill-breadcrumb">
-          <a href={homePath("#catalog")} onClick={(event) => onNavigateHome(event, "#catalog")}>
-            skills
+      <div className="skill-page-inner">
+        <SiteNavbar onSectionLinkClick={onNavigateHome} />
+        <section className="not-found-panel" aria-labelledby="not-found-title">
+          <p className="skill-breadcrumb">
+            <a href={homePath("#catalog")} onClick={(event) => onNavigateHome(event, "#catalog")}>
+              skills
+            </a>
+            <span>/</span>
+            <span>{skillId}</span>
+          </p>
+          <p className="eyebrow">Skill not found</p>
+          <h1 id="not-found-title">No matching skill in this catalog.</h1>
+          <p>Check the skill ID or return to the catalog to scan every available workflow.</p>
+          <a className="button primary" href={homePath("#catalog")} onClick={(event) => onNavigateHome(event, "#catalog")}>
+            Browse skills
           </a>
-          <span>/</span>
-          <span>{skillId}</span>
-        </p>
-        <p className="eyebrow">Skill not found</p>
-        <h1 id="not-found-title">No matching skill in this catalog.</h1>
-        <p>Check the skill ID or return to the catalog to scan every available workflow.</p>
-        <a className="button primary" href={homePath("#catalog")} onClick={(event) => onNavigateHome(event, "#catalog")}>
-          Browse skills
-        </a>
-      </section>
+        </section>
+      </div>
     </main>
   );
 }
@@ -674,7 +718,7 @@ function App() {
     smoothScrollToHash(event, shouldReduceMotion);
   }
 
-  function handleHomeNavigation(event, hash = "") {
+  function handleHomeNavigation(event, hash = event.currentTarget.hash) {
     event.preventDefault();
     navigateTo(homePath(hash));
   }
@@ -694,16 +738,7 @@ function App() {
   return (
     <main>
       <section className="hero" aria-labelledby="hero-title">
-        <nav className="topbar" aria-label="Primary">
-          <Reveal as="a" className="brand" href="#hero-title" onClick={handleSectionLinkClick}>
-            skilly-hand
-          </Reveal>
-          <div>
-            <Reveal as="a" href="#release" delay={60} onClick={handleSectionLinkClick}>Release</Reveal>
-            <Reveal as="a" href="#catalog" delay={110} onClick={handleSectionLinkClick}>Skills</Reveal>
-            <Reveal as="a" href="#install" delay={160} onClick={handleSectionLinkClick}>Install</Reveal>
-          </div>
-        </nav>
+        <SiteNavbar onSectionLinkClick={handleSectionLinkClick} useReveal />
 
         <div className="hero-grid">
           <div className="hero-copy">
@@ -732,14 +767,7 @@ function App() {
           onQueryChange={setQuery}
         />
       </section>
-      <footer className="site-footer" aria-label="Project links">
-        <span>skilly-hand</span>
-        <nav aria-label="External links">
-          <a href="https://www.npmjs.com/package/@skilly-hand/skilly-hand">npx skilly-hand install</a>
-          <a href="https://github.com/Davecelot/skilly-hand">GitHub</a>
-          <a href="https://www.linkedin.com/in/villarroeldiego/">LinkedIn</a>
-        </nav>
-      </footer>
+      <SiteFooter />
     </main>
   );
 }
