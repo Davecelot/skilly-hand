@@ -26,9 +26,33 @@ const supportedTargets = [
   ["TRAE", "ByteDance", "trae.svg"]
 ];
 const setupSteps = [
-  ["01", "Run install", "Creates the managed agent instructions and portable skills."],
-  ["02", "Pick targets", "Adds native adapters for the assistants your team uses."],
-  ["03", "Run doctor", "Checks the install so routing stays predictable."]
+  {
+    number: "01",
+    title: "Run install",
+    commandLabel: "install",
+    command: "npx skilly-hand install",
+    status: "Managed instructions ready",
+    detail: "Creates AGENTS.md plus portable skills from the catalog.",
+    output: ["detect stack", "write skill hooks", "sync routing map"]
+  },
+  {
+    number: "02",
+    title: "Pick targets",
+    commandLabel: "target",
+    command: "npx skilly-hand install --agent codex --agent cursor",
+    status: "Assistant adapters selected",
+    detail: "Adds native files for the coding assistants your team uses.",
+    output: ["codex rules", "cursor rules", "shared skills"]
+  },
+  {
+    number: "03",
+    title: "Run doctor",
+    commandLabel: "verify",
+    command: "npx skilly-hand doctor",
+    status: "Routing stays predictable",
+    detail: "Checks generated files, skill manifests, and target health.",
+    output: ["manifests ok", "targets ok", "ready for agents"]
+  }
 ];
 
 function useReducedMotion() {
@@ -248,28 +272,64 @@ function HeroBento() {
 }
 
 function InstallSetup() {
+  const [activeStepIndex, setActiveStepIndex] = useState(0);
+  const activeStep = setupSteps[activeStepIndex];
+
   return (
     <section className="install-setup" id="install" aria-labelledby="install-title">
       <Reveal className="section-heading">
         <p className="eyebrow">Install setup</p>
         <h2 id="install-title">One command, then the repo knows how agents should work.</h2>
       </Reveal>
-      <div className="setup-grid">
-        <Reveal className="setup-command" delay={120}>
-          <CopyCommand label="install" command="npx skilly-hand install" />
-          <p>Run it from the project root. Use <code>doctor</code> after setup when you want a quick health check.</p>
+      <div className="setup-console">
+        <Reveal className="setup-preview" delay={120} aria-live="polite">
+          <div className="setup-window-dots" aria-hidden="true">
+            <span />
+            <span />
+            <span />
+          </div>
+          <div className="setup-preview-head">
+            <div>
+              <p className="eyebrow">Step {activeStep.number}</p>
+              <h3>{activeStep.status}</h3>
+            </div>
+            <span className="setup-state">active</span>
+          </div>
+          <CopyCommand label={activeStep.commandLabel} command={activeStep.command} />
+          <p>{activeStep.detail}</p>
+          <div className="setup-output" aria-label={`${activeStep.title} output`}>
+            {activeStep.output.map((item) => (
+              <span key={item}>{item}</span>
+            ))}
+          </div>
         </Reveal>
-        <ol className="setup-steps">
-          {setupSteps.map(([number, title, body], index) => (
-            <Reveal as="li" key={title} delay={180 + index * 70}>
-              <span>{number}</span>
-              <div>
-                <h3>{title}</h3>
-                <p>{body}</p>
-              </div>
-            </Reveal>
-          ))}
-        </ol>
+        <Reveal className="setup-table-card" delay={180}>
+          <div className="setup-table-header">
+            <span>#</span>
+            <span>Action</span>
+            <span>Status</span>
+          </div>
+          <ol className="setup-steps" aria-label="Install setup steps">
+            {setupSteps.map((step, index) => (
+              <li key={step.title}>
+                <button
+                  type="button"
+                  className={index === activeStepIndex ? "selected" : ""}
+                  aria-pressed={index === activeStepIndex}
+                  onClick={() => setActiveStepIndex(index)}
+                >
+                  <span>{step.number}</span>
+                  <strong>{step.title}</strong>
+                  <small>{step.status}</small>
+                </button>
+              </li>
+            ))}
+          </ol>
+          <div className="setup-table-footer">
+            <span>Showing {setupSteps.length} steps</span>
+            <span>Click a row to preview</span>
+          </div>
+        </Reveal>
       </div>
     </section>
   );
@@ -459,11 +519,11 @@ function App() {
         />
       </section>
       <footer className="site-footer" aria-label="Project links">
-        <Reveal as="span">skilly-hand</Reveal>
+        <span>skilly-hand</span>
         <nav aria-label="External links">
-          <Reveal as="a" delay={80} href="https://www.npmjs.com/package/@skilly-hand/skilly-hand">npx skilly-hand install</Reveal>
-          <Reveal as="a" delay={130} href="https://github.com/Davecelot/skilly-hand">GitHub</Reveal>
-          <Reveal as="a" delay={180} href="https://www.linkedin.com/in/villarroeldiego/">LinkedIn</Reveal>
+          <a href="https://www.npmjs.com/package/@skilly-hand/skilly-hand">npx skilly-hand install</a>
+          <a href="https://github.com/Davecelot/skilly-hand">GitHub</a>
+          <a href="https://www.linkedin.com/in/villarroeldiego/">LinkedIn</a>
         </nav>
       </footer>
     </main>
