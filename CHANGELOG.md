@@ -8,6 +8,21 @@ All notable changes to this project are documented in this file.
 - _None._
 
 ### Changed
+- _None._
+
+### Fixed
+- _None._
+
+### Removed
+- _None._
+
+## [0.25.3] - 2026-05-01
+[View on npm](https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.25.3)
+
+### Added
+- _None._
+
+### Changed
 - Refreshed the `figma-mcp-0to1` skill with current Figma MCP tools, setup commands, agent coverage notes, Make resources, and trusted workflow guidance.
 
 ### Fixed
