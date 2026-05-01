@@ -129,6 +129,9 @@ jobs:
             --date "$(date -u +%Y-%m-%d)" \
             --no-stage
 
+      - name: Generate site release metadata
+        run: node site/scripts/generate-skills.mjs
+
       - name: Extract changelog notes
         id: extract
         run: |
@@ -143,7 +146,7 @@ jobs:
       - name: Commit, tag, and push
         run: |
           VERSION="${{ steps.version.outputs.version }}"
-          git add package.json packages/*/package.json package-lock.json npm-shrinkwrap.json CHANGELOG.md
+          git add package.json packages/*/package.json package-lock.json npm-shrinkwrap.json CHANGELOG.md site/src/generated/release.js site/src/generated/skills.js
           git commit -m "chore(release): v$VERSION"
           git tag -a "v$VERSION" -m "Release v$VERSION"
           git push origin main "v$VERSION"
@@ -206,6 +209,50 @@ jobs:
           body: ${{ needs.bump.outputs.changelog_notes }}
           draft: false
           prerelease: false
+
+  deploy_site:
+    name: Deploy site
+    if: inputs.mode == 'bump-and-publish'
+    needs: publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout release
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.bump.outputs.tag }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v6
+
+      - name: Build site
+        run: npm run site:build
+        env:
+          GITHUB_PAGES: "true"
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: site/dist
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
 
   publish_existing:
     name: Publish existing release to npm
