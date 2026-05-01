@@ -5,6 +5,21 @@ All notable changes to this project are documented in this file.
 ## [Unreleased]
 
 ### Added
+- _None._
+
+### Changed
+- _None._
+
+### Fixed
+- _None._
+
+### Removed
+- _None._
+
+## [0.26.0] - 2026-05-01
+[View on npm](https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.26.0)
+
+### Added
 - Added dedicated performance-reviewer modes for the Angular and React guideline skills.
 
 ### Changed
