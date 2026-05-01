@@ -1,13 +1,13 @@
 ---
 name: "angular-guidelines"
-description: "Guide Angular code generation and review using latest stable Angular verification and modern framework best practices."
+description: "Guide Angular code generation, review, and performance tuning using latest stable Angular verification, official Angular skill guidance, and modern framework best practices. Trigger: generating, reviewing, refactoring, or optimizing Angular code artifacts in Angular projects."
 skillMetadata:
   author: "skilly-hand"
-  last-edit: "2026-04-03"
+  last-edit: "2026-05-01"
   license: "Apache-2.0"
-  version: "1.1.1"
-  changelog: "Added allowed-modes metadata to declare angular-guidelines sub-agent routing targets; improves discoverability of component-creator and angular-tester delegation modes; affects angular-guidelines manifest metadata"
-  auto-invoke: "Generating, reviewing, or refactoring Angular code artifacts in Angular projects"
+  version: "1.2.0"
+  changelog: "Added curated official Angular skill and performance guidance with a dedicated performance-reviewer mode; improves SSR, hydration, reactivity, testing, and runtime optimization coverage; affects angular-guidelines routing, review checklists, and catalog discovery"
+  auto-invoke: "Generating, reviewing, refactoring, or optimizing Angular code artifacts in Angular projects"
   allowed-tools:
     - "Read"
     - "Edit"
@@ -29,6 +29,7 @@ Use this skill when:
 - You are generating Angular components, directives, pipes, services, or supporting files.
 - You are refactoring existing Angular code to current framework patterns.
 - You are reviewing Angular code quality and framework-alignment in an Angular workspace.
+- You are optimizing Angular performance, SSR/hydration, reactivity/data flow, forms, routing, accessibility, or CLI-aligned generation.
 
 Do not use this skill for:
 
@@ -46,6 +47,7 @@ Choose sub-agents by intent:
 | --- | --- |
 | Create, refactor, or review Angular components | [agents/component-creator.md](agents/component-creator.md) |
 | Write or review Angular tests | [agents/angular-tester.md](agents/angular-tester.md) |
+| Optimize or review Angular performance, SSR, or hydration | [agents/performance-reviewer.md](agents/performance-reviewer.md) |
 
 ---
 
@@ -53,7 +55,8 @@ Choose sub-agents by intent:
 
 1. Run latest stable Angular preflight checks.
 2. Route to the smallest matching sub-agent by task intent.
-3. Apply the sub-agent checklist before finalizing generated code or review output.
+3. If the request mentions performance, SSR, hydration, routing, data fetching, bundle size, change detection, or zoneless behavior, include the performance priority checklist.
+4. Apply the sub-agent checklist before finalizing generated code or review output.
 
 ---
 
@@ -85,13 +88,34 @@ Use these defaults unless project constraints explicitly prevent them:
 | Forms | Typed reactive forms |
 | Rendering strategy | OnPush-friendly patterns and deferred/lazy rendering where appropriate |
 
-### Pattern 3: Generation and Review Guardrails
+### Pattern 3: Modern Reactivity Guardrails
+
+- Use `computed` for derived state rather than duplicating or propagating state manually.
+- Avoid `effect` for state propagation; reserve it for logging, browser storage sync, non-template DOM work, canvas/chart integrations, or other non-reactive APIs.
+- Use `resource` for async signal-based data when the project Angular version supports it and it fits existing data patterns.
+- Use `linkedSignal` for dependent writable state when the project Angular version supports it.
+- Read signals before `await` inside reactive contexts so dependencies are tracked synchronously.
+
+### Pattern 4: Performance Review Priority
+
+Use this official-Angular-aligned priority order for performance review. Measure first when possible, then choose the smallest applicable optimization.
+
+| Priority | Review Focus | Default Action |
+| --- | --- | --- |
+| 1 | Measurement | Use Angular DevTools or Chrome DevTools Angular profiling to identify specific load, change detection, or rendering bottlenecks. |
+| 2 | Loading performance | Prefer lazy routes, `@defer` for non-critical/heavy UI, image optimization, and SSR/hydration where they improve Core Web Vitals. |
+| 3 | Runtime performance | Check zoneless change detection support, slow template/lifecycle computations, OnPush-friendly state, and zone pollution from timers or third-party code. |
+| 4 | SSR/hydration correctness | Avoid server/client template divergence, prefer platform-specific providers, keep per-request state out of shared providers, and use factory providers for request-specific values. |
+| 5 | Advanced loading | Use incremental hydration and advanced deferrable-view strategies only when the project version and UX constraints justify them. |
+
+### Pattern 5: Generation and Review Guardrails
 
 - Keep generated files focused and minimal for the requested artifact.
 - Prefer framework-native patterns over custom abstractions unless required by repo conventions.
 - Call out deprecated patterns in reviewed code and suggest modern Angular replacements.
 - For component-specific work, apply [agents/component-creator.md](agents/component-creator.md).
 - For testing-specific work, apply [agents/angular-tester.md](agents/angular-tester.md).
+- For performance-specific work, apply [agents/performance-reviewer.md](agents/performance-reviewer.md).
 
 ---
 
@@ -111,8 +135,12 @@ Is this a refactor task?
   NO  -> Continue
 
 Is this a review task?
-  YES -> Validate latest-stable alignment + best-practice checklist
+  YES -> Validate latest-stable alignment + best-practice/performance checklist
   NO  -> Apply the minimal Angular guidance needed for the request
+
+Does the task mention performance, SSR, hydration, routing, data fetching, bundles, change detection, or zoneless behavior?
+  YES -> Route through performance-reviewer before finalizing
+  NO  -> Keep the existing component/test route
 ```
 
 ---
@@ -168,6 +196,7 @@ export class ProfileService {
 - Template control flow uses modern block syntax.
 - DI and forms follow modern typed Angular practices.
 - Output avoids deprecated Angular APIs unless needed for compatibility.
+- Performance work follows measurement-first guidance and avoids speculative optimization.
 
 ---
 
@@ -196,3 +225,10 @@ ng update @angular/core @angular/cli
 - Angular update guide: https://angular.dev/update-guide
 - Angular blog (official releases): https://blog.angular.dev
 - Angular GitHub releases: https://github.com/angular/angular/releases
+- Angular Agent Skills: https://angular.dev/ai/agent-skills
+- Official Angular skills repo: https://github.com/angular/skills
+- Angular style guide: https://angular.dev/style-guide
+- Angular performance guide: https://angular.dev/best-practices/performance
+- Angular signals guide: https://angular.dev/guide/signals
+- Angular testing guide: https://angular.dev/guide/testing
+- Angular HTTP testing guide: https://angular.dev/guide/http/testing

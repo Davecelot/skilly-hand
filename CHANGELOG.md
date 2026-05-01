@@ -5,10 +5,10 @@ All notable changes to this project are documented in this file.
 ## [Unreleased]
 
 ### Added
-- _None._
+- Added dedicated performance-reviewer modes for the Angular and React guideline skills.
 
 ### Changed
-- _None._
+- Expanded Angular and React guideline routing, review checklists, and catalog descriptions for performance optimization workflows.
 
 ### Fixed
 - _None._

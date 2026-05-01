@@ -33,6 +33,16 @@ Do not use this sub-agent for:
 
 ---
 
+## Performance-Sensitive Test Patterns
+
+- Assert user-visible async states instead of timing or scheduler internals.
+- Cover Suspense fallback and resolved UI when the component owns a meaningful async boundary.
+- Test deduped fetch or request behavior only when the project already exposes a stable cache/dedupe contract.
+- For transitions and deferred values, assert responsiveness and final visible output, not React implementation details.
+- Avoid tests that lock in incidental render counts unless render count is the public performance contract.
+
+---
+
 ## Command Matrix
 
 | Scenario | Preferred Command | Fallback |
@@ -108,4 +118,5 @@ it("shows fallback before async content resolves", () => {
 - `act`-safe patterns are preserved for stateful and async updates.
 - Assertions validate user-visible behavior and contracts.
 - Suspense/transition scenarios are tested where relevant.
+- Performance-sensitive tests avoid scheduler internals and incidental render-count assertions.
 - Mocks are limited to necessary boundaries.

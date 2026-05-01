@@ -28,6 +28,17 @@ Do not use this sub-agent for:
 
 ---
 
+## Performance Checklist
+
+- Do not define child components inside render; move them to module scope unless they truly need closure state.
+- Do not store redundant derived state; derive from props/state during render.
+- Avoid unnecessary Effects for synchronous derivation or event handling.
+- Keep default non-primitive props stable by defining fallback arrays/objects/functions at module scope.
+- Use Suspense, transitions, deferred values, and memoization only when they improve a real user-visible or measured bottleneck.
+- In Next.js, keep client components narrow and pass only serializable data across server/client boundaries.
+
+---
+
 ## Template Snippets
 
 ### Minimal Pure Function Component
@@ -86,3 +97,4 @@ export function ProfileSection() {
 - Composition is preferred over inheritance or over-abstraction.
 - Client/server boundary directives are correctly scoped.
 - Accessibility semantics are present for interactive controls.
+- Component shape avoids preventable re-renders, redundant state, and unstable default values.

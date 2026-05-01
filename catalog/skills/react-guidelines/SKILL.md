@@ -1,13 +1,13 @@
 ---
 name: "react-guidelines"
-description: "Guide React code generation and review using latest stable React verification and modern framework best practices."
+description: "Guide React and Next.js code generation, review, and performance tuning using latest stable React verification and modern framework best practices. Trigger: generating, reviewing, refactoring, or optimizing React code artifacts in React projects."
 skillMetadata:
   author: "skilly-hand"
-  last-edit: "2026-04-04"
+  last-edit: "2026-05-01"
   license: "Apache-2.0"
-  version: "1.0.0"
-  changelog: "Added new react-guidelines skill with component and testing sub-agent routing; improves React-specific generation and review consistency with latest-stable preflight checks; affects portable catalog skill discovery and React workflow guidance"
-  auto-invoke: "Generating, reviewing, or refactoring React code artifacts in React projects"
+  version: "1.1.0"
+  changelog: "Added curated Vercel-style React and Next.js performance review guidance with a dedicated performance-reviewer mode; improves async, bundle, server, client data, and rendering optimization coverage; affects react-guidelines routing, review checklists, and catalog discovery"
+  auto-invoke: "Generating, reviewing, refactoring, or optimizing React code artifacts in React projects"
   allowed-tools:
     - "Read"
     - "Edit"
@@ -29,6 +29,7 @@ Use this skill when:
 - You are generating React components, hooks, or supporting modules.
 - You are refactoring existing React code to current framework patterns.
 - You are reviewing React code quality and framework-alignment in a React workspace.
+- You are optimizing React or Next.js behavior around async work, bundle size, data fetching, server/client boundaries, or rendering cost.
 
 Do not use this skill for:
 
@@ -46,6 +47,7 @@ Choose sub-agents by intent:
 | --- | --- |
 | Create, refactor, or review React components | [agents/component-creator.md](agents/component-creator.md) |
 | Write or review React tests | [agents/react-tester.md](agents/react-tester.md) |
+| Optimize or review React/Next.js performance | [agents/performance-reviewer.md](agents/performance-reviewer.md) |
 
 ---
 
@@ -53,7 +55,8 @@ Choose sub-agents by intent:
 
 1. Run latest stable React preflight checks.
 2. Route to the smallest matching sub-agent by task intent.
-3. Apply the sub-agent checklist before finalizing generated code or review output.
+3. If the request mentions performance, Next.js, data fetching, server/client boundaries, bundles, or re-renders, include the performance priority checklist.
+4. Apply the sub-agent checklist before finalizing generated code or review output.
 
 ---
 
@@ -94,6 +97,22 @@ Use these defaults unless project constraints explicitly prevent them:
 - Keep state minimal and colocated near usage.
 - For component-specific work, apply [agents/component-creator.md](agents/component-creator.md).
 - For testing-specific work, apply [agents/react-tester.md](agents/react-tester.md).
+- For performance-specific work, apply [agents/performance-reviewer.md](agents/performance-reviewer.md).
+
+### Pattern 4: Performance Review Priority
+
+Use this Vercel-style priority order for React and Next.js performance review. Start with the highest-impact item that applies to the request; do not add complexity for hypothetical bottlenecks.
+
+| Priority | Review Focus | Default Action |
+| --- | --- | --- |
+| 1 | Eliminating waterfalls | Start independent promises early, defer awaits until values are needed, and use `Promise.all` for independent async work. |
+| 2 | Bundle size optimization | Avoid problematic barrel imports unless tooling optimizes them, dynamically import heavy or client-only modules, and defer third-party libraries. |
+| 3 | Server-side performance | Authenticate server actions, avoid shared request state, minimize client-component serialization, and use per-request dedupe where applicable. |
+| 4 | Client-side data fetching | Dedupe repeated requests, keep global listeners passive and cleaned up, and keep browser storage minimal and versioned. |
+| 5 | Re-render optimization | Derive state during render, avoid redundant state, keep non-primitive defaults stable, and memoize only when it removes measured churn. |
+| 6 | Rendering performance | Split expensive work, place Suspense boundaries around meaningful async UI, and use transitions/deferred values for user-visible responsiveness. |
+| 7 | JavaScript performance | Keep hot-path work small, avoid repeated parsing or allocation in render paths, and prefer platform APIs over bulky helpers where practical. |
+| 8 | Advanced patterns | Use virtualization, streaming, caching, or compiler-aware patterns only when the project stack and bottleneck justify them. |
 
 ---
 
@@ -113,8 +132,12 @@ Is this a refactor task?
   NO  -> Continue
 
 Is this a review task?
-  YES -> Validate latest-stable alignment + hook/purity checklist
+  YES -> Validate latest-stable alignment + hook/purity/performance checklist
   NO  -> Apply the minimal React guidance needed for the request
+
+Does the task mention performance, Next.js, data fetching, bundles, RSC, or re-renders?
+  YES -> Route through performance-reviewer before finalizing
+  NO  -> Keep the existing component/test route
 ```
 
 ---
@@ -170,6 +193,7 @@ export function UserPanelClient({ name }: { name: string }) {
 - Hooks follow call-order rules and purity constraints.
 - `'use client'`/`'use server'` directives are only used where boundary semantics require them.
 - Suspense/StrictMode/Profiler guidance is considered when relevant to behavior.
+- Performance work follows the priority order from waterfalls through advanced patterns and avoids speculative optimization.
 
 ---
 
@@ -208,3 +232,4 @@ npm run catalog:check
 - StrictMode: https://react.dev/reference/react/StrictMode
 - Fragment: https://react.dev/reference/react/Fragment
 - Profiler: https://react.dev/reference/react/Profiler
+- Vercel Labs React best practices skill: https://github.com/vercel-labs/agent-skills/tree/main/skills/react-best-practices

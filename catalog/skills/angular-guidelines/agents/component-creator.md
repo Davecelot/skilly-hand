@@ -27,6 +27,18 @@ Do not use this sub-agent for:
 
 ---
 
+## Style and Reactivity Checklist
+
+- Prefer feature-based organization and one primary Angular concept per file.
+- Use `protected` for class members that are only read by the template.
+- Mark Angular-managed properties `readonly`, including `input`, `model`, `output`, and query values.
+- Prefer `[class]` and `[style]` bindings over `ngClass` and `ngStyle`.
+- Move complex template logic into TypeScript, usually as a `computed`.
+- Use `computed` for derived state and avoid `effect` for state propagation.
+- Use `resource` or `linkedSignal` only when the project Angular version supports them and they fit existing data patterns.
+
+---
+
 ## Template Snippets
 
 ### Minimal Standalone Component
@@ -122,3 +134,4 @@ export class CardComponent {
 - Templates use native control flow blocks, not legacy structural directives.
 - Host interaction includes required ARIA and keyboard semantics for interactive UI.
 - Change detection and state flow are OnPush-friendly and predictable.
+- Template-only members are `protected`, Angular-managed fields are `readonly`, and complex template logic is moved into `computed` values.

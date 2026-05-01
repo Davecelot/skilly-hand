@@ -29,8 +29,11 @@ Do not use this sub-agent for:
 - Test signal and computed behavior directly when possible.
 - Test signal inputs/outputs using component instance APIs and DOM-triggered events.
 - Cover async behavior with `fakeAsync`/`tick`/`flush` or `waitForAsync`/`whenStable`.
-- For HTTP paths, use `HttpClientTestingModule`/`HttpTestingController` and verify requests.
+- For HTTP paths, use `provideHttpClient()` before `provideHttpClientTesting()`, then verify requests with `HttpTestingController`.
+- Use component DOM tests when template behavior, user interaction, or child integration matters.
+- Use router testing harnesses when navigation, guards, resolvers, or routed components are the behavior under test.
 - For services, prefer explicit DI setup and clear mocking boundaries.
+- Avoid assertions on incidental implementation details unless they are part of the public contract.
 
 ---
 
@@ -99,12 +102,17 @@ describe("CounterComponent", () => {
 
 ```typescript
 import { TestBed } from "@angular/core/testing";
-import { HttpClientTestingModule, HttpTestingController } from "@angular/common/http/testing";
+import { provideHttpClient } from "@angular/common/http";
+import { provideHttpClientTesting, HttpTestingController } from "@angular/common/http/testing";
 
 describe("ProfileService", () => {
   it("requests profile", () => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      providers: [
+        ProfileService,
+        provideHttpClient(),
+        provideHttpClientTesting()
+      ]
     });
     const service = TestBed.inject(ProfileService);
     const httpMock = TestBed.inject(HttpTestingController);
@@ -127,4 +135,6 @@ describe("ProfileService", () => {
 - Standalone Angular artifacts are tested with appropriate TestBed setup.
 - Signal/input/output behavior is asserted explicitly.
 - Async and HTTP behavior use deterministic Angular testing utilities.
+- HTTP tests use provider-based setup with `provideHttpClient()` before `provideHttpClientTesting()` for new code.
+- Router behavior uses harness-style tests where the workspace supports them.
 - Assertions verify user-visible behavior or contract-level outcomes, not incidental internals.

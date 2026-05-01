@@ -1,7 +1,7 @@
 {
   "id": "react-guidelines",
   "title": "React Guidelines",
-  "description": "Guide React code generation and review using latest stable React verification and modern framework best practices.",
+  "description": "Guide React and Next.js code generation, review, and performance tuning using latest stable React verification and modern framework best practices. Trigger: generating, reviewing, refactoring, or optimizing React code artifacts in React projects.",
   "portable": true,
   "tags": ["react", "frontend", "workflow", "best-practices"],
   "detectors": ["react"],
@@ -10,14 +10,15 @@
   "agentSupport": ["codex", "claude", "cursor", "gemini", "copilot", "antigravity", "windsurf", "trae"],
   "skillMetadata": {
     "author": "skilly-hand",
-    "last-edit": "2026-04-04",
+    "last-edit": "2026-05-01",
     "license": "Apache-2.0",
-    "version": "1.0.0",
-    "changelog": "Added new react-guidelines skill with component and testing sub-agent routing; improves React-specific generation and review consistency with latest-stable preflight checks; affects portable catalog skill discovery and React workflow guidance",
-    "auto-invoke": "Generating, reviewing, or refactoring React code artifacts in React projects",
+    "version": "1.1.0",
+    "changelog": "Added curated Vercel-style React and Next.js performance review guidance with a dedicated performance-reviewer mode; improves async, bundle, server, client data, and rendering optimization coverage; affects react-guidelines routing, review checklists, and catalog discovery",
+    "auto-invoke": "Generating, reviewing, refactoring, or optimizing React code artifacts in React projects",
     "allowed-modes": [
       "component-creator",
-      "react-tester"
+      "react-tester",
+      "performance-reviewer"
     ],
     "allowed-tools": [
       "Read",
@@ -35,7 +36,8 @@
   "files": [
     { "path": "SKILL.md", "kind": "instruction" },
     { "path": "agents/component-creator.md", "kind": "instruction" },
-    { "path": "agents/react-tester.md", "kind": "instruction" }
+    { "path": "agents/react-tester.md", "kind": "instruction" },
+    { "path": "agents/performance-reviewer.md", "kind": "instruction" }
   ],
   "dependencies": []
 }
