@@ -8,6 +8,8 @@ const Dithering = lazy(() =>
   import("@paper-design/shaders-react").then((module) => ({ default: module.Dithering }))
 );
 
+const appBasePath = normalizeBasePath(import.meta.env.BASE_URL);
+
 const workflow = [
   ["Detect", "Read the project stack and recommend the right workflows."],
   ["Choose", "Filter the portable catalog by stack, tags, or team intent."],
@@ -54,6 +56,51 @@ const setupSteps = [
     output: ["manifests ok", "targets ok", "ready for agents"]
   }
 ];
+
+function normalizeBasePath(basePath) {
+  if (!basePath || basePath === "/") {
+    return "/";
+  }
+
+  return basePath.endsWith("/") ? basePath : `${basePath}/`;
+}
+
+function stripBasePath(pathname) {
+  if (appBasePath === "/") {
+    return pathname;
+  }
+
+  const baseWithoutSlash = appBasePath.slice(0, -1);
+
+  if (pathname === baseWithoutSlash) {
+    return "/";
+  }
+
+  if (pathname.startsWith(appBasePath)) {
+    return pathname.slice(baseWithoutSlash.length) || "/";
+  }
+
+  return pathname;
+}
+
+function skillPath(skillId) {
+  return `${appBasePath}skills/${encodeURIComponent(skillId)}`;
+}
+
+function homePath(hash = "") {
+  return `${appBasePath}${hash}`;
+}
+
+function parseAppRoute() {
+  const path = stripBasePath(window.location.pathname);
+  const match = path.match(/^\/skills\/([^/]+)\/?$/);
+
+  if (match) {
+    return { type: "skill", skillId: decodeURIComponent(match[1]) };
+  }
+
+  return { type: "home" };
+}
 
 function useReducedMotion() {
   const [shouldReduceMotion, setShouldReduceMotion] = useState(false);
@@ -394,7 +441,7 @@ function ReleaseBanner() {
   );
 }
 
-function SkillDirectory({ filteredSkills, selectedSkill, onSelect, query, onQueryChange }) {
+function SkillDirectory({ filteredSkills, onDeepDive, query, onQueryChange }) {
   return (
     <>
       <Reveal className="section-heading catalog-heading">
@@ -417,10 +464,8 @@ function SkillDirectory({ filteredSkills, selectedSkill, onSelect, query, onQuer
         <Reveal as="section" className="skill-panel" delay={180} aria-label="Skill list">
           <div className="skill-list" role="list" aria-label="Available skills">
             {filteredSkills.map((skill, index) => (
-              <Reveal
-                as="article"
-                className={skill.id === selectedSkill.id ? "skill-row selected" : "skill-row"}
-                delay={Math.min(index, 8) * 38}
+              <article
+                className="skill-row"
                 id={`skill-${skill.id}`}
                 key={skill.id}
                 role="listitem"
@@ -432,36 +477,174 @@ function SkillDirectory({ filteredSkills, selectedSkill, onSelect, query, onQuer
                   <p className="skill-id">{skill.id}</p>
                   <h3>{skill.title}</h3>
                 </div>
-                <button type="button" aria-pressed={skill.id === selectedSkill.id} onClick={() => onSelect(skill)}>
+                <button type="button" onClick={() => onDeepDive(skill)}>
                   Deep dive
                 </button>
-              </Reveal>
+              </article>
             ))}
             {filteredSkills.length === 0 ? (
               <p className="empty-state">No skills match this search yet.</p>
             ) : null}
           </div>
         </Reveal>
-
-        <Reveal as="aside" className="skill-detail" delay={260} aria-labelledby="skill-detail-title">
-          <p className="eyebrow">Deep dive</p>
-          <h3 id="skill-detail-title">{selectedSkill.title}</h3>
-          <p>{selectedSkill.description}</p>
-          <div className="source-path">
-            <span>Source</span>
-            <code>{selectedSkill.sourcePath}</code>
-          </div>
-          <pre className="skill-markdown">{selectedSkill.content}</pre>
-        </Reveal>
       </Reveal>
     </>
   );
 }
 
+function SkillDetailPage({ skill, onNavigateHome }) {
+  const metadataEntries = [
+    ["Source", skill.sourcePath],
+    ["Version", skill.metadata?.version],
+    ["Last edit", skill.metadata?.["last-edit"]],
+    ["Author", skill.metadata?.author],
+    ["License", skill.metadata?.license],
+    ["Auto invoke", skill.metadata?.["auto-invoke"]]
+  ].filter(([, value]) => value);
+
+  return (
+    <main className="skill-page">
+      <nav className="detail-topbar" aria-label="Skill detail">
+        <a className="brand" href={homePath()} onClick={(event) => onNavigateHome(event)}>
+          skilly-hand
+        </a>
+        <a href={homePath("#catalog")} onClick={(event) => onNavigateHome(event, "#catalog")}>
+          Catalog
+        </a>
+      </nav>
+
+      <a className="back-link" href={homePath("#catalog")} onClick={(event) => onNavigateHome(event, "#catalog")}>
+        ← Back to catalog
+      </a>
+
+      <article className="skill-page-layout" aria-labelledby="skill-page-title">
+        <header className="skill-page-hero">
+          <p className="skill-breadcrumb">
+            <a href={homePath("#catalog")} onClick={(event) => onNavigateHome(event, "#catalog")}>
+              skills
+            </a>
+            <span>/</span>
+            <span>{skill.id}</span>
+          </p>
+          <p className="eyebrow">Skill detail</p>
+          <h1 id="skill-page-title">{skill.title}</h1>
+          <p className="detail-summary">{skill.description}</p>
+          <CopyCommand label="install" command="npx skilly-hand install" />
+        </header>
+
+        <aside className="skill-page-meta" aria-label={`${skill.title} metadata`}>
+          <div className="skill-tags" aria-label={`${skill.title} tags`}>
+            {skill.tags.map((tag) => (
+              <span key={tag}>{tag}</span>
+            ))}
+          </div>
+          <dl className="metadata-grid">
+            {metadataEntries.map(([label, value]) => (
+              <div key={label}>
+                <dt>{label}</dt>
+                <dd>{Array.isArray(value) ? value.join(", ") : value}</dd>
+              </div>
+            ))}
+          </dl>
+          {skill.files?.length > 0 && (
+            <div className="metadata-files">
+              <p className="metadata-files-label">Files</p>
+              <ul className="metadata-files-tree">
+                {skill.files.map(f => (
+                  <li key={f.name} data-type={f.type}>
+                    <span>{f.name}{f.type === "dir" ? "/" : ""}</span>
+                    {f.children?.length > 0 && (
+                      <ul>
+                        {f.children.map(c => (
+                          <li key={c.name} data-type={c.type}>{c.name}</li>
+                        ))}
+                      </ul>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </aside>
+
+        <section className="skill-page-content" aria-labelledby="skill-markdown-title">
+          <div className="skill-section-head">
+            <p className="eyebrow">SKILL.md</p>
+            <h2 id="skill-markdown-title">Source content</h2>
+          </div>
+          <pre className="skill-markdown detail-markdown">{skill.content}</pre>
+        </section>
+      </article>
+
+      <footer className="site-footer" aria-label="Project links">
+        <span>skilly-hand</span>
+        <nav aria-label="External links">
+          <a href="https://www.npmjs.com/package/@skilly-hand/skilly-hand">npx skilly-hand install</a>
+          <a href="https://github.com/Davecelot/skilly-hand">GitHub</a>
+          <a href="https://www.linkedin.com/in/villarroeldiego/">LinkedIn</a>
+        </nav>
+      </footer>
+    </main>
+  );
+}
+
+function SkillNotFoundPage({ skillId, onNavigateHome }) {
+  return (
+    <main className="skill-page not-found-page">
+      <nav className="detail-topbar" aria-label="Skill detail">
+        <a className="brand" href={homePath()} onClick={(event) => onNavigateHome(event)}>
+          skilly-hand
+        </a>
+      </nav>
+      <section className="not-found-panel" aria-labelledby="not-found-title">
+        <p className="skill-breadcrumb">
+          <a href={homePath("#catalog")} onClick={(event) => onNavigateHome(event, "#catalog")}>
+            skills
+          </a>
+          <span>/</span>
+          <span>{skillId}</span>
+        </p>
+        <p className="eyebrow">Skill not found</p>
+        <h1 id="not-found-title">No matching skill in this catalog.</h1>
+        <p>Check the skill ID or return to the catalog to scan every available workflow.</p>
+        <a className="button primary" href={homePath("#catalog")} onClick={(event) => onNavigateHome(event, "#catalog")}>
+          Browse skills
+        </a>
+      </section>
+    </main>
+  );
+}
+
 function App() {
   const [query, setQuery] = useState("");
-  const [selectedSkillId, setSelectedSkillId] = useState(skills[0]?.id);
+  const [route, setRoute] = useState(parseAppRoute);
   const shouldReduceMotion = useReducedMotion();
+
+  useEffect(() => {
+    function handlePopState() {
+      setRoute(parseAppRoute());
+    }
+
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, []);
+
+  useEffect(() => {
+    if (route.type !== "home" || !window.location.hash) {
+      return;
+    }
+
+    const target = document.querySelector(window.location.hash);
+
+    if (!target) {
+      return;
+    }
+
+    window.requestAnimationFrame(() => {
+      target.scrollIntoView({ behavior: shouldReduceMotion ? "auto" : "smooth" });
+      target.focus?.({ preventScroll: true });
+    });
+  }, [route, shouldReduceMotion]);
 
   const filteredSkills = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
@@ -470,11 +653,43 @@ function App() {
       return !normalizedQuery || content.includes(normalizedQuery);
     });
   }, [query]);
-  const selectedSkill = useMemo(
-    () => filteredSkills.find((skill) => skill.id === selectedSkillId) || filteredSkills[0] || skills[0],
-    [filteredSkills, selectedSkillId]
+  const detailSkill = useMemo(
+    () => (route.type === "skill" ? skills.find((skill) => skill.id === route.skillId) : undefined),
+    [route]
   );
-  const handleSectionLinkClick = (event) => smoothScrollToHash(event, shouldReduceMotion);
+
+  function navigateTo(url) {
+    window.history.pushState(null, "", url);
+    setRoute(parseAppRoute());
+    window.scrollTo({ top: 0, behavior: shouldReduceMotion ? "auto" : "smooth" });
+  }
+
+  function handleSectionLinkClick(event) {
+    if (route.type !== "home") {
+      event.preventDefault();
+      navigateTo(homePath(event.currentTarget.hash));
+      return;
+    }
+
+    smoothScrollToHash(event, shouldReduceMotion);
+  }
+
+  function handleHomeNavigation(event, hash = "") {
+    event.preventDefault();
+    navigateTo(homePath(hash));
+  }
+
+  function openSkillDetail(skill) {
+    navigateTo(skillPath(skill.id));
+  }
+
+  if (route.type === "skill") {
+    if (!detailSkill) {
+      return <SkillNotFoundPage skillId={route.skillId} onNavigateHome={handleHomeNavigation} />;
+    }
+
+    return <SkillDetailPage skill={detailSkill} onNavigateHome={handleHomeNavigation} />;
+  }
 
   return (
     <main>
@@ -512,8 +727,7 @@ function App() {
       <section className="catalog" id="catalog" aria-labelledby="catalog-title">
         <SkillDirectory
           filteredSkills={filteredSkills}
-          selectedSkill={selectedSkill}
-          onSelect={(skill) => setSelectedSkillId(skill.id)}
+          onDeepDive={openSkillDetail}
           query={query}
           onQueryChange={setQuery}
         />
