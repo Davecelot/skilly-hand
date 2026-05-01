@@ -14,6 +14,8 @@ Failure observed?
      -> Verify link format, run whoami, confirm seat/plan and file access
   -> Rate-limit behavior
      -> Reduce read call volume, stage calls, wait/backoff, upgrade seat/plan if needed
+  -> Missing expected tool
+     -> Compare active client tools with official matrix, then choose a supported fallback
   -> Write failure
      -> Stop retries, inspect state with read tools, fix cause, retry scoped step
 ```
@@ -35,15 +37,27 @@ Failure observed?
 ### Rate limiting
 
 - Read-heavy calls are rate-limited by plan/seat.
+- Starter plan or View/Collab seats are limited to low monthly usage.
+- Dev/Full seats on Professional or Organization plans have higher daily usage.
+- Enterprise Dev/Full seats have the highest documented daily usage.
+- Officially documented exempt tools include `add_code_connect_map`, `generate_figma_design`, and `whoami`.
 - Use smaller selections and fewer repeated reads.
 - Prefer `get_metadata` preflight before broad `get_design_context`.
 - Batch intent into fewer, targeted calls.
+
+### Missing expected tools
+
+- Official Figma MCP tools may not be exposed by every client plugin surface.
+- Client-specific helpers, such as Codex `get_libraries`, are not official substitutes for every client.
+- Prefer a documented fallback rather than forcing an unavailable tool.
 
 ### Write step errors
 
 - Do not immediately retry the exact same large request.
 - Split into smaller write actions.
 - Verify partial outcomes using read tools before next step.
+- For `create_new_file`, ensure a plan/team context is available.
+- For `generate_diagram`, do not pre-create a blank FigJam file unless adding to an existing file is the explicit goal.
 
 ## Scoped Retry Pattern
 

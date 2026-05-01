@@ -8,7 +8,7 @@ All notable changes to this project are documented in this file.
 - _None._
 
 ### Changed
-- _None._
+- Refreshed the `figma-mcp-0to1` skill with current Figma MCP tools, setup commands, agent coverage notes, Make resources, and trusted workflow guidance.
 
 ### Fixed
 - _None._

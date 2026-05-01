@@ -3,10 +3,10 @@ name: "figma-mcp-0to1"
 description: "Guide users from Figma MCP installation and authentication through first canvas creation, with function-level tool coverage and operational recovery patterns."
 skillMetadata:
   author: "skilly-hand"
-  last-edit: "2026-04-03"
+  last-edit: "2026-05-01"
   license: "Apache-2.0"
-  version: "1.0.1"
-  changelog: "Added allowed-modes metadata to declare figma-mcp-0to1 sub-agent routing targets; improves discoverability of install-auth, tool-function-catalog, canvas-creation-playbook, and troubleshooting-ops delegation modes; affects figma-mcp-0to1 manifest metadata"
+  version: "1.0.2"
+  changelog: "Refreshed Figma MCP tools, commands, permissions, Make resources, and agent-support notes against current Figma coverage; improves setup accuracy and 0-to-1 workflow reliability; affects figma-mcp-0to1 docs, references, assets, and metadata"
   auto-invoke: "Installing, configuring, or using Figma MCP from setup through first canvas creation"
   allowed-tools:
     - "Read"
@@ -30,6 +30,7 @@ Use this skill when:
 - You need a reliable path from connection to first successful canvas output.
 - You need to choose the right Figma MCP function for a task.
 - You need operational recovery for permission, auth, tool-loading, or rate-limit failures.
+- You need to understand which skilly-hand agents overlap with Figma-supported MCP clients.
 
 Do not use this skill for:
 
@@ -57,18 +58,33 @@ Choose subskills by intent:
 1. Set up server transport and authentication.
 2. Verify connectivity with a low-risk call (`whoami` on remote, or a read tool).
 3. Select the smallest tool that solves the immediate task.
-4. Run creation in short, validated steps (avoid large one-shot requests).
-5. If anything fails, use troubleshooting flow before retrying.
+4. For writes, inspect existing file/design-system context before creating new content.
+5. Run creation in short, validated steps (avoid large one-shot requests).
+6. If anything fails, use troubleshooting flow before retrying.
 
 ---
 
 ## Core Rules
 
 - Prefer remote server for broadest feature coverage and write workflows.
+- Treat official Figma MCP docs as the source of truth for official tools, supported clients, permissions, and limits.
+- Keep client-specific helpers separate from official Figma MCP tools.
 - Treat write actions as staged operations, not a single large operation.
 - Use link-based node targeting for reliable design-context extraction.
 - Keep a clear distinction between read context tools and write/canvas tools.
 - For repeated team workflows, reuse prompts and config snippets from `assets/`.
+
+---
+
+## Agent Coverage
+
+Figma MCP support and skilly-hand installation support are related but not identical:
+
+| Coverage | Agents or Clients | Guidance |
+| --- | --- | --- |
+| Figma-supported and skilly-hand-supported | `codex`, `claude`, `cursor`, `copilot` | Include concrete setup paths in this skill. |
+| Figma-supported but not skilly-hand-native | VS Code, Warp, Augment, Factory, Firebender | Mention as Figma-supported clients, but do not add skilly-hand install assumptions. |
+| skilly-hand-supported but not source-backed in current Figma docs | `gemini`, `antigravity`, `windsurf`, `trae` | Keep broad `agentSupport`; document that Figma-specific setup may require client documentation or manual MCP config. |
 
 ---
 
@@ -85,6 +101,21 @@ Choose subskills by intent:
 ```bash
 # Codex CLI (manual remote setup)
 codex mcp add figma --url https://mcp.figma.com/mcp
+
+# Claude Code plugin setup
+claude plugin install figma@claude-plugins-official
+
+# Claude Code manual remote setup
+claude mcp add --transport http figma https://mcp.figma.com/mcp
+
+# Claude Code manual remote setup, user scope
+claude mcp add --scope user --transport http figma https://mcp.figma.com/mcp
+
+# Claude Code manual desktop setup
+claude mcp add --transport http figma-desktop http://127.0.0.1:3845/mcp
+
+# Cursor plugin setup
+/add-plugin figma
 
 # Verify catalog integrity in this repository
 npm run catalog:check

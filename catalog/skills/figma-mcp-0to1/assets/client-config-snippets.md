@@ -14,6 +14,37 @@
 codex mcp add figma --url https://mcp.figma.com/mcp
 ```
 
+## Codex App
+
+Use the Figma plugin/app install path in Codex when available, then complete the OAuth authentication flow.
+
+## Claude Code Plugin
+
+```bash
+claude plugin install figma@claude-plugins-official
+```
+
+## Claude Code (manual remote)
+
+```bash
+claude mcp add --transport http figma https://mcp.figma.com/mcp
+claude mcp list
+```
+
+## Claude Code (manual remote, user scope)
+
+```bash
+claude mcp add --scope user --transport http figma https://mcp.figma.com/mcp
+claude mcp list
+```
+
+## Claude Code (manual desktop)
+
+```bash
+claude mcp add --transport http figma-desktop http://127.0.0.1:3845/mcp
+claude mcp list
+```
+
 ## VS Code `mcp.json` (remote)
 
 ```json
@@ -53,24 +84,38 @@ codex mcp add figma --url https://mcp.figma.com/mcp
 }
 ```
 
-## Claude Code (manual remote)
+## Cursor Plugin
 
 ```bash
-claude mcp add --transport http figma https://mcp.figma.com/mcp
-claude mcp list
+/add-plugin figma
 ```
 
-## Claude Code (manual desktop)
+## Cursor MCP config (desktop)
 
-```bash
-claude mcp add --transport http figma-desktop http://127.0.0.1:3845/mcp
-claude mcp list
+```json
+{
+  "mcpServers": {
+    "figma-desktop": {
+      "url": "http://127.0.0.1:3845/mcp"
+    }
+  }
+}
 ```
 
-## Gemini CLI
+## Other Desktop MCP Config
 
-```bash
-gemini extensions install https://github.com/figma/mcp-server-guide
-# then inside gemini CLI:
-# /mcp auth figma
+```json
+{
+  "mcpServers": {
+    "figma-desktop": {
+      "url": "http://127.0.0.1:3845/mcp"
+    }
+  }
+}
 ```
+
+## Agent Coverage Notes
+
+- Figma-supported and skilly-hand-supported: `codex`, `claude`, `cursor`, `copilot`.
+- Figma-supported but not skilly-hand-native: VS Code, Warp, Augment, Factory, Firebender.
+- skilly-hand-supported but not source-backed in current Figma docs: `gemini`, `antigravity`, `windsurf`, `trae`.
