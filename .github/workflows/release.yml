@@ -213,7 +213,7 @@ jobs:
   deploy_site:
     name: Deploy site
     if: inputs.mode == 'bump-and-publish'
-    needs: publish
+    needs: [bump, publish]
     runs-on: ubuntu-latest
     permissions:
       contents: read
