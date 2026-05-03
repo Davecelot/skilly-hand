@@ -1,0 +1,27 @@
+name: Codex Dispatch Release
+
+on:
+  push:
+    branches:
+      - dispatch-release-0.26.2
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  dispatch:
+    name: Dispatch Release Workflow
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dispatch release workflow
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          curl -fsS -X POST \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/$REPO/actions/workflows/release.yml/dispatches" \
+            -d '{"ref":"main","inputs":{"mode":"bump-and-publish","bump":"patch","version":""}}'
