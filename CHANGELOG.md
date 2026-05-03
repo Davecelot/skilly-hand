@@ -5,6 +5,21 @@ All notable changes to this project are documented in this file.
 ## [Unreleased]
 
 ### Added
+- _None._
+
+### Changed
+- _None._
+
+### Fixed
+- _None._
+
+### Removed
+- _None._
+
+## [0.26.1] - 2026-05-03
+[View on npm](https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.26.1)
+
+### Added
 - Added portable `gsap-animation` skill with official-source GSAP guidance for timelines, ScrollTrigger, React `useGSAP`, plugin selection, performance, cleanup, and reduced-motion patterns.
 - Added GSAP project detection so installs recommend `gsap-animation` when `gsap` or `@gsap/react` is present.
 

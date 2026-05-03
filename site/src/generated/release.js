@@ -1,18 +1,18 @@
 export const release = {
-  "version": "0.26.0",
-  "date": "2026-05-01",
-  "npmUrl": "https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.26.0",
+  "version": "0.26.1",
+  "date": "2026-05-03",
+  "npmUrl": "https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.26.1",
   "sections": [
     {
       "title": "Added",
       "items": [
-        "Added dedicated performance-reviewer modes for the Angular and React guideline skills."
+        "Added portable `gsap-animation` skill with official-source GSAP guidance for timelines, ScrollTrigger, React `useGSAP`, plugin selection, performance, cleanup, and reduced-motion patterns."
       ]
     },
     {
       "title": "Changed",
       "items": [
-        "Expanded Angular and React guideline routing, review checklists, and catalog descriptions for performance optimization workflows."
+        "Updated `frontend-design` to route advanced motion work through `gsap-animation` and include the new critique workflow in catalog metadata."
       ]
     }
   ]
