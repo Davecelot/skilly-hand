@@ -1,6 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import os from "node:os";
 import path from "node:path";
+import { cp, mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { detectProject } from "../packages/detectors/src/index.js";
 
 const fixturesDir = path.resolve("tests/fixtures");
@@ -65,6 +67,22 @@ test("detects figma-plugin projects", async () => {
 
   assert.ok(technologies.includes("figma"), "should detect figma");
   assert.ok(byTech.figma.includes("figma-mcp-0to1"), "figma should recommend figma-mcp-0to1");
+});
+
+test("detects GSAP dependencies and recommends gsap-animation", async () => {
+  const tmpRoot = await mkdtemp(path.join(os.tmpdir(), "skilly-hand-gsap-"));
+  const projectDir = path.join(tmpRoot, "react-vite");
+  await cp(path.join(fixturesDir, "react-vite"), projectDir, { recursive: true });
+
+  const packageJsonPath = path.join(projectDir, "package.json");
+  const packageJson = JSON.parse(await readFile(packageJsonPath, "utf8"));
+  packageJson.dependencies.gsap = "^3.15.0";
+  await writeFile(packageJsonPath, JSON.stringify(packageJson, null, 2) + "\n", "utf8");
+
+  const detections = await detectProject(projectDir);
+  const byTech = Object.fromEntries(detections.map((d) => [d.technology, d.recommendedSkillIds]));
+
+  assert.ok(byTech.gsap.includes("gsap-animation"), "gsap should recommend gsap-animation");
 });
 
 test("does not detect typescript for bare node-basic project", async () => {

@@ -1,13 +1,13 @@
 ---
 name: "frontend-design"
-description: "Project-aware frontend design skill that detects the existing tech stack, UI libraries, CSS variables, and design tokens before proposing any UI work. Supports greenfield projects via DESIGN.md context setup, and includes post-generation motion and visual refinement phases."
+description: "Project-aware frontend design skill that detects the existing tech stack, UI libraries, CSS variables, and design tokens before proposing any UI work. Supports greenfield projects via DESIGN.md context setup, post-generation critique, visual refinement, and GSAP-aware motion polish."
 skillMetadata:
   author: "skilly-hand"
-  last-edit: "2026-04-05"
+  last-edit: "2026-05-03"
   license: "Apache-2.0"
-  version: "1.1.0"
-  changelog: "v1.1.0: Added design-context-setter agent for greenfield/DESIGN.md workflow; added visual-refiner agent for post-generation quality evaluation; added motion-designer agent for stack-aware micro-interactions; added aesthetic-archetypes reference asset; expanded SKILL.md routing map with optional motion and refinement phases; upgraded component-designer with interaction states checklist and aesthetic principles"
-  auto-invoke: "Designing or generating UI components, pages, or layouts in a web or mobile project; setting up visual direction for a greenfield project; adding motion or micro-interactions to existing UI; refining or polishing generated UI output"
+  version: "1.3.0"
+  changelog: "Added GSAP-aware motion routing through gsap-animation while preserving critique workflow; improves advanced frontend animation handoffs with official-source GSAP guidance; affects frontend-design motion sequencing, metadata, and catalog dependencies"
+  auto-invoke: "Designing or generating UI components, pages, or layouts in a web or mobile project; setting up visual direction for a greenfield project; critiquing generated UI for AI slop; adding motion or micro-interactions to existing UI; refining or polishing generated UI output"
   allowed-tools:
     - "Read"
     - "Grep"
@@ -15,6 +15,8 @@ skillMetadata:
     - "Bash"
     - "Edit"
     - "Write"
+    - "Task"
+    - "SubAgent"
 ---
 # Frontend Design Guide
 
@@ -45,8 +47,9 @@ Always run stack detection first. Never skip to design.
 | 0 (always first) | Detect framework, UI library, CSS approach, tokens, and existing patterns | [agents/stack-detector.md](agents/stack-detector.md) |
 | 0b (if no DESIGN.md and no existing components) | Gather design intent and create DESIGN.md | [agents/design-context-setter.md](agents/design-context-setter.md) |
 | 1 (only after confirmation) | Design and implement components using confirmed stack | [agents/component-designer.md](agents/component-designer.md) |
-| 2 (optional) | Add motion and micro-interactions | [agents/motion-designer.md](agents/motion-designer.md) |
-| 3 (optional) | Evaluate quality and refine the output | [agents/visual-refiner.md](agents/visual-refiner.md) |
+| 2 (mandatory after generation) | Challenge the output for AI slop, weak hierarchy, heuristic failures, and unclear product fit | [agents/critique.md](agents/critique.md) |
+| 3 (after critique) | Apply visual quality refinements routed by critique | [agents/visual-refiner.md](agents/visual-refiner.md) |
+| 4 (optional) | Add motion and micro-interactions, preferring GSAP handoff for advanced motion | [agents/motion-designer.md](agents/motion-designer.md) |
 
 ---
 
@@ -58,8 +61,9 @@ Always run stack detection first. Never skip to design.
 4. **If anything is unclear or ambiguous, ask** — do not proceed with partial or uncertain information.
 5. **Scan existing tokens and components** — read what already exists before proposing anything.
 6. **Design with confirmed context only** — hand off to `component-designer` only after steps 2–4 are complete.
-7. **Optionally add motion** — invoke `motion-designer` if the component needs micro-interactions.
-8. **Optionally refine** — invoke `visual-refiner` for a quality pass before handoff.
+7. **Critique after generation** — invoke `critique` for a frontend-only challenge pass before polish.
+8. **Refine from critique** — invoke `visual-refiner` for visual fixes routed by critique.
+9. **Optionally add motion** — invoke `motion-designer` if critique, refinement, or the user identifies a motion need. For timelines, scroll reveals, richer micro-interactions, lifecycle-safe framework animation, or plugin decisions, route through `gsap-animation`.
 
 ---
 
@@ -190,8 +194,12 @@ Ready to implement?
   YES -> Hand off to component-designer with full confirmed context
 
 After generation:
+  -> Invoke critique to challenge design quality and route fixes
+  -> Invoke visual-refiner for critique-routed visual fixes
   -> Does the component need motion? -> Invoke motion-designer
-  -> Does the output need a quality pass? -> Invoke visual-refiner
+       -> Does motion need timelines, ScrollTrigger, framework cleanup, or plugins?
+            YES -> Use gsap-animation for official-source GSAP guidance
+            NO  -> Use confirmed stack primitives
 ```
 
 ---
@@ -275,7 +283,8 @@ find src/components -maxdepth 2 -name "*.tsx" -o -name "*.vue" | head -10
 - Stack detection procedure: [agents/stack-detector.md](agents/stack-detector.md)
 - Design context setup (greenfield): [agents/design-context-setter.md](agents/design-context-setter.md)
 - Component design rules: [agents/component-designer.md](agents/component-designer.md)
-- Motion and micro-interactions: [agents/motion-designer.md](agents/motion-designer.md)
+- Frontend design critique: [agents/critique.md](agents/critique.md)
 - Visual quality refinement: [agents/visual-refiner.md](agents/visual-refiner.md)
+- Motion and micro-interactions: [agents/motion-designer.md](agents/motion-designer.md)
 - Full scan checklist: [assets/stack-scan-checklist.md](assets/stack-scan-checklist.md)
 - Aesthetic archetypes reference: [assets/aesthetic-archetypes.md](assets/aesthetic-archetypes.md)

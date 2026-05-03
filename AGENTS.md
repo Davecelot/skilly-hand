@@ -18,13 +18,14 @@
 | ----- | ----------- | ---- |
 | `accessibility-audit` | Audit web accessibility against W3C WCAG 2.2 Level AA using framework-agnostic checks, remediation patterns, and portable command-line scanning. | frontend, accessibility, workflow, quality |
 | `agents-root-orchestrator` | Author root AGENTS.md as a Where/What/When orchestrator that routes tasks and skill invocation clearly. | core, workflow, orchestration |
-| `angular-guidelines` | Guide Angular code generation and review using latest stable Angular verification and modern framework best practices. | angular, frontend, workflow, best-practices |
+| `angular-guidelines` | Guide Angular code generation, review, and performance tuning using latest stable Angular verification, official Angular skill guidance, and modern framework best practices. Trigger: generating, reviewing, refactoring, or optimizing Angular code artifacts in Angular projects. | angular, frontend, workflow, best-practices |
 | `figma-mcp-0to1` | Guide users from Figma MCP installation and authentication through first canvas creation, with function-level tool coverage and operational recovery patterns. | figma, mcp, workflow, design |
-| `frontend-design` | Project-aware frontend design skill that detects the existing tech stack, UI libraries, CSS variables, and design tokens before proposing any UI work. Supports greenfield projects via DESIGN.md context setup, and includes post-generation motion and visual refinement phases. | frontend, design, workflow, ui, motion, greenfield |
+| `frontend-design` | Project-aware frontend design skill that detects the existing tech stack, UI libraries, CSS variables, and design tokens before proposing any UI work. Supports greenfield projects via DESIGN.md context setup, post-generation critique, visual refinement, and GSAP-aware motion polish. | frontend, design, workflow, ui, motion, greenfield |
+| `gsap-animation` | Guide GSAP animation implementation using only official GSAP documentation and the official greensock/gsap-skills source material. Trigger: implementing, reviewing, or choosing GSAP for frontend motion, timelines, ScrollTrigger, React useGSAP, JavaScript animation libraries, or advanced UI animation. | frontend, animation, motion, gsap, workflow |
 | `output-optimizer` | Optimize output token consumption through compact interpreter modes with controlled expansion when complexity, ambiguity, or risk requires more detail. Trigger: minimizing response verbosity while preserving clarity and correctness. | core, workflow, efficiency, communication |
 | `project-security` | Scan project configuration and release surfaces for leak and security risks, and enforce security gates on commit, push, and publish workflows across GitHub, GitLab, npm, pnpm, yarn, and generic CI. Trigger: validating repository security posture, preventing secret leaks, or hardening delivery pipelines. | security, workflow, quality, core |
 | `project-teacher` | Scan the active project and teach any concept, code path, or decision using verified information, interactive questions, and simple explanations. Trigger: user asks to explain, understand, clarify, or learn about anything in the project or codebase. | core, workflow, education |
-| `react-guidelines` | Guide React code generation and review using latest stable React verification and modern framework best practices. | react, frontend, workflow, best-practices |
+| `react-guidelines` | Guide React and Next.js code generation, review, and performance tuning using latest stable React verification and modern framework best practices. Trigger: generating, reviewing, refactoring, or optimizing React code artifacts in React projects. | react, frontend, workflow, best-practices |
 | `review-rangers` | Review code, decisions, and artifacts through a multi-perspective committee and a domain expert safety guard, then synthesize a structured verdict. | core, workflow, review, quality |
 | `roaster` | Challenge plans with constructive roast-style critique that exposes weak assumptions, missing angles, shallow sequencing, and unclear success criteria. Trigger: when the user proposes, requests, or evaluates a plan of any kind. | core, workflow, planning, quality |
 | `skill-creator` | Create and standardize AI skills with reusable structure, metadata rules, and templates. | core, workflow, authoring |
@@ -74,13 +75,14 @@ This gate is mandatory whenever the user proposes, requests, or evaluates a plan
 | ------ | ----- |
 | Auditing, reviewing, or implementing web accessibility against WCAG 2.2 Level AA | `accessibility-audit` |
 | Creating or updating root AGENTS.md orchestration guidance | `agents-root-orchestrator` |
-| Generating, reviewing, or refactoring Angular code artifacts in Angular projects | `angular-guidelines` |
+| Generating, reviewing, refactoring, or optimizing Angular code artifacts in Angular projects | `angular-guidelines` |
 | Installing, configuring, or using Figma MCP from setup through first canvas creation | `figma-mcp-0to1` |
-| Designing or generating UI components, pages, or layouts in a web or mobile project; setting up visual direction for a greenfield project; adding motion or micro-interactions to existing UI; refining or polishing generated UI output | `frontend-design` |
+| Designing or generating UI components, pages, or layouts in a web or mobile project; setting up visual direction for a greenfield project; critiquing generated UI for AI slop; adding motion or micro-interactions to existing UI; refining or polishing generated UI output | `frontend-design` |
+| Implementing, reviewing, or choosing GSAP for frontend motion, timelines, ScrollTrigger, React useGSAP, JavaScript animation libraries, or advanced UI animation | `gsap-animation` |
 | When minimizing output verbosity or selecting compact communication modes | `output-optimizer` |
 | Scanning project configuration and delivery workflows for leaks or security issues before commit, push, or publish | `project-security` |
 | User needs to understand, explain, or learn about any aspect of the project or codebase | `project-teacher` |
-| Generating, reviewing, or refactoring React code artifacts in React projects | `react-guidelines` |
+| Generating, reviewing, refactoring, or optimizing React code artifacts in React projects | `react-guidelines` |
 | Reviewing code, decisions, or artifacts where adversarial multi-perspective evaluation adds value | `review-rangers` |
 | When the user proposes, requests, or evaluates a plan of any kind | `roaster` |
 | Creating a new skill | `skill-creator` |

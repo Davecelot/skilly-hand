@@ -5,10 +5,12 @@ All notable changes to this project are documented in this file.
 ## [Unreleased]
 
 ### Added
-- _None._
+- Added portable `gsap-animation` skill with official-source GSAP guidance for timelines, ScrollTrigger, React `useGSAP`, plugin selection, performance, cleanup, and reduced-motion patterns.
+- Added GSAP project detection so installs recommend `gsap-animation` when `gsap` or `@gsap/react` is present.
 
 ### Changed
-- _None._
+- Updated `frontend-design` to route advanced motion work through `gsap-animation` and include the new critique workflow in catalog metadata.
+- Updated selected skill installation to include portable skill dependencies automatically.
 
 ### Fixed
 - _None._

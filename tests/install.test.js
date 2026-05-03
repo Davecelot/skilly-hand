@@ -29,7 +29,7 @@ test("dry run returns install plan without writing files", async () => {
   const ids = result.plan.skills.map((skill) => skill.id);
 
   assert.equal(result.applied, false);
-  assert.equal(result.plan.skills.length, 13);
+  assert.equal(result.plan.skills.length, 14);
   assert.equal(result.plan.decisionsRegistry.relativePath, ".ai/DECISIONS.md");
   assert.equal(result.plan.decisionsRegistry.willCreate, true);
   await assert.rejects(access(path.join(projectDir, ".ai", "DECISIONS.md")), "expected dry run to avoid creating decisions registry");
@@ -37,6 +37,7 @@ test("dry run returns install plan without writing files", async () => {
     "accessibility-audit",
     "agents-root-orchestrator",
     "frontend-design",
+    "gsap-animation",
     "output-optimizer",
     "project-security",
     "project-teacher",
@@ -136,6 +137,7 @@ test("dry run includes angular-guidelines for angular projects", async () => {
     "agents-root-orchestrator",
     "angular-guidelines",
     "frontend-design",
+    "gsap-animation",
     "output-optimizer",
     "project-security",
     "project-teacher",
@@ -376,6 +378,18 @@ test("selectedSkillIds overrides automatic selection during install", async () =
   const ids = result.plan.skills.map((skill) => skill.id);
 
   assert.deepEqual(ids, ["spec-driven-development", "token-optimizer"]);
+});
+
+test("selectedSkillIds includes portable skill dependencies", async () => {
+  const projectDir = await makeFixtureCopy("react-vite");
+  const result = await installProject({
+    cwd: projectDir,
+    dryRun: true,
+    selectedSkillIds: ["frontend-design"]
+  });
+  const ids = result.plan.skills.map((skill) => skill.id);
+
+  assert.deepEqual(ids, ["frontend-design", "gsap-animation"]);
 });
 
 test("install rejects unknown selectedSkillIds", async () => {

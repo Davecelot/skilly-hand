@@ -1,7 +1,7 @@
 {
   "id": "frontend-design",
   "title": "Frontend Design",
-  "description": "Project-aware frontend design skill that detects the existing tech stack, UI libraries, CSS variables, and design tokens before proposing any UI work. Supports greenfield projects via DESIGN.md context setup, and includes post-generation motion and visual refinement phases.",
+  "description": "Project-aware frontend design skill that detects the existing tech stack, UI libraries, CSS variables, and design tokens before proposing any UI work. Supports greenfield projects via DESIGN.md context setup, post-generation critique, visual refinement, and GSAP-aware motion polish.",
   "portable": true,
   "tags": ["frontend", "design", "workflow", "ui", "motion", "greenfield"],
   "detectors": ["always"],
@@ -10,22 +10,31 @@
   "agentSupport": ["codex", "claude", "cursor", "gemini", "copilot", "antigravity", "windsurf", "trae"],
   "skillMetadata": {
     "author": "skilly-hand",
-    "last-edit": "2026-04-05",
+    "last-edit": "2026-05-03",
     "license": "Apache-2.0",
-    "version": "1.1.0",
-    "changelog": "v1.1.0: Added design-context-setter agent for greenfield/DESIGN.md workflow; added visual-refiner agent for post-generation quality evaluation; added motion-designer agent for stack-aware micro-interactions; added aesthetic-archetypes reference asset; expanded SKILL.md routing map with optional motion and refinement phases; upgraded component-designer with interaction states checklist and aesthetic principles",
-    "auto-invoke": "Designing or generating UI components, pages, or layouts in a web or mobile project; setting up visual direction for a greenfield project; adding motion or micro-interactions to existing UI; refining or polishing generated UI output",
-    "allowed-tools": ["Read", "Grep", "Glob", "Bash", "Edit", "Write"]
+    "version": "1.3.0",
+    "changelog": "Added GSAP-aware motion routing through gsap-animation while preserving critique workflow; improves advanced frontend animation handoffs with official-source GSAP guidance; affects frontend-design motion sequencing, metadata, and catalog dependencies",
+    "auto-invoke": "Designing or generating UI components, pages, or layouts in a web or mobile project; setting up visual direction for a greenfield project; critiquing generated UI for AI slop; adding motion or micro-interactions to existing UI; refining or polishing generated UI output",
+    "allowed-modes": [
+      "stack-detector",
+      "design-context-setter",
+      "component-designer",
+      "critique",
+      "visual-refiner",
+      "motion-designer"
+    ],
+    "allowed-tools": ["Read", "Grep", "Glob", "Bash", "Edit", "Write", "Task", "SubAgent"]
   },
   "files": [
     { "path": "SKILL.md", "kind": "instruction" },
     { "path": "agents/stack-detector.md", "kind": "asset" },
     { "path": "agents/design-context-setter.md", "kind": "asset" },
     { "path": "agents/component-designer.md", "kind": "asset" },
-    { "path": "agents/motion-designer.md", "kind": "asset" },
+    { "path": "agents/critique.md", "kind": "asset" },
     { "path": "agents/visual-refiner.md", "kind": "asset" },
+    { "path": "agents/motion-designer.md", "kind": "asset" },
     { "path": "assets/stack-scan-checklist.md", "kind": "asset" },
     { "path": "assets/aesthetic-archetypes.md", "kind": "asset" }
   ],
-  "dependencies": []
+  "dependencies": ["gsap-animation"]
 }

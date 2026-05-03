@@ -187,6 +187,15 @@ export async function detectProject(cwd) {
     });
   }
 
+  if ("gsap" in deps || "@gsap/react" in deps) {
+    addDetection(results, {
+      technology: "gsap",
+      confidence: 0.95,
+      reasons: ['Dependency "gsap" or "@gsap/react" found in package.json'],
+      recommendedSkillIds: ["gsap-animation"]
+    });
+  }
+
   return results.sort((a, b) => b.confidence - a.confidence || a.technology.localeCompare(b.technology));
 }
 

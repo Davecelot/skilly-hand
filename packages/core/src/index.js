@@ -269,6 +269,26 @@ function parseSkillIds(input) {
   return uniq((input || []).flatMap((value) => String(value).split(",")).map((value) => value.trim()).filter(Boolean));
 }
 
+function expandSkillDependencies({ catalog, skillIds }) {
+  const byId = new Map(catalog.filter((skill) => skill.portable).map((skill) => [skill.id, skill]));
+  const expanded = new Set(skillIds);
+  const pending = [...skillIds];
+
+  while (pending.length > 0) {
+    const skillId = pending.pop();
+    const skill = byId.get(skillId);
+    if (!skill || !Array.isArray(skill.dependencies)) continue;
+
+    for (const dependencyId of skill.dependencies) {
+      if (!byId.has(dependencyId) || expanded.has(dependencyId)) continue;
+      expanded.add(dependencyId);
+      pending.push(dependencyId);
+    }
+  }
+
+  return expanded;
+}
+
 export function resolveSkillSelectionByIds({ catalog, selectedSkillIds = [] }) {
   const ids = parseSkillIds(selectedSkillIds);
   const portableById = new Map(
@@ -293,7 +313,9 @@ export function resolveSkillSelectionByIds({ catalog, selectedSkillIds = [] }) {
     throw new Error(invalid.join("; "));
   }
 
-  return ids.map((id) => portableById.get(id)).sort((a, b) => a.id.localeCompare(b.id));
+  const expanded = expandSkillDependencies({ catalog, skillIds: ids });
+
+  return [...expanded].map((id) => portableById.get(id)).sort((a, b) => a.id.localeCompare(b.id));
 }
 
 export function resolveSkillSelection({ catalog, detections, includeTags = [], excludeTags = [] }) {
@@ -306,7 +328,8 @@ export function resolveSkillSelection({ catalog, detections, includeTags = [], e
     }
   }
 
-  let selected = catalog.filter((skill) => requested.has(skill.id) && skill.portable);
+  const expanded = expandSkillDependencies({ catalog, skillIds: [...requested] });
+  let selected = catalog.filter((skill) => expanded.has(skill.id) && skill.portable);
 
   if (includeTags.length > 0) {
     selected = selected.filter((skill) => includeTags.every((tag) => skill.tags.includes(tag)));

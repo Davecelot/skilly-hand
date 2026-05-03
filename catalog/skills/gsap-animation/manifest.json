@@ -1,0 +1,30 @@
+{
+  "id": "gsap-animation",
+  "title": "GSAP Animation",
+  "description": "Guide GSAP animation implementation using only official GSAP documentation and the official greensock/gsap-skills source material. Trigger: implementing, reviewing, or choosing GSAP for frontend motion, timelines, ScrollTrigger, React useGSAP, JavaScript animation libraries, or advanced UI animation.",
+  "portable": true,
+  "tags": ["frontend", "animation", "motion", "gsap", "workflow"],
+  "detectors": ["react", "nextjs", "angular", "vite", "tailwindcss", "storybook"],
+  "detectionTriggers": ["auto"],
+  "installsFor": ["all"],
+  "agentSupport": ["codex", "claude", "cursor", "gemini", "copilot", "antigravity", "windsurf", "trae"],
+  "skillMetadata": {
+    "author": "skilly-hand",
+    "last-edit": "2026-05-03",
+    "license": "Apache-2.0",
+    "version": "1.0.0",
+    "changelog": "Added aggregate GSAP animation guidance backed by official GSAP docs and official GSAP AI skills; improves frontend motion implementation with verified timelines, ScrollTrigger, React cleanup, plugin, performance, and accessibility patterns; affects frontend animation routing and catalog discovery",
+    "auto-invoke": "Implementing, reviewing, or choosing GSAP for frontend motion, timelines, ScrollTrigger, React useGSAP, JavaScript animation libraries, or advanced UI animation",
+    "allowed-tools": ["Read", "Edit", "Write", "Glob", "Grep", "Bash", "WebFetch", "WebSearch", "Task", "SubAgent"]
+  },
+  "files": [
+    { "path": "SKILL.md", "kind": "instruction" },
+    { "path": "references/official-source-map.md", "kind": "reference" },
+    { "path": "references/core-patterns.md", "kind": "reference" },
+    { "path": "references/react-patterns.md", "kind": "reference" },
+    { "path": "references/scrolltrigger-patterns.md", "kind": "reference" },
+    { "path": "references/plugin-selection.md", "kind": "reference" },
+    { "path": "references/performance-accessibility.md", "kind": "reference" }
+  ],
+  "dependencies": []
+}
