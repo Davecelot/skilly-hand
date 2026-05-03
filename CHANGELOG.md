@@ -5,6 +5,21 @@ All notable changes to this project are documented in this file.
 ## [Unreleased]
 
 ### Added
+- _None._
+
+### Changed
+- _None._
+
+### Fixed
+- _None._
+
+### Removed
+- _None._
+
+## [0.26.2] - 2026-05-03
+[View on npm](https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.26.2)
+
+### Added
 - Added portable `motion-animation` skill with official Motion guidance for JavaScript, React components, gestures, scroll animation, layout animation, exit animation, performance, accessibility, and source verification.
 
 ### Changed
