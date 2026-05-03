@@ -1,12 +1,12 @@
 ---
 name: "frontend-design"
-description: "Project-aware frontend design skill that detects the existing tech stack, UI libraries, CSS variables, and design tokens before proposing any UI work. Supports greenfield projects via DESIGN.md context setup, post-generation critique, visual refinement, and GSAP-aware motion polish."
+description: "Project-aware frontend design skill that detects the existing tech stack, UI libraries, CSS variables, and design tokens before proposing any UI work. Supports greenfield projects via DESIGN.md context setup, post-generation critique, visual refinement, and Motion/GSAP-aware motion polish."
 skillMetadata:
   author: "skilly-hand"
   last-edit: "2026-05-03"
   license: "Apache-2.0"
-  version: "1.3.0"
-  changelog: "Added GSAP-aware motion routing through gsap-animation while preserving critique workflow; improves advanced frontend animation handoffs with official-source GSAP guidance; affects frontend-design motion sequencing, metadata, and catalog dependencies"
+  version: "1.4.0"
+  changelog: "Added Motion-aware routing through motion-animation alongside gsap-animation; improves animation handoffs for Motion-native JavaScript and React projects; affects frontend-design motion sequencing, metadata, and catalog dependencies"
   auto-invoke: "Designing or generating UI components, pages, or layouts in a web or mobile project; setting up visual direction for a greenfield project; critiquing generated UI for AI slop; adding motion or micro-interactions to existing UI; refining or polishing generated UI output"
   allowed-tools:
     - "Read"
@@ -49,7 +49,7 @@ Always run stack detection first. Never skip to design.
 | 1 (only after confirmation) | Design and implement components using confirmed stack | [agents/component-designer.md](agents/component-designer.md) |
 | 2 (mandatory after generation) | Challenge the output for AI slop, weak hierarchy, heuristic failures, and unclear product fit | [agents/critique.md](agents/critique.md) |
 | 3 (after critique) | Apply visual quality refinements routed by critique | [agents/visual-refiner.md](agents/visual-refiner.md) |
-| 4 (optional) | Add motion and micro-interactions, preferring GSAP handoff for advanced motion | [agents/motion-designer.md](agents/motion-designer.md) |
+| 4 (optional) | Add motion and micro-interactions, routing Motion-native and GSAP-native work to the matching official-source skill | [agents/motion-designer.md](agents/motion-designer.md) |
 
 ---
 
@@ -63,7 +63,7 @@ Always run stack detection first. Never skip to design.
 6. **Design with confirmed context only** — hand off to `component-designer` only after steps 2–4 are complete.
 7. **Critique after generation** — invoke `critique` for a frontend-only challenge pass before polish.
 8. **Refine from critique** — invoke `visual-refiner` for visual fixes routed by critique.
-9. **Optionally add motion** — invoke `motion-designer` if critique, refinement, or the user identifies a motion need. For timelines, scroll reveals, richer micro-interactions, lifecycle-safe framework animation, or plugin decisions, route through `gsap-animation`.
+9. **Optionally add motion** — invoke `motion-designer` if critique, refinement, or the user identifies a motion need. Route Motion-native JavaScript/React animation through `motion-animation`; route GSAP timelines, ScrollTrigger, and plugin decisions through `gsap-animation`.
 
 ---
 
@@ -197,7 +197,9 @@ After generation:
   -> Invoke critique to challenge design quality and route fixes
   -> Invoke visual-refiner for critique-routed visual fixes
   -> Does the component need motion? -> Invoke motion-designer
-       -> Does motion need timelines, ScrollTrigger, framework cleanup, or plugins?
+       -> Does motion match existing Motion/Framer Motion, React motion props, layout, exit, gestures, or lightweight JS animation?
+            YES -> Use motion-animation for official-source Motion guidance
+       -> Does motion need GSAP timelines, ScrollTrigger, pin/scrub behavior, or GSAP plugins?
             YES -> Use gsap-animation for official-source GSAP guidance
             NO  -> Use confirmed stack primitives
 ```

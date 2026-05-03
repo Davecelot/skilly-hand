@@ -75,6 +75,8 @@ The catalog currently includes:
 - `angular-guidelines`
 - `figma-mcp-0to1`
 - `frontend-design`
+- `gsap-animation`
+- `motion-animation`
 - `output-optimizer`
 - `project-security`
 - `project-teacher`

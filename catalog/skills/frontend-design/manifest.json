@@ -1,7 +1,7 @@
 {
   "id": "frontend-design",
   "title": "Frontend Design",
-  "description": "Project-aware frontend design skill that detects the existing tech stack, UI libraries, CSS variables, and design tokens before proposing any UI work. Supports greenfield projects via DESIGN.md context setup, post-generation critique, visual refinement, and GSAP-aware motion polish.",
+  "description": "Project-aware frontend design skill that detects the existing tech stack, UI libraries, CSS variables, and design tokens before proposing any UI work. Supports greenfield projects via DESIGN.md context setup, post-generation critique, visual refinement, and Motion/GSAP-aware motion polish.",
   "portable": true,
   "tags": ["frontend", "design", "workflow", "ui", "motion", "greenfield"],
   "detectors": ["always"],
@@ -12,8 +12,8 @@
     "author": "skilly-hand",
     "last-edit": "2026-05-03",
     "license": "Apache-2.0",
-    "version": "1.3.0",
-    "changelog": "Added GSAP-aware motion routing through gsap-animation while preserving critique workflow; improves advanced frontend animation handoffs with official-source GSAP guidance; affects frontend-design motion sequencing, metadata, and catalog dependencies",
+    "version": "1.4.0",
+    "changelog": "Added Motion-aware routing through motion-animation alongside gsap-animation; improves animation handoffs for Motion-native JavaScript and React projects; affects frontend-design motion sequencing, metadata, and catalog dependencies",
     "auto-invoke": "Designing or generating UI components, pages, or layouts in a web or mobile project; setting up visual direction for a greenfield project; critiquing generated UI for AI slop; adding motion or micro-interactions to existing UI; refining or polishing generated UI output",
     "allowed-modes": [
       "stack-detector",
@@ -36,5 +36,5 @@
     { "path": "assets/stack-scan-checklist.md", "kind": "asset" },
     { "path": "assets/aesthetic-archetypes.md", "kind": "asset" }
   ],
-  "dependencies": ["gsap-animation"]
+  "dependencies": ["motion-animation", "gsap-animation"]
 }

@@ -5,10 +5,11 @@ All notable changes to this project are documented in this file.
 ## [Unreleased]
 
 ### Added
-- _None._
+- Added portable `motion-animation` skill with official Motion guidance for JavaScript, React components, gestures, scroll animation, layout animation, exit animation, performance, accessibility, and source verification.
 
 ### Changed
-- _None._
+- Updated `frontend-design` to route Motion-native animation work through `motion-animation` alongside existing GSAP routing.
+- Updated catalog and install expectations so Motion guidance is included in generated skill lists and frontend-design dependencies.
 
 ### Fixed
 - _None._

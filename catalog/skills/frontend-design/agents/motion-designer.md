@@ -6,7 +6,9 @@
 
 Motion must be implemented using the animation primitives already available in the project's stack. Never introduce a new animation library without the user's explicit approval.
 
-For advanced animation needs, prefer a handoff to `gsap-animation` when GSAP is already installed, explicitly requested, or approved as a new dependency. Use that skill for timelines, scroll-driven reveals, richer micro-interactions, framework lifecycle cleanup, and GSAP plugin decisions.
+For Motion-native animation needs, prefer a handoff to `motion-animation` when Motion or Framer Motion is already installed, explicitly requested, or approved as a new dependency. Use that skill for framework-agnostic JavaScript Motion APIs, React `motion` components, gestures, scroll-linked animation, scroll-triggered animation, layout animation, and exit animation.
+
+For GSAP-native animation needs, prefer a handoff to `gsap-animation` when GSAP is already installed, explicitly requested, or approved as a new dependency. Use that skill for GSAP timelines, ScrollTrigger pin/scrub behavior, and GSAP plugin decisions.
 
 ---
 
@@ -56,7 +58,9 @@ Animation stack:
 
 If no animation primitives are found, ask: "This project has no existing animation setup. Should I use CSS transitions only (no new dependencies), or would you like to add a library? If so, which one?"
 
-If the user wants a JavaScript animation library or the motion needs timeline sequencing, scroll-driven animation, pinning, scrub, advanced SVG/text/UI plugins, or framework-agnostic runtime control, recommend GSAP and invoke `gsap-animation`. If `gsap` is not already installed, ask for approval before adding it. If another animation library is already established and the user did not ask to switch, respect the existing library.
+If Motion or Framer Motion is already established, or the user asks for Motion, React motion props, gestures, layout animation, exit animation, lightweight framework-agnostic JavaScript animation, `whileInView`, or `useScroll`, invoke `motion-animation`. If `motion` is not already installed, ask for approval before adding it.
+
+If the motion needs GSAP timeline sequencing, ScrollTrigger pinning/scrub, GSAP plugins, or explicit GSAP behavior, invoke `gsap-animation`. If `gsap` is not already installed, ask for approval before adding it. If another animation library is already established and the user did not ask to switch, respect the existing library.
 
 ---
 
@@ -105,13 +109,25 @@ Moments where a small motion adds personality without adding noise:
 
 **Fix**: These are always optional and always ask the user first. Never add delight motion without explicit approval.
 
-### 5. GSAP Handoff Opportunities
+### 5. Motion Handoff Opportunities
+
+Some motion work is better handled with official Motion guidance instead of local heuristics:
+
+- The project already uses `motion`, `framer-motion`, or `@motionone/dom`.
+- The user asks for Motion or Framer Motion.
+- React animation should use `motion` components, `AnimatePresence`, `whileHover`, `whileTap`, `whileInView`, `useScroll`, `layout`, or `layoutId`.
+- Framework-agnostic JavaScript animation should use Motion `animate()`, `scroll()`, `inView()`, `hover()`, `press()`, or `stagger()`.
+- The project needs lightweight DOM/SVG/object animation and the user approves Motion as the dependency.
+
+**Fix**: Invoke `motion-animation` and include the detected project stack, dependency status, component scope, requested motion behavior, and reduced-motion expectations. Do not add `motion` without user approval.
+
+### 6. GSAP Handoff Opportunities
 
 Some motion work is better handled with official GSAP guidance instead of local heuristics:
 
 - Multi-step entrance or page choreography that needs timeline sequencing.
 - Scroll reveals, scrubbed animation, pinned sections, or parallax-like effects.
-- React, Next.js, Vue, Svelte, or Angular animation that needs lifecycle-safe cleanup.
+- Existing GSAP, React `useGSAP()`, Next.js, Vue, Svelte, or Angular animation that needs GSAP lifecycle-safe cleanup.
 - Flip, Draggable, ScrollTrigger, SplitText, SVG, custom easing, or other GSAP plugin decisions.
 - Runtime controls such as pause, play, reverse, seek, progress, or timeScale.
 
@@ -192,7 +208,8 @@ If the existing project has no `prefers-reduced-motion` handling anywhere, note 
 Before finalizing any motion work:
 
 - [ ] All animation primitives are from the confirmed stack — no new dependencies added without approval.
-- [ ] Advanced GSAP-suitable motion was routed through `gsap-animation`.
+- [ ] Motion-suitable work was routed through `motion-animation`.
+- [ ] GSAP-suitable work was routed through `gsap-animation`.
 - [ ] No layout-triggering properties are animated.
 - [ ] All animations have a `prefers-reduced-motion` fallback.
 - [ ] Timing values are within the reference ranges above.
