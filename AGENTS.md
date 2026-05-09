@@ -26,6 +26,7 @@
 | `output-optimizer` | Optimize output token consumption through compact interpreter modes with controlled expansion when complexity, ambiguity, or risk requires more detail. Trigger: minimizing response verbosity while preserving clarity and correctness. | core, workflow, efficiency, communication |
 | `project-security` | Scan project configuration and release surfaces for leak and security risks, and enforce security gates on commit, push, and publish workflows across GitHub, GitLab, npm, pnpm, yarn, and generic CI. Trigger: validating repository security posture, preventing secret leaks, or hardening delivery pipelines. | security, workflow, quality, core |
 | `project-teacher` | Scan the active project and teach any concept, code path, or decision using verified information, interactive questions, and simple explanations. Trigger: user asks to explain, understand, clarify, or learn about anything in the project or codebase. | core, workflow, education |
+| `prompt-engineering` | Guide users in writing, improving, evaluating, and tuning prompts for LLMs across factual, creative, structured, grounded, coding, safety-sensitive, and production scenarios. Trigger: writing, improving, evaluating, or tuning prompts for LLMs. | prompting, llm, workflow, quality |
 | `react-guidelines` | Guide React and Next.js code generation, review, and performance tuning using latest stable React verification and modern framework best practices. Trigger: generating, reviewing, refactoring, or optimizing React code artifacts in React projects. | react, frontend, workflow, best-practices |
 | `review-rangers` | Review code, decisions, and artifacts through a multi-perspective committee and a domain expert safety guard, then synthesize a structured verdict. | core, workflow, review, quality |
 | `roaster` | Challenge plans with constructive roast-style critique that exposes weak assumptions, missing angles, shallow sequencing, and unclear success criteria. Trigger: when the user proposes, requests, or evaluates a plan of any kind. | core, workflow, planning, quality |
@@ -84,6 +85,7 @@ This gate is mandatory whenever the user proposes, requests, or evaluates a plan
 | When minimizing output verbosity or selecting compact communication modes | `output-optimizer` |
 | Scanning project configuration and delivery workflows for leaks or security issues before commit, push, or publish | `project-security` |
 | User needs to understand, explain, or learn about any aspect of the project or codebase | `project-teacher` |
+| Writing, improving, evaluating, or tuning prompts for LLMs | `prompt-engineering` |
 | Generating, reviewing, refactoring, or optimizing React code artifacts in React projects | `react-guidelines` |
 | Reviewing code, decisions, or artifacts where adversarial multi-perspective evaluation adds value | `review-rangers` |
 | When the user proposes, requests, or evaluates a plan of any kind | `roaster` |

@@ -5,7 +5,7 @@ All notable changes to this project are documented in this file.
 ## [Unreleased]
 
 ### Added
-- _None._
+- Added the `prompt-engineering` skill with reusable guidance, templates, scenario recipes, evaluation checks, and source mapping for LLM prompt design and tuning.
 
 ### Changed
 - _None._

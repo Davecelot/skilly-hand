@@ -80,6 +80,7 @@ The catalog currently includes:
 - `output-optimizer`
 - `project-security`
 - `project-teacher`
+- `prompt-engineering`
 - `react-guidelines`
 - `review-rangers`
 - `roaster`

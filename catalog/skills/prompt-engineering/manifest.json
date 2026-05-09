@@ -1,0 +1,36 @@
+{
+  "id": "prompt-engineering",
+  "title": "Prompt Engineering",
+  "description": "Guide users in writing, improving, evaluating, and tuning prompts for LLMs across factual, creative, structured, grounded, coding, safety-sensitive, and production scenarios. Trigger: writing, improving, evaluating, or tuning prompts for LLMs.",
+  "portable": true,
+  "tags": ["prompting", "llm", "workflow", "quality"],
+  "detectors": ["manual"],
+  "detectionTriggers": ["manual"],
+  "installsFor": ["all"],
+  "agentSupport": ["codex", "claude", "cursor", "gemini", "copilot", "antigravity", "windsurf", "trae"],
+  "skillMetadata": {
+    "author": "skilly-hand",
+    "last-edit": "2026-05-09",
+    "license": "Apache-2.0",
+    "version": "1.0.0",
+    "changelog": "Added portable prompt-engineering guidance from NotebookLLM source material; improves reusable prompt design, tuning, and evaluation workflows; affects catalog skill routing and prompt quality support",
+    "auto-invoke": "Writing, improving, evaluating, or tuning prompts for LLMs",
+    "allowed-tools": [
+      "Read",
+      "Edit",
+      "Write",
+      "Glob",
+      "Grep",
+      "Bash",
+      "Task"
+    ]
+  },
+  "files": [
+    { "path": "SKILL.md", "kind": "instruction" },
+    { "path": "assets/prompt-templates.md", "kind": "asset" },
+    { "path": "assets/scenario-recipes.md", "kind": "asset" },
+    { "path": "assets/evaluation-checklist.md", "kind": "asset" },
+    { "path": "references/notebookllm-source-map.md", "kind": "reference" }
+  ],
+  "dependencies": []
+}
