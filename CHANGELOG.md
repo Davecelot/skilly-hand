@@ -8,7 +8,7 @@ All notable changes to this project are documented in this file.
 - _None._
 
 ### Changed
-- _None._
+- Updated the `figma-mcp-0to1` skill for current Figma MCP remote-first setup, supported-client coverage, Figma-provided skills, FigJam write workflows, code-to-canvas support, and access/rate-limit guidance.
 
 ### Fixed
 - _None._

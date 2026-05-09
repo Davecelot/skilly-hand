@@ -33,6 +33,7 @@ Failure observed?
 1. Validate Figma URL format and node id.
 2. Run `whoami` to verify authenticated account.
 3. Confirm authenticated user belongs to correct plan and has file access.
+4. For write-to-canvas, confirm the user has edit access; Dev seats are read-only outside drafts.
 
 ### Rate limiting
 
@@ -41,6 +42,7 @@ Failure observed?
 - Dev/Full seats on Professional or Organization plans have higher daily usage.
 - Enterprise Dev/Full seats have the highest documented daily usage.
 - Officially documented exempt tools include `add_code_connect_map`, `generate_figma_design`, and `whoami`.
+- `use_figma` write tools may be documented outside standard read limits, but still require correct seat and edit permissions.
 - Use smaller selections and fewer repeated reads.
 - Prefer `get_metadata` preflight before broad `get_design_context`.
 - Batch intent into fewer, targeted calls.
@@ -58,6 +60,12 @@ Failure observed?
 - Verify partial outcomes using read tools before next step.
 - For `create_new_file`, ensure a plan/team context is available.
 - For `generate_diagram`, do not pre-create a blank FigJam file unless adding to an existing file is the explicit goal.
+- For FigJam writes, use `figma-use-figjam` guidance where available instead of generic Figma Design assumptions.
+
+### Expired image URLs
+
+- Figma-hosted image URLs returned by MCP can expire.
+- Refresh the design context to get new URLs, or download/save assets into the project and reference local files for durable implementation.
 
 ## Scoped Retry Pattern
 

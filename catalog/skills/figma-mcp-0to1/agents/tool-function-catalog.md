@@ -7,7 +7,7 @@ Pick the smallest correct Figma MCP function for the task, with predictable inpu
 ## Start Here
 
 1. Read [../references/official-tools-matrix.md](../references/official-tools-matrix.md).
-2. Identify whether task is read, write, design-system search, code-connect, diagram, live UI capture, or Make resource context.
+2. Identify whether task is read, write, FigJam, design-system search, code-connect, diagram, live UI capture, or Make resource context.
 3. Prefer read-first calls before write calls on unknown files.
 
 ## Selection Rules
@@ -18,9 +18,11 @@ Pick the smallest correct Figma MCP function for the task, with predictable inpu
 - Need variables/tokens only: `get_variable_defs`.
 - Need visual reference: `get_screenshot`.
 - Need FigJam extraction: `get_figjam`.
+- Need FigJam creation/editing: `use_figma` with the `figma-use-figjam` skill when available.
 - Need library discovery in Codex before a scoped search: `get_libraries` if the Codex Figma plugin exposes it.
 - Need design-system discovery before creating: `search_design_system`.
-- Need to write/create/update Figma Design or FigJam content: `use_figma` (remote write workflow; use `figma-use` skill when available).
+- Need to write/create/update Figma Design content: `use_figma` (remote write workflow; use `figma-use` skill when available).
+- Need to write/create/update FigJam content: `use_figma` (remote write workflow; use `figma-use-figjam` skill when available).
 - Need first-time live web UI capture: `generate_figma_design`.
 - Need new blank file: `create_new_file` (requires plan/team context such as `planKey` in some clients).
 - Need Mermaid-to-FigJam: `generate_diagram` (creates its own FigJam file unless an existing FigJam file key is provided).
@@ -35,6 +37,7 @@ Use direct tool-trigger language when selection is ambiguous:
 - "Use Figma MCP `search_design_system` before creating any new component."
 - "Use Figma MCP `generate_figma_design` to capture this live web UI to a new Figma file."
 - "Use Figma MCP `create_new_file`, then `use_figma` to add a first frame and typography style."
+- "Use `figma-use-figjam` with `use_figma` to organize this FigJam board into sections and connectors."
 - "Use MCP resources from this Figma Make link and fetch only the files needed for implementation."
 
 ## Remote/Desktop Caveats

@@ -1,4 +1,4 @@
-# Official Figma MCP Tools Matrix (As of 2026-05-01)
+# Official Figma MCP Tools Matrix (As of 2026-05-09)
 
 This matrix tracks the official Figma MCP tool/function set in current Figma documentation. Treat it as the source of truth for official tool names, supported file types, and remote-only status. Client-specific helpers are listed separately.
 
@@ -19,13 +19,28 @@ This matrix tracks the official Figma MCP tool/function set in current Figma doc
 | `whoami` | Show authenticated Figma identity, plans, and seat types | None | No file context required | Remote-only in official docs; exempt from read rate limits. |
 | `get_code_connect_suggestions` | Suggest candidate node-to-code mappings | File context + repo context | Figma Design | Usually part of Code Connect workflows. |
 | `send_code_connect_mappings` | Confirm/persist mapping suggestions | Suggestions payload | Figma Design | Follow-up action after suggestion generation. |
-| `use_figma` | General-purpose write/edit/delete/inspect via Plugin API workflow | Task instructions and file context | Figma Design, FigJam | Remote-only; default direct write/update path; best used with the `figma-use` skill when available. |
+| `use_figma` | General-purpose write/edit/delete/inspect via Plugin API workflow | Task instructions and file context | Figma Design, FigJam | Remote-only; default direct write/update path; use `figma-use` for Figma Design and `figma-use-figjam` for FigJam when available. |
 | `search_design_system` | Search libraries for components, variables, styles | Query text and optional type narrowing | Figma Design | Remote-only; use before creating new artifacts when design-system reuse is relevant. |
 | `create_new_file` | Create new blank Design or FigJam file | File name, file type, plan context | No file context required | Remote-only; creates files in drafts or a project; requires plan/team context in some clients. |
 
 ## Figma Make Resources
 
 Figma Make project context is exposed through MCP resources on clients that support MCP resources. Use a valid Figma Make link, let the client list available project files, and fetch only the files needed for the implementation task.
+
+## Figma-Provided Skills
+
+Figma documents these skills as the preferred guidance layer for common MCP workflows:
+
+| Skill | Purpose |
+| --- | --- |
+| `figma-use` | Foundational Figma Design write-to-canvas workflow. |
+| `figma-use-figjam` | Foundational FigJam write workflow. |
+| `figma-code-connect-components` | Connect published Figma components to code implementations. |
+| `figma-create-design-system-rules` | Generate project rules for design-to-code workflows. |
+| `figma-create-new-file` | Create blank Design or FigJam files. |
+| `figma-implement-design` | Translate a Figma design URL into production code. |
+| `figma-generate-library` | Example workflow for generating or syncing a design-system library. |
+| `figma-generate-design` | Example workflow for building screens/views from a design system. |
 
 ## Codex Plugin Helpers
 
@@ -41,16 +56,19 @@ Some official Figma MCP tools may not be exposed by every client plugin surface.
 
 | Coverage | Agents or Clients | Guidance |
 | --- | --- | --- |
-| Figma-supported and skilly-hand-supported | `codex`, `claude`, `cursor`, `copilot` | Include concrete setup paths and prompts in this skill. |
-| Figma-supported but not skilly-hand-native | VS Code, Warp, Augment, Factory, Firebender | Mention as Figma-supported clients; do not add skilly-hand install assumptions. |
-| skilly-hand-supported but not source-backed in current Figma docs | `gemini`, `antigravity`, `windsurf`, `trae` | Keep broad install support; advise manual MCP/client docs for Figma-specific setup. |
+| Figma-supported and skilly-hand-supported | `codex`, `claude`, `cursor`, `copilot`, `gemini` | Include concrete setup paths where documented; otherwise point to the Figma MCP catalog/client docs. |
+| Figma-supported but not skilly-hand-native | Amazon Q, Android Studio, VS Code, Warp, Augment, Factory, Firebender, Kiro, OpenHands, Replit | Mention as Figma-supported clients; do not add skilly-hand install assumptions. |
+| skilly-hand-supported but not source-backed in current Figma docs | `antigravity`, `windsurf`, `trae` | Keep broad install support; advise manual MCP/client docs for Figma-specific setup. |
 
 ## Rate-Limit Notes (Official)
 
 - Read tools are subject to seat/plan limits and per-minute limits.
+- Remote server access is documented for all seats/plans, but practical usage is governed by seat/plan limits.
+- Desktop server access is documented for Dev or Full seats on paid plans.
 - Starter plan or View/Collab seats: up to 6 tool calls per month.
 - Professional or Organization with Dev/Full seat: up to 200 tool calls per day.
 - Enterprise with Dev/Full seat: up to 600 tool calls per day.
+- Dev seats only have read-only access outside drafts for write-to-canvas workflows.
 - Officially documented exempt tools include:
 - `add_code_connect_map`
 - `generate_figma_design`
@@ -65,6 +83,7 @@ Some official Figma MCP tools may not be exposed by every client plugin surface.
 5. Use `use_figma` for direct Figma Design or FigJam writes and updates.
 6. Keep `use_figma` calls small and validate after each step.
 7. Use `get_screenshot` as final visual verification after edits when available.
+8. Use `figma-use-figjam` rather than Figma Design assumptions for FigJam board edits.
 
 ## Sources
 
@@ -77,3 +96,4 @@ Some official Figma MCP tools may not be exposed by every client plugin surface.
 - https://developers.figma.com/docs/figma-mcp-server/bringing-make-context-to-your-agent/
 - https://developers.figma.com/docs/figma-mcp-server/plans-access-and-permissions/
 - https://help.figma.com/hc/en-us/articles/32132100833559-Guide-to-the-Figma-MCP-server
+- https://help.figma.com/hc/en-us/articles/39166810751895-Figma-skills-for-MCP

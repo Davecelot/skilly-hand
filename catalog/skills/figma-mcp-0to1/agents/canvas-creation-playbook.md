@@ -26,7 +26,8 @@ Deliver a first successful Figma canvas result with low risk and clear verificat
 - Create one frame.
 - Add one text node.
 - Apply one style/token decision.
-- For FigJam, create or update one small board object such as a sticky, section, connector, or shape.
+- For Figma Design, load or invoke `figma-use` when available.
+- For FigJam, load or invoke `figma-use-figjam` when available, then create or update one small board object such as a sticky, section, connector, shape, table, or code block.
 
 5. **Validate state**
 - Inspect with `get_metadata` or `get_screenshot`.
@@ -43,6 +44,12 @@ Deliver a first successful Figma canvas result with low risk and clear verificat
 1. Call `generate_diagram` from plain-language workflow description or Mermaid syntax.
 2. Let `generate_diagram` create a new FigJam file, or provide an existing FigJam file key.
 3. Validate diagram structure and labels.
+
+### FigJam board-first flow
+
+1. Create or choose a FigJam file, using `create_new_file figjam <name>` if a fresh board is needed.
+2. Use `figma-use-figjam` with `use_figma` for small write steps.
+3. Validate with `get_figjam` or `get_screenshot`.
 
 ### Code-to-canvas flow
 
