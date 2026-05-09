@@ -1,18 +1,12 @@
 export const release = {
-  "version": "0.26.2",
-  "date": "2026-05-03",
-  "npmUrl": "https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.26.2",
+  "version": "0.26.3",
+  "date": "2026-05-09",
+  "npmUrl": "https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.26.3",
   "sections": [
-    {
-      "title": "Added",
-      "items": [
-        "Added portable `motion-animation` skill with official Motion guidance for JavaScript, React components, gestures, scroll animation, layout animation, exit animation, performance, accessibility, and source verification."
-      ]
-    },
     {
       "title": "Changed",
       "items": [
-        "Updated `frontend-design` to route Motion-native animation work through `motion-animation` alongside existing GSAP routing."
+        "Updated the `figma-mcp-0to1` skill for current Figma MCP remote-first setup, supported-client coverage, Figma-provided skills, FigJam write workflows, code-to-canvas support, and access/rate-limit guidance."
       ]
     }
   ]

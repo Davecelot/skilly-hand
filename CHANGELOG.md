@@ -8,6 +8,21 @@ All notable changes to this project are documented in this file.
 - _None._
 
 ### Changed
+- _None._
+
+### Fixed
+- _None._
+
+### Removed
+- _None._
+
+## [0.26.3] - 2026-05-09
+[View on npm](https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.26.3)
+
+### Added
+- _None._
+
+### Changed
 - Updated the `figma-mcp-0to1` skill for current Figma MCP remote-first setup, supported-client coverage, Figma-provided skills, FigJam write workflows, code-to-canvas support, and access/rate-limit guidance.
 
 ### Fixed
