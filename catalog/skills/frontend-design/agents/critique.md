@@ -12,6 +12,7 @@ Before critiquing:
 2. Read `DESIGN.md` if it exists.
 3. Inspect the generated/proposed UI source and, when available, the rendered page.
 4. Compare against sampled project components, tokens, and interaction patterns.
+5. If `DESIGN.md` includes references or anti-references, evaluate against the taste rules from [../assets/taste-reference-extraction.md](../assets/taste-reference-extraction.md), not just generic taste.
 
 Do not use this agent when:
 
@@ -65,6 +66,8 @@ Check whether the UI serves the actual product context.
 - Brand: Does it follow `DESIGN.md` personality and anti-references?
 - Mode: Is this a brand surface where design is the product, or a product surface where design serves repeated use?
 - Distinction: Would this still be recognizable if the logo and copy were removed?
+- Reference translation: Did the UI borrow concrete ingredients from the references, or did it imitate a superficial mood?
+- Anti-reference compliance: Did any explicitly rejected pattern slip back in?
 
 ### Pass 3 - Nielsen Heuristics
 

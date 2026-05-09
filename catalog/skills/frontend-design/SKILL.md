@@ -1,12 +1,12 @@
 ---
 name: "frontend-design"
-description: "Project-aware frontend design skill that detects the existing tech stack, UI libraries, CSS variables, and design tokens before proposing any UI work. Supports greenfield projects via DESIGN.md context setup, post-generation critique, visual refinement, and Motion/GSAP-aware motion polish."
+description: "Project-aware frontend design skill that detects the existing tech stack, UI libraries, CSS variables, and design tokens before proposing any UI work. Supports greenfield projects via DESIGN.md context setup, taste-reference extraction, post-generation critique, visual refinement, and Motion/GSAP-aware motion polish."
 skillMetadata:
   author: "skilly-hand"
-  last-edit: "2026-05-03"
+  last-edit: "2026-05-09"
   license: "Apache-2.0"
-  version: "1.4.0"
-  changelog: "Added Motion-aware routing through motion-animation alongside gsap-animation; improves animation handoffs for Motion-native JavaScript and React projects; affects frontend-design motion sequencing, metadata, and catalog dependencies"
+  version: "1.5.0"
+  changelog: "Added taste-reference extraction guidance sourced from Refero Styles and Impeccable; improves how agents translate visual references, anti-references, and register into DESIGN.md-ready language; affects greenfield design setup, critique, refinement, and resource routing"
   auto-invoke: "Designing or generating UI components, pages, or layouts in a web or mobile project; setting up visual direction for a greenfield project; critiquing generated UI for AI slop; adding motion or micro-interactions to existing UI; refining or polishing generated UI output"
   allowed-tools:
     - "Read"
@@ -59,11 +59,12 @@ Always run stack detection first. Never skip to design.
 2. **Check for DESIGN.md** — if it exists, read it before any design work. If it does not exist and the project has no existing components to sample, run `design-context-setter` to create it.
 3. **Present findings to the user** — surface the detected stack and any DESIGN.md context clearly, then ask for explicit confirmation.
 4. **If anything is unclear or ambiguous, ask** — do not proceed with partial or uncertain information.
-5. **Scan existing tokens and components** — read what already exists before proposing anything.
-6. **Design with confirmed context only** — hand off to `component-designer` only after steps 2–4 are complete.
-7. **Critique after generation** — invoke `critique` for a frontend-only challenge pass before polish.
-8. **Refine from critique** — invoke `visual-refiner` for visual fixes routed by critique.
-9. **Optionally add motion** — invoke `motion-designer` if critique, refinement, or the user identifies a motion need. Route Motion-native JavaScript/React animation through `motion-animation`; route GSAP timelines, ScrollTrigger, and plugin decisions through `gsap-animation`.
+5. **Extract taste from references** — when the user provides visual references or asks for stronger taste, use [assets/taste-reference-extraction.md](assets/taste-reference-extraction.md) to translate examples into concrete design language, anti-references, and register.
+6. **Scan existing tokens and components** — read what already exists before proposing anything.
+7. **Design with confirmed context only** — hand off to `component-designer` only after steps 2–5 are complete.
+8. **Critique after generation** — invoke `critique` for a frontend-only challenge pass before polish.
+9. **Refine from critique** — invoke `visual-refiner` for visual fixes routed by critique.
+10. **Optionally add motion** — invoke `motion-designer` if critique, refinement, or the user identifies a motion need. Route Motion-native JavaScript/React animation through `motion-animation`; route GSAP timelines, ScrollTrigger, and plugin decisions through `gsap-animation`.
 
 ---
 
@@ -135,6 +136,17 @@ After stack detection, read 3–5 existing components before proposing any desig
 Every new component or style must feel like it was written by the same team that wrote the existing code — not imported from a different design system.
 
 If no existing components are found, use `DESIGN.md` as the visual language reference. If neither exists, run `design-context-setter` before proceeding.
+
+### Pattern 5: Explain Taste as Observable Decisions
+
+When the user provides references, do not summarize them as vibes. Convert each reference into visible, buildable decisions:
+
+- **Register:** brand surface where design is the product, or product surface where design serves repeated use.
+- **Visual ingredients:** type contrast, color role, spacing rhythm, density, radius, elevation, imagery, component shape, and motion character.
+- **Taste rules:** what to repeat, what to avoid, and what would make the design feel off-brand.
+- **Anti-references:** common AI reflexes the project should reject.
+
+Use [assets/taste-reference-extraction.md](assets/taste-reference-extraction.md) for the extraction workflow. Its source model combines Refero Styles' reference-search framing with Impeccable's design vocabulary, register split, and anti-slop detection.
 
 ---
 
@@ -290,3 +302,4 @@ find src/components -maxdepth 2 -name "*.tsx" -o -name "*.vue" | head -10
 - Motion and micro-interactions: [agents/motion-designer.md](agents/motion-designer.md)
 - Full scan checklist: [assets/stack-scan-checklist.md](assets/stack-scan-checklist.md)
 - Aesthetic archetypes reference: [assets/aesthetic-archetypes.md](assets/aesthetic-archetypes.md)
+- Taste reference extraction: [assets/taste-reference-extraction.md](assets/taste-reference-extraction.md)

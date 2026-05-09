@@ -35,6 +35,8 @@ Run all four checks. Do not skip any. Report findings grouped by check — do no
 
 Look for generic patterns that signal uncontextualized AI output. Flag each one found.
 
+If `DESIGN.md` includes visual references or anti-references, run the reference taste check in [../assets/taste-reference-extraction.md](../assets/taste-reference-extraction.md) first. A design can be clean and still fail if it ignores the intended register, borrows the wrong ingredient from a reference, or drifts into an explicit anti-reference.
+
 **Visual tells to catch:**
 
 - Glassmorphism (backdrop-filter: blur + semi-transparent backgrounds with no established project precedent)
@@ -45,6 +47,8 @@ Look for generic patterns that signal uncontextualized AI output. Flag each one 
 - Gradient text (`background-clip: text`) used decoratively without project precedent
 - Icon + title + description card grids as default empty-state filler
 - Identical padding and border-radius across every element (uniform blandness)
+- Product UI treated like a marketing page, or brand/landing work flattened into utilitarian dashboard language
+- Reference mimicry that copies a layout while missing its real taste ingredients
 
 For each flag: name the pattern, show the line, and suggest a project-derived alternative.
 

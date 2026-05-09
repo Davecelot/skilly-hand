@@ -6,6 +6,8 @@ Gather the project's design intent once, then write it to `DESIGN.md` at the pro
 
 This agent is modeled on how modern AI-first design platforms (Stitch, v0, Galileo) treat a persistent design brief — a short, always-available document that anchors every generation.
 
+When the user provides references, use the extraction workflow in [../assets/taste-reference-extraction.md](../assets/taste-reference-extraction.md) before drafting the aesthetic direction. It converts reference sites, brands, moods, and anti-references into concrete language the rest of the skill can apply.
+
 ---
 
 ## When to Use
@@ -59,10 +61,20 @@ Ask these questions one at a time. Do not front-load the full list.
 **4. Are there any visual references?**
 "Any products, sites, or brands whose aesthetic this should feel close to? (Optional — skip if none.)"
 
-**5. What's the accessibility baseline?**
+If the user provides references, extract them into:
+
+- what to borrow;
+- what to avoid;
+- whether the target is brand or product register;
+- the visible ingredients that define the taste.
+
+**5. Any anti-references?**
+"Are there products, sites, or AI-looking patterns this should explicitly avoid? Examples: purple gradients, glassmorphism, nested cards, generic centered hero layouts."
+
+**6. What's the accessibility baseline?**
 "Should we target WCAG 2.2 Level AA (standard), AAA (enhanced), or is there a specific requirement? Default is AA."
 
-**6. Any hard constraints?**
+**7. Any hard constraints?**
 "Are there colors, fonts, or patterns that must be used or must be avoided? (brand guidelines, corporate requirements, legal restrictions)"
 
 After collecting answers, propose a brief aesthetic direction and ask for confirmation before writing the file.
@@ -89,6 +101,7 @@ Write the following structure to `DESIGN.md` at the project root. Every field mu
 
 **Adjectives:** [3 adjectives from user]
 **Visual references:** [references, or "none specified"]
+**Anti-references:** [visual patterns or references to avoid, or "none specified"]
 
 ## Aesthetic Direction
 

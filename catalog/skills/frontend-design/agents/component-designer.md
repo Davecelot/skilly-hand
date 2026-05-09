@@ -53,6 +53,7 @@ These apply within the constraints of the confirmed stack — they guide choices
 - One clear visual focus per component — the most important element should be unmistakable.
 - Avoid equal-weight elements. If everything is emphasized, nothing is.
 - When `DESIGN.md` defines a motion character, let it inform transition presence even at this stage — flag it for `motion-designer` rather than omitting it entirely.
+- If `DESIGN.md` includes visual references or anti-references, translate them through [../assets/taste-reference-extraction.md](../assets/taste-reference-extraction.md): borrow observable decisions, not full layouts.
 
 ---
 
