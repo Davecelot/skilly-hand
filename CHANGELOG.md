@@ -5,6 +5,21 @@ All notable changes to this project are documented in this file.
 ## [Unreleased]
 
 ### Added
+- _None._
+
+### Changed
+- _None._
+
+### Fixed
+- _None._
+
+### Removed
+- _None._
+
+## [0.26.5] - 2026-05-09
+[View on npm](https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.26.5)
+
+### Added
 - Added the `prompt-engineering` skill with reusable guidance, templates, scenario recipes, evaluation checks, and source mapping for LLM prompt design and tuning.
 
 ### Changed
