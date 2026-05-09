@@ -15,12 +15,12 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        uses: actions/checkout@v6
 
       - name: Setup Node
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        uses: actions/setup-node@v6
         with:
-          node-version: "20"
+          node-version: "24"
 
       - name: Install dependencies (auto-detect package manager)
         run: |
@@ -44,12 +44,12 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        uses: actions/checkout@v6
 
       - name: Setup Node
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        uses: actions/setup-node@v6
         with:
-          node-version: "20"
+          node-version: "24"
 
       - name: Install dependencies (auto-detect package manager)
         run: |
@@ -70,7 +70,7 @@ jobs:
           node scripts/dependency-security-check.mjs --json > dependency-security-report.json
 
       - name: Upload dependency report artifact
-        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275f52d1598f
+        uses: actions/upload-artifact@v4
         with:
           name: dependency-security-report
           path: dependency-security-report.json

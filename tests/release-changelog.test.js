@@ -163,6 +163,6 @@ test("release workflow deploys site from the bumped release tag", async () => {
   const workflow = await readFile(new URL("../.github/workflows/release.yml", import.meta.url), "utf8");
 
   assert.match(workflow, /deploy_site:\n(?: {2,}.+\n)*? {4}if: inputs\.mode == 'bump-and-publish'\n {4}needs: \[bump, publish\]/);
-  assert.match(workflow, /- name: Checkout release\n {8}uses: actions\/checkout@v4\n {8}with:\n {10}ref: \$\{\{ needs\.bump\.outputs\.tag \}\}/);
+  assert.match(workflow, /- name: Checkout release\n {8}uses: actions\/checkout@v6\n {8}with:\n {10}ref: \$\{\{ needs\.bump\.outputs\.tag \}\}/);
   assert.match(workflow, /git add .*CHANGELOG\.md site\/src\/generated\/release\.js site\/src\/generated\/skills\.js/);
 });
