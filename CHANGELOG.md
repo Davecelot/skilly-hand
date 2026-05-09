@@ -5,6 +5,21 @@ All notable changes to this project are documented in this file.
 ## [Unreleased]
 
 ### Added
+- _None._
+
+### Changed
+- _None._
+
+### Fixed
+- _None._
+
+### Removed
+- _None._
+
+## [0.26.4] - 2026-05-09
+[View on npm](https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.26.4)
+
+### Added
 - Added taste-reference extraction guidance to `frontend-design`, with Refero Styles and Impeccable-inspired workflows for turning references into register, visual ingredients, anti-references, and DESIGN.md-ready taste contracts.
 
 ### Changed
