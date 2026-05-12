@@ -11,6 +11,21 @@ All notable changes to this project are documented in this file.
 - _None._
 
 ### Fixed
+- _None._
+
+### Removed
+- _None._
+
+## [0.26.7] - 2026-05-12
+[View on npm](https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.26.7)
+
+### Added
+- _None._
+
+### Changed
+- _None._
+
+### Fixed
 - Added release notes for the NotebookLLM prompt-engineering reference bundle so the next automated trusted-publisher release has non-empty changelog metadata.
 
 ### Removed
