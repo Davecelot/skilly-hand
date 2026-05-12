@@ -11,7 +11,7 @@ All notable changes to this project are documented in this file.
 - _None._
 
 ### Fixed
-- _None._
+- Added release notes for the NotebookLLM prompt-engineering reference bundle so the next automated trusted-publisher release has non-empty changelog metadata.
 
 ### Removed
 - _None._
@@ -20,7 +20,7 @@ All notable changes to this project are documented in this file.
 [View on npm](https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.26.6)
 
 ### Added
-- _None._
+- Added NotebookLLM prompt-engineering PDF references to the `prompt-engineering` skill manifest and source map.
 
 ### Changed
 - _None._
