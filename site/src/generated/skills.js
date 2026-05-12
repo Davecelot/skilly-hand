@@ -631,6 +631,10 @@ export const skills = [
         "type": "dir",
         "children": [
           {
+            "name": "notebookllm",
+            "type": "dir"
+          },
+          {
             "name": "notebookllm-source-map.md",
             "type": "file"
           }
