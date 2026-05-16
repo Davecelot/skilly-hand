@@ -5,6 +5,21 @@ All notable changes to this project are documented in this file.
 ## [Unreleased]
 
 ### Added
+- _None._
+
+### Changed
+- _None._
+
+### Fixed
+- _None._
+
+### Removed
+- _None._
+
+## [0.28.0] - 2026-05-16
+[View on npm](https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.28.0)
+
+### Added
 - Added a top-level `skills/` symlink overlay so skills.sh can discover the portable catalog directly from the GitHub repository.
 
 ### Changed
