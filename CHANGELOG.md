@@ -5,7 +5,7 @@ All notable changes to this project are documented in this file.
 ## [Unreleased]
 
 ### Added
-- _None._
+- Added a top-level `skills/` symlink overlay so skills.sh can discover the portable catalog directly from the GitHub repository.
 
 ### Changed
 - _None._
@@ -23,10 +23,10 @@ All notable changes to this project are documented in this file.
 - _None._
 
 ### Changed
-- _None._
+- Added pnpm workspace support alongside npm lockfile validation and refreshed the interactive CLI launcher on direct `@inquirer/prompts`.
 
 ### Fixed
-- _None._
+- Kept the review-rangers release gate aligned with the current interactive command discovery checks.
 
 ### Removed
 - _None._

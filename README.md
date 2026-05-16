@@ -39,6 +39,18 @@ npx skilly-hand
 `npx skilly-hand` opens an interactive prompt workflow when running in a TTY.
 The guided home supports type-to-filter command discovery and includes a built-in Command Guide.
 
+### Install on skills.sh
+
+The full skill catalog is also discoverable through the [skills.sh](https://www.skills.sh/) ecosystem:
+
+```bash
+npx skills add Davecelot/skilly-hand --skill '*'
+```
+
+Use `npx skills add Davecelot/skilly-hand --list` to inspect the available skills before installing. The `skills/` directory is a GitHub-facing overlay made of symlinks to `catalog/skills/`; it helps skills.sh discover the catalog without changing the regular `npx skilly-hand` npm package contents or CLI flow.
+
+Windows contributors who clone the repo locally should enable symlink support before checkout, for example with `git config --global core.symlinks true`, and may also need Developer Mode or elevated symlink privileges. If the repo was already checked out without symlinks, re-check out or reclone after enabling support.
+
 ---
 
 ## Commands
