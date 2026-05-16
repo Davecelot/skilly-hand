@@ -30,39 +30,42 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
+      - name: Enable Corepack
+        run: corepack enable
+
       - name: Setup Node
         uses: actions/setup-node@v6
         with:
           node-version: 24
-          cache: npm
+          cache: pnpm
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Verify versions
         run: node scripts/verify-versions.mjs
 
       - name: Dependency policy
-        run: npm run deps:policy:check
+        run: pnpm deps:policy:check
 
       - name: Security check
-        run: npm run security:check
+        run: pnpm security:check
 
       - name: Catalog check
-        run: npm run catalog:check
+        run: pnpm catalog:check
 
       - name: Tests
-        run: npm test
+        run: pnpm test
         env:
           NO_COLOR: '1'
 
       - name: Review rangers
-        run: npm run review:rangers
+        run: pnpm review:rangers
         env:
           NO_COLOR: '1'
 
       - name: Packlist
-        run: npm run verify:packlist
+        run: pnpm verify:packlist
 
   bump:
     name: Bump version and push tag
@@ -119,6 +122,10 @@ jobs:
             sed -i "s/\"version\": \"$CURRENT\"/\"version\": \"$NEW\"/" "$PKG"
           done
 
+          # Regenerate pnpm-lock.yaml so it stays in sync with the bumped versions.
+          corepack enable
+          pnpm install --lockfile-only
+
           echo "version=$NEW" >> "$GITHUB_OUTPUT"
           echo "tag=v$NEW" >> "$GITHUB_OUTPUT"
 
@@ -146,7 +153,7 @@ jobs:
       - name: Commit, tag, and push
         run: |
           VERSION="${{ steps.version.outputs.version }}"
-          git add package.json packages/*/package.json package-lock.json npm-shrinkwrap.json CHANGELOG.md site/src/generated/release.js site/src/generated/skills.js
+          git add package.json packages/*/package.json package-lock.json npm-shrinkwrap.json pnpm-lock.yaml CHANGELOG.md site/src/generated/release.js site/src/generated/skills.js
           git commit -m "chore(release): v$VERSION"
           git tag -a "v$VERSION" -m "Release v$VERSION"
           git push origin main "v$VERSION"
@@ -228,20 +235,23 @@ jobs:
         with:
           ref: ${{ needs.bump.outputs.tag }}
 
+      - name: Enable Corepack
+        run: corepack enable
+
       - name: Setup Node
         uses: actions/setup-node@v6
         with:
           node-version: 24
-          cache: npm
+          cache: pnpm
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Configure Pages
         uses: actions/configure-pages@v6
 
       - name: Build site
-        run: npm run site:build
+        run: pnpm site:build
         env:
           GITHUB_PAGES: "true"
 

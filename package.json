@@ -28,6 +28,7 @@
   "engines": {
     "node": ">=22.0.0"
   },
+  "packageManager": "pnpm@11.1.2",
   "scripts": {
     "build": "node ./scripts/build-catalog-index.mjs",
     "catalog:check": "node ./scripts/check-catalog.mjs",
@@ -53,9 +54,9 @@
     "detect": "node ./packages/cli/src/bin.js detect",
     "list": "node ./packages/cli/src/bin.js list",
     "doctor": "node ./packages/cli/src/bin.js doctor",
-    "site:dev": "npm run dev -w @skilly-hand/site",
-    "site:build": "npm run build -w @skilly-hand/site",
-    "site:preview": "npm run preview -w @skilly-hand/site"
+    "site:dev": "pnpm --filter @skilly-hand/site dev",
+    "site:build": "pnpm --filter @skilly-hand/site build",
+    "site:preview": "pnpm --filter @skilly-hand/site preview"
   },
   "dependencies": {
     "@inquirer/prompts": "8.4.3"
