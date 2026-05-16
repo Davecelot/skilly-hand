@@ -44,11 +44,11 @@ function scanEvidence() {
 
   const findings = [];
 
-  if (!inquirerUi.includes('type: "search"')) {
+  if (!inquirerUi.includes("search as searchPrompt") || !inquirerUi.includes("prompts.search(")) {
     findings.push({
       severity: "high",
       code: "guided-home-search-missing",
-      message: "Interactive launcher is missing searchable command discovery."
+      message: "Interactive launcher is missing direct searchable command discovery."
     });
   }
 
@@ -147,4 +147,3 @@ function main() {
 }
 
 main();
-

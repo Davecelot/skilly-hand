@@ -58,6 +58,6 @@
     "site:preview": "npm run preview -w @skilly-hand/site"
   },
   "dependencies": {
-    "inquirer": "13.4.1"
+    "@inquirer/prompts": "8.4.3"
   }
 }

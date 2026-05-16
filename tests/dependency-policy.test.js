@@ -55,7 +55,7 @@ test("dependency policy check fails when npm-shrinkwrap.json is missing", async 
 });
 
 test("dependency policy check passes with exact versions and synced lockfiles", async () => {
-  const cwd = await makeProject({ deps: { inquirer: "13.4.1" } });
+  const cwd = await makeProject({ deps: { "@inquirer/prompts": "8.4.3" } });
   const result = await runDependencyPolicyCheck({ cwd });
   assert.equal(result.valid, true);
   assert.equal(result.lockfilesSynchronized, true);
@@ -78,7 +78,7 @@ test("dependency policy check fails when lockfiles are not synchronized", async 
   assert.equal(result.issues.some((issue) => /out of sync/.test(issue)), true);
 });
 
-test("runtime dependencies do not include react or ink", async () => {
+test("runtime dependencies use direct inquirer prompts without react, ink, or legacy inquirer", async () => {
   const here = path.dirname(fileURLToPath(import.meta.url));
   const packageJsonPath = path.resolve(here, "../package.json");
   const packageJson = JSON.parse(await readFile(packageJsonPath, "utf8"));
@@ -86,5 +86,6 @@ test("runtime dependencies do not include react or ink", async () => {
 
   assert.equal(Boolean(deps.react), false);
   assert.equal(Boolean(deps.ink), false);
-  assert.equal(typeof deps.inquirer, "string");
+  assert.equal(Boolean(deps.inquirer), false);
+  assert.equal(deps["@inquirer/prompts"], "8.4.3");
 });

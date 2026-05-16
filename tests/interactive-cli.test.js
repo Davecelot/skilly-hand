@@ -391,17 +391,15 @@ test("inquirer launcher flow runs in React-host projects without React hook fail
   const stdout = createWritable(true);
   const stderr = createWritable(true);
   const writes = [];
-  const prompts = [
-    { command: "command-guide" },
-    { command: "detect" },
-    { command: "exit" }
-  ];
+  const commands = ["command-guide", "detect", "exit"];
 
   const interactiveUi = createInquirerInteractiveUi({
-    prompt: async () => {
-      const next = prompts.shift();
-      if (!next) throw new Error("Prompt queue exhausted");
-      return next;
+    promptFns: {
+      search: async () => {
+        const next = commands.shift();
+        if (!next) throw new Error("Command prompt queue exhausted");
+        return next;
+      }
     },
     write: (value) => {
       writes.push(String(value));
@@ -456,20 +454,30 @@ test("inquirer launcher flow runs in React-host projects without React hook fail
 test("inquirer launcher install flow renders contextual micro-help and next hint", async () => {
   const writes = [];
   const askedMessages = [];
-  const prompts = [
-    { command: "install" },
-    { selectedSkillIds: ["token-optimizer"] },
-    { selectedAgents: ["codex"] },
-    { installDecision: "apply" },
-    { command: "exit" }
-  ];
+  const commands = ["install", "exit"];
+  const checkboxes = [["token-optimizer"], ["codex"]];
+  const selections = ["apply"];
 
   const interactiveUi = createInquirerInteractiveUi({
-    prompt: async (questions) => {
-      askedMessages.push(...(questions || []).map((question) => String(question?.message || "")));
-      const next = prompts.shift();
-      if (!next) throw new Error("Prompt queue exhausted");
-      return next;
+    promptFns: {
+      search: async (config) => {
+        askedMessages.push(String(config?.message || ""));
+        const next = commands.shift();
+        if (!next) throw new Error("Command prompt queue exhausted");
+        return next;
+      },
+      checkbox: async (config) => {
+        askedMessages.push(String(config?.message || ""));
+        const next = checkboxes.shift();
+        if (!next) throw new Error("Checkbox prompt queue exhausted");
+        return next;
+      },
+      select: async (config) => {
+        askedMessages.push(String(config?.message || ""));
+        const next = selections.shift();
+        if (!next) throw new Error("Select prompt queue exhausted");
+        return next;
+      }
     },
     write: (value) => writes.push(String(value))
   });

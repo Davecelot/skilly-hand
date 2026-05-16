@@ -1,4 +1,9 @@
-import inquirer from "inquirer";
+import {
+  checkbox as checkboxPrompt,
+  confirm as confirmPrompt,
+  search as searchPrompt,
+  select as selectPrompt
+} from "@inquirer/prompts";
 import { filterCommands, getInteractiveCommands } from "./command-registry.js";
 
 function writeBlock(write, title, body) {
@@ -74,21 +79,25 @@ const COMMAND_HINTS = {
   uninstall: "Tip: run `npx skilly-hand install` anytime to restore managed files."
 };
 
+const DEFAULT_PROMPT_FNS = {
+  checkbox: checkboxPrompt,
+  confirm: confirmPrompt,
+  search: searchPrompt,
+  select: selectPrompt
+};
+
 export function createInquirerInteractiveUi({
-  prompt = (questions) => inquirer.prompt(questions),
+  promptFns = {},
   write = (value) => process.stdout.write(value)
 } = {}) {
+  const prompts = { ...DEFAULT_PROMPT_FNS, ...promptFns };
+
   async function confirm({ message, defaultValue = false }) {
     try {
-      const response = await prompt([
-        {
-          type: "confirm",
-          name: "confirmed",
-          message: String(message),
-          default: defaultValue
-        }
-      ]);
-      return Boolean(response.confirmed);
+      return Boolean(await prompts.confirm({
+        message: String(message),
+        default: defaultValue
+      }));
     } catch (error) {
       if (error?.name === "ExitPromptError") return false;
       throw error;
@@ -100,21 +109,17 @@ export function createInquirerInteractiveUi({
     writeBlock(write, "Guided Home", buildGuidedHomeIntro());
 
     while (true) {
-      const { command } = await prompt([
-        {
-          type: "search",
-          name: "command",
-          message: `${header}: choose a command`,
-          source: async (term) =>
-            filterCommands(commands, term).map((item) => ({
-              name: commandChoiceName(item),
-              value: item.value,
-              description: `${item.bestFor} | aliases: ${(item.aliases || []).join(", ") || "none"}`
-            })),
-          default: "install",
-          pageSize: 10
-        }
-      ]);
+      const command = await prompts.search({
+        message: `${header}: choose a command`,
+        source: async (term) =>
+          filterCommands(commands, term).map((item) => ({
+            name: commandChoiceName(item),
+            value: item.value,
+            description: `${item.bestFor} | aliases: ${(item.aliases || []).join(", ") || "none"}`
+          })),
+        default: "install",
+        pageSize: 10
+      });
 
       if (command === "exit") return;
       if (command === "command-guide") {
@@ -129,27 +134,19 @@ export function createInquirerInteractiveUi({
 
         writeBlock(write, "Install Tips", installTipsBlock());
 
-        const { selectedSkillIds } = await prompt([
-          {
-            type: "checkbox",
-            name: "selectedSkillIds",
-            message: "Select skills to install",
-            choices: skillChoices,
-            pageSize: 16
-          }
-        ]);
+        const selectedSkillIds = await prompts.checkbox({
+          message: "Select skills to install",
+          choices: skillChoices,
+          pageSize: 16
+        });
 
         writeBlock(write, "Assistant Target Tips", agentTipsBlock());
 
-        const { selectedAgents } = await prompt([
-          {
-            type: "checkbox",
-            name: "selectedAgents",
-            message: "Select assistant targets",
-            choices: agentChoices,
-            pageSize: 12
-          }
-        ]);
+        const selectedAgents = await prompts.checkbox({
+          message: "Select assistant targets",
+          choices: agentChoices,
+          pageSize: 12
+        });
 
         const previewBundle = await actions.previewInstallBundle({
           selectedSkillIds,
@@ -157,17 +154,13 @@ export function createInquirerInteractiveUi({
         });
         writeBlock(write, "Install Preview", previewBundle?.text || "");
 
-        const { installDecision } = await prompt([
-          {
-            type: "list",
-            name: "installDecision",
-            message: "Next action (type 'apply' to install, or 'menu' to go back)",
-            choices: [
-              { name: "Apply installation", value: "apply" },
-              { name: "Back to command menu", value: "menu" }
-            ]
-          }
-        ]);
+        const installDecision = await prompts.select({
+          message: "Next action (type 'apply' to install, or 'menu' to go back)",
+          choices: [
+            { name: "Apply installation", value: "apply" },
+            { name: "Back to command menu", value: "menu" }
+          ]
+        });
 
         if (installDecision === "apply") {
           const applyBundle = await actions.applyInstallBundle({
