@@ -29,13 +29,14 @@ test("dry run returns install plan without writing files", async () => {
   const ids = result.plan.skills.map((skill) => skill.id);
 
   assert.equal(result.applied, false);
-  assert.equal(result.plan.skills.length, 15);
+  assert.equal(result.plan.skills.length, 16);
   assert.equal(result.plan.decisionsRegistry.relativePath, ".ai/DECISIONS.md");
   assert.equal(result.plan.decisionsRegistry.willCreate, true);
   await assert.rejects(access(path.join(projectDir, ".ai", "DECISIONS.md")), "expected dry run to avoid creating decisions registry");
   assert.deepEqual(ids, [
     "accessibility-audit",
     "agents-root-orchestrator",
+    "context-handoff",
     "forge-me-a-skill",
     "frontend-design",
     "gsap-animation",
@@ -123,8 +124,8 @@ test("dry run includes core skills even for no-stack projects", async () => {
   const ids = result.plan.skills.map((skill) => skill.id);
 
   assert.equal(result.applied, false);
-  assert.equal(result.plan.skills.length, 10);
-  assert.deepEqual(ids, ["agents-root-orchestrator", "forge-me-a-skill", "output-optimizer", "project-security", "project-teacher", "review-rangers", "roaster", "spec-driven-development", "test-driven-development", "token-optimizer"]);
+  assert.equal(result.plan.skills.length, 11);
+  assert.deepEqual(ids, ["agents-root-orchestrator", "context-handoff", "forge-me-a-skill", "output-optimizer", "project-security", "project-teacher", "review-rangers", "roaster", "spec-driven-development", "test-driven-development", "token-optimizer"]);
 });
 
 test("dry run includes angular-guidelines for angular projects", async () => {
@@ -137,6 +138,7 @@ test("dry run includes angular-guidelines for angular projects", async () => {
     "accessibility-audit",
     "agents-root-orchestrator",
     "angular-guidelines",
+    "context-handoff",
     "forge-me-a-skill",
     "frontend-design",
     "gsap-animation",

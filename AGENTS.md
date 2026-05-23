@@ -19,6 +19,7 @@
 | `accessibility-audit` | Audit web accessibility against W3C WCAG 2.2 Level AA using framework-agnostic checks, remediation patterns, and portable command-line scanning. | frontend, accessibility, workflow, quality |
 | `agents-root-orchestrator` | Author root AGENTS.md as a Where/What/When orchestrator that routes tasks and skill invocation clearly. | core, workflow, orchestration |
 | `angular-guidelines` | Guide Angular code generation, review, and performance tuning using latest stable Angular verification, official Angular skill guidance, and modern framework best practices. Trigger: generating, reviewing, refactoring, or optimizing Angular code artifacts in Angular projects. | angular, frontend, workflow, best-practices |
+| `context-handoff` | Capture compact, neutral, AI-ready Markdown handoffs that preserve session context across chats without becoming a full transcript or personal memory store. Trigger: summarizing, compacting, preserving, or handing off session context across chats. | core, workflow, memory, communication |
 | `figma-mcp-0to1` | Guide users from Figma MCP installation and authentication through first canvas creation, with function-level tool coverage and operational recovery patterns. | figma, mcp, workflow, design |
 | `forge-me-a-skill` | Create and standardize AI skills with reusable structure, metadata rules, and templates. | core, workflow, authoring |
 | `frontend-design` | Project-aware frontend design skill that detects the existing tech stack, UI libraries, CSS variables, and design tokens before proposing any UI work. Supports greenfield projects via DESIGN.md context setup, taste-reference extraction, post-generation critique, visual refinement, and Motion/GSAP-aware motion polish. | frontend, design, workflow, ui, motion, greenfield |
@@ -78,6 +79,7 @@ This gate is mandatory whenever the user proposes, requests, or evaluates a plan
 | Auditing, reviewing, or implementing web accessibility against WCAG 2.2 Level AA | `accessibility-audit` |
 | Creating or updating root AGENTS.md orchestration guidance | `agents-root-orchestrator` |
 | Generating, reviewing, refactoring, or optimizing Angular code artifacts in Angular projects | `angular-guidelines` |
+| Summarizing, compacting, preserving, or handing off session context across chats | `context-handoff` |
 | Installing, configuring, or using Figma MCP from setup through first canvas creation | `figma-mcp-0to1` |
 | Creating a new skill | `forge-me-a-skill` |
 | Designing or generating UI components, pages, or layouts in a web or mobile project; setting up visual direction for a greenfield project; critiquing generated UI for AI slop; adding motion or micro-interactions to existing UI; refining or polishing generated UI output | `frontend-design` |

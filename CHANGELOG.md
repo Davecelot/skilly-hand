@@ -5,7 +5,7 @@ All notable changes to this project are documented in this file.
 ## [Unreleased]
 
 ### Added
-- _None._
+- Added `context-handoff` for compact, privacy-aware session handoffs across agent chats.
 
 ### Changed
 - _None._
