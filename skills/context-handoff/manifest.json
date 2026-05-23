@@ -1,0 +1,33 @@
+{
+  "id": "context-handoff",
+  "title": "Context Handoff",
+  "description": "Capture compact, neutral, AI-ready Markdown handoffs that preserve session context across chats without becoming a full transcript or personal memory store. Trigger: summarizing, compacting, preserving, or handing off session context across chats.",
+  "portable": true,
+  "tags": ["core", "workflow", "memory", "communication"],
+  "detectors": ["always"],
+  "detectionTriggers": ["always"],
+  "installsFor": ["all"],
+  "agentSupport": ["codex", "claude", "cursor", "gemini", "copilot", "antigravity", "windsurf", "trae"],
+  "skillMetadata": {
+    "author": "skilly-hand",
+    "last-edit": "2026-05-23",
+    "license": "Apache-2.0",
+    "version": "1.0.0",
+    "changelog": "Added context-handoff skill for project-local session continuity; preserves compact verified context across chats without transcript bloat; affects catalog skill routing and handoff-writing workflows",
+    "auto-invoke": "Summarizing, compacting, preserving, or handing off session context across chats",
+    "allowed-tools": [
+      "Read",
+      "Edit",
+      "Write",
+      "Glob",
+      "Grep",
+      "Bash",
+      "Task"
+    ]
+  },
+  "files": [
+    { "path": "SKILL.md", "kind": "instruction" },
+    { "path": "assets/handoff-template.md", "kind": "asset" }
+  ],
+  "dependencies": []
+}
