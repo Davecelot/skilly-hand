@@ -5,6 +5,21 @@ All notable changes to this project are documented in this file.
 ## [Unreleased]
 
 ### Added
+- _None._
+
+### Changed
+- _None._
+
+### Fixed
+- _None._
+
+### Removed
+- _None._
+
+## [0.29.0] - 2026-05-23
+[View on npm](https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.29.0)
+
+### Added
 - Added `forge-me-a-skill` as the portable catalog workflow for creating and standardizing reusable skills.
 
 ### Changed
