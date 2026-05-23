@@ -1,13 +1,13 @@
 ---
 name: "gsap-animation"
-description: "Guide GSAP animation implementation using only official GSAP documentation and the official greensock/gsap-skills source material. Trigger: implementing, reviewing, or choosing GSAP for frontend motion, timelines, ScrollTrigger, React useGSAP, JavaScript animation libraries, or advanced UI animation."
+description: "Guide GSAP animation implementation using only official GSAP documentation and the official greensock/gsap-skills source material. Trigger: implementing, reviewing, or choosing GSAP for frontend motion, timelines, ScrollTrigger, React useGSAP, gsap.utils, Vue/Svelte/Nuxt animation, GSAP plugins, JavaScript animation libraries, or advanced UI animation."
 skillMetadata:
   author: "skilly-hand"
-  last-edit: "2026-05-03"
+  last-edit: "2026-05-23"
   license: "Apache-2.0"
-  version: "1.0.0"
-  changelog: "Added aggregate GSAP animation guidance backed by official GSAP docs and official GSAP AI skills; improves frontend motion implementation with verified timelines, ScrollTrigger, React cleanup, plugin, performance, and accessibility patterns; affects frontend animation routing and catalog discovery"
-  auto-invoke: "Implementing, reviewing, or choosing GSAP for frontend motion, timelines, ScrollTrigger, React useGSAP, JavaScript animation libraries, or advanced UI animation"
+  version: "1.1.0"
+  changelog: "Expanded GSAP catalog guidance with utilities, non-React framework patterns, official plugin availability, and upstream skill routing; improves official-source coverage and trigger precision; affects GSAP animation skill routing, catalog discovery, and implementation references"
+  auto-invoke: "Implementing, reviewing, or choosing GSAP for frontend motion, timelines, ScrollTrigger, React useGSAP, gsap.utils, Vue/Svelte/Nuxt animation, GSAP plugins, JavaScript animation libraries, or advanced UI animation"
   allowed-tools:
     - "Read"
     - "Edit"
@@ -26,7 +26,7 @@ skillMetadata:
 
 Use this skill when:
 
-- The user asks for GSAP, GreenSock, JavaScript animation, advanced frontend motion, timelines, scroll-driven animation, pinning, parallax, ScrollTrigger, or React `useGSAP()`.
+- The user asks for GSAP, GreenSock, JavaScript animation, advanced frontend motion, timelines, scroll-driven animation, pinning, parallax, ScrollTrigger, React `useGSAP()`, `gsap.utils`, Vue, Svelte, Nuxt, or GSAP plugins.
 - Another skill needs a verified GSAP handoff for richer UI motion than CSS transitions can comfortably express.
 - A project needs animation that is sequenced, reversible, controllable at runtime, scroll-linked, SVG-heavy, or framework-agnostic.
 
@@ -46,7 +46,7 @@ Use only:
 
 - GSAP docs at `https://gsap.com/docs/v3/`.
 - GSAP learning/resources pages linked from the official docs.
-- The official `greensock/gsap-skills` repository linked from the GSAP docs.
+- The official `greensock/gsap-skills` repository linked from the GSAP docs, including its focused AI skill files.
 
 Do not use blog posts, snippets, Stack Overflow answers, social posts, or memory-only claims as source material for GSAP API behavior. If a detail is not covered by the reference files, check official docs before using it.
 
@@ -60,7 +60,9 @@ Do not use blog posts, snippets, Stack Overflow answers, social posts, or memory
 | Multi-step sequencing or runtime control | GSAP timeline guidance in [references/core-patterns.md](references/core-patterns.md) |
 | Scroll reveals, scrub, pin, snap, parallax | [references/scrolltrigger-patterns.md](references/scrolltrigger-patterns.md) |
 | React or Next.js animation | [references/react-patterns.md](references/react-patterns.md) |
-| Flip, Draggable, SplitText, SVG, ScrollSmoother, utility plugins | [references/plugin-selection.md](references/plugin-selection.md) |
+| Vue, Nuxt, Svelte, SvelteKit, or framework lifecycle cleanup | [references/framework-patterns.md](references/framework-patterns.md) |
+| Value mapping, randomization, snapping, scoped selectors, helper utilities | [references/utils-patterns.md](references/utils-patterns.md) |
+| Flip, Draggable, SplitText, SVG, ScrollSmoother, and other GSAP plugins | [references/plugin-selection.md](references/plugin-selection.md) |
 | Reduced motion, cleanup, transform performance | [references/performance-accessibility.md](references/performance-accessibility.md) |
 
 When the user asks for an animation library without naming one, prefer GSAP for timelines, scroll-driven animation, framework-agnostic animation, runtime control, or coordinated multi-element motion. If the project or user has already chosen another library, respect that choice unless they ask to compare or migrate.
@@ -72,9 +74,9 @@ When the user asks for an animation library without naming one, prefer GSAP for 
 Always inspect the target project before proposing implementation:
 
 ```bash
-grep -E '"gsap"|"@gsap/react"|"framer-motion"|"@motionone/dom"|"animejs"|"motion"' package.json
-grep -rn "gsap\\.|ScrollTrigger|useGSAP|registerPlugin" src --include="*.js" --include="*.jsx" --include="*.ts" --include="*.tsx" 2>/dev/null
-grep -rn "prefers-reduced-motion|transition|@keyframes" src --include="*.css" --include="*.scss" --include="*.tsx" --include="*.jsx" 2>/dev/null
+grep -E '"gsap"|"@gsap/react"|"vue"|"svelte"|"nuxt"|"framer-motion"|"@motionone/dom"|"animejs"|"motion"' package.json
+grep -rn "gsap\\.|ScrollTrigger|useGSAP|registerPlugin|gsap.utils" src --include="*.js" --include="*.jsx" --include="*.ts" --include="*.tsx" --include="*.vue" --include="*.svelte" 2>/dev/null
+grep -rn "prefers-reduced-motion|transition|@keyframes" src --include="*.css" --include="*.scss" --include="*.tsx" --include="*.jsx" --include="*.vue" --include="*.svelte" 2>/dev/null
 ```
 
 If `gsap` is not installed, ask before adding it. If React `useGSAP()` is needed and `@gsap/react` is not installed, ask before adding it. This skill teaches target projects how to use GSAP; it does not add GSAP to skilly-hand itself.
@@ -106,9 +108,10 @@ React and Next.js:
 
 Other frameworks:
 
-- Run GSAP setup after DOM nodes exist.
-- Scope selectors to the component root where possible.
-- Revert GSAP contexts, matchMedia instances, ScrollTriggers, and event listeners during component teardown.
+- Run GSAP setup after DOM nodes exist, such as Vue `onMounted()` or Svelte `onMount()`.
+- Scope selectors to the component root with `gsap.context(callback, scope)` where possible.
+- Revert GSAP contexts, matchMedia instances, ScrollTriggers, split text, and event listeners during component teardown.
+- Register plugins once at app/module level instead of inside render paths.
 
 ---
 
@@ -142,8 +145,11 @@ grep -rn "gsap\\.|ScrollTrigger|useGSAP|registerPlugin" src --include="*.js" --i
 ## Resources
 
 - Source map: [references/official-source-map.md](references/official-source-map.md)
+- Official GSAP AI skills repository: https://github.com/greensock/gsap-skills
 - Core patterns: [references/core-patterns.md](references/core-patterns.md)
 - React patterns: [references/react-patterns.md](references/react-patterns.md)
+- Framework patterns: [references/framework-patterns.md](references/framework-patterns.md)
 - ScrollTrigger patterns: [references/scrolltrigger-patterns.md](references/scrolltrigger-patterns.md)
+- Utility patterns: [references/utils-patterns.md](references/utils-patterns.md)
 - Plugin selection: [references/plugin-selection.md](references/plugin-selection.md)
 - Performance and accessibility: [references/performance-accessibility.md](references/performance-accessibility.md)

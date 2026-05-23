@@ -53,5 +53,5 @@ Chaining notations document integrated workflows where multiple skills are seque
 ```text
 Updating root AGENTS.md guidance
   -> agents-root-orchestrator
-  -> skill-creator (if reusable workflow docs changed)
+  -> forge-me-a-skill (if reusable workflow docs changed)
 ```

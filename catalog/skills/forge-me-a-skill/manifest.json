@@ -1,6 +1,6 @@
 {
-  "id": "skill-creator",
-  "title": "Skill Creator",
+  "id": "forge-me-a-skill",
+  "title": "Forge Me A Skill",
   "description": "Create and standardize AI skills with reusable structure, metadata rules, and templates.",
   "portable": true,
   "tags": ["core", "workflow", "authoring"],

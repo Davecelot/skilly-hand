@@ -86,6 +86,7 @@ The catalog currently includes:
 - `agents-root-orchestrator`
 - `angular-guidelines`
 - `figma-mcp-0to1`
+- `forge-me-a-skill`
 - `frontend-design`
 - `gsap-animation`
 - `motion-animation`
@@ -96,7 +97,6 @@ The catalog currently includes:
 - `react-guidelines`
 - `review-rangers`
 - `roaster`
-- `skill-creator`
 - `spec-driven-development`
 - `test-driven-development`
 - `token-optimizer`

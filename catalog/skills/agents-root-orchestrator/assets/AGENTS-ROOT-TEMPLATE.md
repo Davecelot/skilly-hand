@@ -24,7 +24,7 @@
 | Task Type | Recommended Skill Chain |
 | --------- | ----------------------- |
 | Multi-step planning | `spec-driven-development` |
-| Creating/updating reusable skills | `skill-creator` |
+| Creating/updating reusable skills | `forge-me-a-skill` |
 | Root AGENTS orchestration updates | `agents-root-orchestrator` |
 
 ## When
@@ -50,7 +50,7 @@ Chaining notations document integrated workflows where multiple skills are seque
 ```text
 Updating root AGENTS orchestration guidance
   -> agents-root-orchestrator
-  -> skill-creator (if workflow guidance changes)
+  -> forge-me-a-skill (if workflow guidance changes)
 ```
 
 When to use: maintaining repository-level routing, trigger, and escalation guidance.
@@ -59,7 +59,7 @@ When to use: maintaining repository-level routing, trigger, and escalation guida
 
 ```text
 Asking for a new reusable skill
-  -> skill-creator
+  -> forge-me-a-skill
   -> spec-driven-development
   -> agents-root-orchestrator
 ```

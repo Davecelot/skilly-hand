@@ -1,5 +1,5 @@
 ---
-name: "skill-creator"
+name: "forge-me-a-skill"
 description: "Create and standardize AI skills with reusable structure, metadata rules, and templates."
 skillMetadata:
   author: "skilly-hand"
@@ -20,7 +20,7 @@ skillMetadata:
     - "Task"
     - "SubAgent"
 ---
-# Skill Creator Guide
+# Forge Me A Skill Guide
 
 ## When to Create a Skill
 
@@ -52,6 +52,8 @@ skills/{skill-name}/
 │   │   └── SKILL.md
 │   └── agent2/
 │       └── SKILL.md
+├── scripts/              # Optional - executable helpers for repeatable tasks
+│   └── helper.sh
 └── references/           # Optional - links to local docs
     └── docs.md
 ```
@@ -65,16 +67,17 @@ skills/{skill-name}/
 | Generic skill | `{technology}` | `pytest`, `playwright`, `typescript` |
 | `{product-name}`-specific | `{product-name}-{purpose}` | `{product-name}-best-practices`, `{product-name}-code-connect`, `{product-name}-a11y-checker` |
 | `{product-name}` testing | `{product-name}-{function}-{target}` | `{product-name}-unit-test`, `{product-name}-token-audit` |
-| Workflow skill | `{action}-{target}` | `skill-creator`, `commit-writer`, `pr-writer` |
+| Workflow skill | `{action}-{target}` | `forge-me-a-skill`, `commit-writer`, `pr-writer` |
 
 ---
 
-## Decision: assets/ vs references/ vs agents/
+## Decision: assets/ vs scripts/ vs references/ vs agents/
 
 ```text
 Need code templates?        -> assets/
 Need JSON schemas?          -> assets/
 Need example configs?       -> assets/
+Need executable helpers?    -> scripts/
 Link to existing docs?      -> references/
 Link to external guides?    -> references/ (with local path)
 Skill needs sub-agents?     -> agents/

@@ -36,6 +36,7 @@ test("dry run returns install plan without writing files", async () => {
   assert.deepEqual(ids, [
     "accessibility-audit",
     "agents-root-orchestrator",
+    "forge-me-a-skill",
     "frontend-design",
     "gsap-animation",
     "motion-animation",
@@ -45,7 +46,6 @@ test("dry run returns install plan without writing files", async () => {
     "react-guidelines",
     "review-rangers",
     "roaster",
-    "skill-creator",
     "spec-driven-development",
     "test-driven-development",
     "token-optimizer"
@@ -124,7 +124,7 @@ test("dry run includes core skills even for no-stack projects", async () => {
 
   assert.equal(result.applied, false);
   assert.equal(result.plan.skills.length, 10);
-  assert.deepEqual(ids, ["agents-root-orchestrator", "output-optimizer", "project-security", "project-teacher", "review-rangers", "roaster", "skill-creator", "spec-driven-development", "test-driven-development", "token-optimizer"]);
+  assert.deepEqual(ids, ["agents-root-orchestrator", "forge-me-a-skill", "output-optimizer", "project-security", "project-teacher", "review-rangers", "roaster", "spec-driven-development", "test-driven-development", "token-optimizer"]);
 });
 
 test("dry run includes angular-guidelines for angular projects", async () => {
@@ -137,6 +137,7 @@ test("dry run includes angular-guidelines for angular projects", async () => {
     "accessibility-audit",
     "agents-root-orchestrator",
     "angular-guidelines",
+    "forge-me-a-skill",
     "frontend-design",
     "gsap-animation",
     "motion-animation",
@@ -145,7 +146,6 @@ test("dry run includes angular-guidelines for angular projects", async () => {
     "project-teacher",
     "review-rangers",
     "roaster",
-    "skill-creator",
     "spec-driven-development",
     "test-driven-development",
     "token-optimizer"
@@ -200,7 +200,7 @@ test("install creates managed files, symlinks, and restores originals on uninsta
 
   const doctorResult = await runDoctor(projectDir);
   assert.equal(doctorResult.installed, true);
-  assert.equal(doctorResult.lock.skills.includes("skill-creator"), true);
+  assert.equal(doctorResult.lock.skills.includes("forge-me-a-skill"), true);
   assert.equal(doctorResult.lock.skills.includes("spec-driven-development"), true);
   assert.equal(doctorResult.lock.skills.includes("agents-root-orchestrator"), true);
 

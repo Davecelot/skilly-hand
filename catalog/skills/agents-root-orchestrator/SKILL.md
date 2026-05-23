@@ -112,7 +112,7 @@ Are trigger conditions currently implicit or ambiguous?
 | Action | Skill |
 | ------ | ----- |
 | Planning multi-step feature work | `spec-driven-development` |
-| Creating new reusable skill instructions | `skill-creator` |
+| Creating new reusable skill instructions | `forge-me-a-skill` |
 | Updating root AGENTS orchestration map | `agents-root-orchestrator` |
 ```
 
@@ -127,7 +127,7 @@ Chaining notations document integrated workflows where multiple skills are seque
 
 ```text
 Asking for a new skill
-  -> skill-creator
+  -> forge-me-a-skill
   -> spec-driven-development
   -> agents-root-orchestrator
 ```
@@ -151,5 +151,5 @@ npx skilly-hand install --dry-run
 
 - Template: [assets/AGENTS-ROOT-TEMPLATE.md](assets/AGENTS-ROOT-TEMPLATE.md)
 - Companion skills:
-  - [../skill-creator/SKILL.md](../skill-creator/SKILL.md)
+  - [../forge-me-a-skill/SKILL.md](../forge-me-a-skill/SKILL.md)
   - [../spec-driven-development/SKILL.md](../spec-driven-development/SKILL.md)

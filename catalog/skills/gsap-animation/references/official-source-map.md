@@ -1,6 +1,6 @@
 # Official GSAP Source Map
 
-Extracted: 2026-05-03
+Extracted: 2026-05-23
 
 This skill may only use official GSAP sources. The official GSAP docs page links the official `greensock/gsap-skills` repository as "AI Skills", so that repository is accepted as source material for agent-oriented guidance.
 
@@ -22,9 +22,14 @@ This skill may only use official GSAP sources. The official GSAP docs page links
 | Source | Use |
 | --- | --- |
 | https://raw.githubusercontent.com/greensock/gsap-skills/main/skills/gsap-core/SKILL.md | Agent-oriented core tween, transform, easing, `matchMedia()`, and recommendation guidance |
+| https://raw.githubusercontent.com/greensock/gsap-skills/main/skills/gsap-timeline/SKILL.md | Agent-oriented timeline sequencing, position parameters, labels, nesting, playback, and ScrollTrigger placement guidance |
+| https://raw.githubusercontent.com/greensock/gsap-skills/main/skills/gsap-plugins/SKILL.md | Agent-oriented plugin selection, registration, install/licensing, SplitText, MorphSVG, DrawSVG, Draggable, Flip, and related plugin guidance |
+| https://raw.githubusercontent.com/greensock/gsap-skills/main/skills/gsap-utils/SKILL.md | Agent-oriented `gsap.utils` guidance for mapping, clamping, snapping, randomization, selectors, arrays, wrapping, and piping |
 | https://raw.githubusercontent.com/greensock/gsap-skills/main/skills/gsap-react/SKILL.md | Agent-oriented React, `useGSAP()`, context, cleanup, SSR, and callback guidance |
 | https://raw.githubusercontent.com/greensock/gsap-skills/main/skills/gsap-scrolltrigger/SKILL.md | Agent-oriented ScrollTrigger registration, scroll-linked animation, pin, scrub, and cleanup guidance |
 | https://raw.githubusercontent.com/greensock/gsap-skills/main/skills/gsap-performance/SKILL.md | Agent-oriented transform/performance cautions |
+| https://raw.githubusercontent.com/greensock/gsap-skills/main/skills/gsap-frameworks/SKILL.md | Agent-oriented Vue, Nuxt, Svelte, SvelteKit, lifecycle, scoping, and cleanup guidance |
+| https://raw.githubusercontent.com/greensock/gsap-skills/main/skills/llms.txt | Official AI agent skill index, trigger terms, plugin availability note, and upstream routing map |
 
 ## Verification Rule
 

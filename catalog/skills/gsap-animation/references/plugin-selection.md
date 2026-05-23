@@ -1,6 +1,6 @@
 # GSAP Plugin Selection
 
-Extracted: 2026-05-03
+Extracted: 2026-05-23
 
 Sources:
 
@@ -14,6 +14,8 @@ Sources:
 Use the smallest GSAP surface that solves the motion problem. Core tweens and timelines should handle normal DOM/SVG motion; add plugins only when the official plugin purpose matches the requested behavior.
 
 Register every plugin used with `gsap.registerPlugin(...)`. Official installation guidance recommends registration in module environments so build tools do not drop plugins during tree shaking.
+
+All GSAP plugins are available from the public `gsap` package, including formerly Club GSAP plugins such as `SplitText`, `MorphSVGPlugin`, and `DrawSVGPlugin`. Do not suggest a private GreenSock registry, `.npmrc` auth token, license key, or paid Club GSAP membership for plugin access.
 
 ## Selection Matrix
 

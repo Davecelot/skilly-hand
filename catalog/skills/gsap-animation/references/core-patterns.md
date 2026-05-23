@@ -1,6 +1,6 @@
 # GSAP Core Patterns
 
-Extracted: 2026-05-03
+Extracted: 2026-05-23
 
 Sources:
 
@@ -47,6 +47,26 @@ Store the returned tween when playback must be controlled later.
 Use timelines for sequences, overlap, labels, modular choreography, or playback control. Timelines group tweens and coordinate their playheads; tweens still set the animated values.
 
 Prefer a timeline over stacking multiple `delay` values. Use the position parameter for offsets and overlaps, and labels when named positions make later control easier.
+
+Use timeline defaults when child tweens share duration, ease, or other common vars:
+
+```js
+const tl = gsap.timeline({ defaults: { duration: 0.5, ease: "power2.out" } });
+tl.to(".a", { x: 100 })
+  .to(".b", { y: 50 }, "<0.15");
+```
+
+Common position parameters:
+
+- `0`: absolute start time.
+- `"+=0.5"` or `"-=0.2"`: relative offset from the previous insertion point.
+- `"<"`: start with the most recently added animation.
+- `">"`: start after the most recently added animation.
+- `"label"` or `"label+=0.2"`: start at or near a named label.
+
+Use playback methods such as `play()`, `pause()`, `reverse()`, `restart()`, `time()`, and `progress()` only when runtime control is required.
+
+When using ScrollTrigger with a sequence, attach ScrollTrigger to the top-level tween or timeline rather than nested child tweens.
 
 ## Properties and Values
 

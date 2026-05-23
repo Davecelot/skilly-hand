@@ -5,16 +5,16 @@ All notable changes to this project are documented in this file.
 ## [Unreleased]
 
 ### Added
-- _None._
+- Added `forge-me-a-skill` as the portable catalog workflow for creating and standardizing reusable skills.
 
 ### Changed
-- _None._
+- Expanded `gsap-animation` guidance with utilities, Vue/Svelte/Nuxt framework patterns, and official GSAP plugin coverage.
 
 ### Fixed
 - _None._
 
 ### Removed
-- _None._
+- Removed the old `skill-creator` catalog ID in favor of `forge-me-a-skill`.
 
 ## [0.28.0] - 2026-05-16
 [View on npm](https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.28.0)

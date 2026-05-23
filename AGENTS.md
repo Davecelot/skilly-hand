@@ -20,8 +20,9 @@
 | `agents-root-orchestrator` | Author root AGENTS.md as a Where/What/When orchestrator that routes tasks and skill invocation clearly. | core, workflow, orchestration |
 | `angular-guidelines` | Guide Angular code generation, review, and performance tuning using latest stable Angular verification, official Angular skill guidance, and modern framework best practices. Trigger: generating, reviewing, refactoring, or optimizing Angular code artifacts in Angular projects. | angular, frontend, workflow, best-practices |
 | `figma-mcp-0to1` | Guide users from Figma MCP installation and authentication through first canvas creation, with function-level tool coverage and operational recovery patterns. | figma, mcp, workflow, design |
+| `forge-me-a-skill` | Create and standardize AI skills with reusable structure, metadata rules, and templates. | core, workflow, authoring |
 | `frontend-design` | Project-aware frontend design skill that detects the existing tech stack, UI libraries, CSS variables, and design tokens before proposing any UI work. Supports greenfield projects via DESIGN.md context setup, taste-reference extraction, post-generation critique, visual refinement, and Motion/GSAP-aware motion polish. | frontend, design, workflow, ui, motion, greenfield |
-| `gsap-animation` | Guide GSAP animation implementation using only official GSAP documentation and the official greensock/gsap-skills source material. Trigger: implementing, reviewing, or choosing GSAP for frontend motion, timelines, ScrollTrigger, React useGSAP, JavaScript animation libraries, or advanced UI animation. | frontend, animation, motion, gsap, workflow |
+| `gsap-animation` | Guide GSAP animation implementation using only official GSAP documentation and the official greensock/gsap-skills source material. Trigger: implementing, reviewing, or choosing GSAP for frontend motion, timelines, ScrollTrigger, React useGSAP, gsap.utils, Vue/Svelte/Nuxt animation, GSAP plugins, JavaScript animation libraries, or advanced UI animation. | frontend, animation, motion, gsap, workflow |
 | `motion-animation` | Guide Motion, formerly Framer Motion, animation implementation using only official Motion documentation. Trigger: implementing, reviewing, or choosing Motion for JavaScript animation, React motion components, gestures, scroll animation, layout animation, exit animation, or framework-agnostic UI motion. | frontend, animation, motion, framer-motion, workflow |
 | `output-optimizer` | Optimize output token consumption through compact interpreter modes with controlled expansion when complexity, ambiguity, or risk requires more detail. Trigger: minimizing response verbosity while preserving clarity and correctness. | core, workflow, efficiency, communication |
 | `project-security` | Scan project configuration and release surfaces for leak and security risks, and enforce security gates on commit, push, and publish workflows across GitHub, GitLab, npm, pnpm, yarn, and generic CI. Trigger: validating repository security posture, preventing secret leaks, or hardening delivery pipelines. | security, workflow, quality, core |
@@ -30,7 +31,6 @@
 | `react-guidelines` | Guide React and Next.js code generation, review, and performance tuning using latest stable React verification and modern framework best practices. Trigger: generating, reviewing, refactoring, or optimizing React code artifacts in React projects. | react, frontend, workflow, best-practices |
 | `review-rangers` | Review code, decisions, and artifacts through a multi-perspective committee and a domain expert safety guard, then synthesize a structured verdict. | core, workflow, review, quality |
 | `roaster` | Challenge plans with constructive roast-style critique that exposes weak assumptions, missing angles, shallow sequencing, and unclear success criteria. Trigger: when the user proposes, requests, or evaluates a plan of any kind. | core, workflow, planning, quality |
-| `skill-creator` | Create and standardize AI skills with reusable structure, metadata rules, and templates. | core, workflow, authoring |
 | `spec-driven-development` | Plan, execute, and verify multi-step work through versioned specs with small, testable tasks. | core, workflow, planning |
 | `test-driven-development` | Guide implementation using the RED → GREEN → REFACTOR TDD cycle: write a failing test first, write the minimum code to pass, then refactor while tests stay green. | testing, workflow, quality, core |
 | `token-optimizer` | Classify task complexity and right-size reasoning depth, context gathering, and response detail to reduce wasted tokens. | core, workflow, efficiency |
@@ -66,7 +66,7 @@ This gate is mandatory whenever the user proposes, requests, or evaluates a plan
 | --------- | ----------------------- |
 | Planning feature work, bug fixes, and multi-phase implementation | `spec-driven-development` |
 | Executing approved implementation plans | `spec-driven-development` -> task-specific skills |
-| Creating or updating reusable skills | `skill-creator` |
+| Creating or updating reusable skills | `forge-me-a-skill` |
 | Creating or updating root AGENTS orchestration guidance | `agents-root-orchestrator` |
 
 ## When
@@ -79,8 +79,9 @@ This gate is mandatory whenever the user proposes, requests, or evaluates a plan
 | Creating or updating root AGENTS.md orchestration guidance | `agents-root-orchestrator` |
 | Generating, reviewing, refactoring, or optimizing Angular code artifacts in Angular projects | `angular-guidelines` |
 | Installing, configuring, or using Figma MCP from setup through first canvas creation | `figma-mcp-0to1` |
+| Creating a new skill | `forge-me-a-skill` |
 | Designing or generating UI components, pages, or layouts in a web or mobile project; setting up visual direction for a greenfield project; critiquing generated UI for AI slop; adding motion or micro-interactions to existing UI; refining or polishing generated UI output | `frontend-design` |
-| Implementing, reviewing, or choosing GSAP for frontend motion, timelines, ScrollTrigger, React useGSAP, JavaScript animation libraries, or advanced UI animation | `gsap-animation` |
+| Implementing, reviewing, or choosing GSAP for frontend motion, timelines, ScrollTrigger, React useGSAP, gsap.utils, Vue/Svelte/Nuxt animation, GSAP plugins, JavaScript animation libraries, or advanced UI animation | `gsap-animation` |
 | Implementing, reviewing, or choosing Motion for JavaScript animation, React motion components, gestures, scroll animation, layout animation, exit animation, or framework-agnostic UI motion | `motion-animation` |
 | When minimizing output verbosity or selecting compact communication modes | `output-optimizer` |
 | Scanning project configuration and delivery workflows for leaks or security issues before commit, push, or publish | `project-security` |
@@ -89,7 +90,6 @@ This gate is mandatory whenever the user proposes, requests, or evaluates a plan
 | Generating, reviewing, refactoring, or optimizing React code artifacts in React projects | `react-guidelines` |
 | Reviewing code, decisions, or artifacts where adversarial multi-perspective evaluation adds value | `review-rangers` |
 | When the user proposes, requests, or evaluates a plan of any kind | `roaster` |
-| Creating a new skill | `skill-creator` |
 | Planning or executing feature work, bug fixes, and multi-phase implementation | `spec-driven-development` |
 | Implementing features, services, or components using test-driven development (TDD) or RED→GREEN→REFACTOR cycles | `test-driven-development` |
 | Classifying task complexity and choosing reasoning depth/token budget | `token-optimizer` |
@@ -111,14 +111,14 @@ Chaining notations document integrated workflows where multiple skills are seque
 ```text
 Updating root AGENTS.md guidance
   -> agents-root-orchestrator
-  -> skill-creator (if reusable workflow docs changed)
+  -> forge-me-a-skill (if reusable workflow docs changed)
 ```
 
 ### Skill Introduction Workflow
 
 ```text
 Asking for a new reusable skill
-  -> skill-creator
+  -> forge-me-a-skill
   -> spec-driven-development
   -> agents-root-orchestrator
 ```
