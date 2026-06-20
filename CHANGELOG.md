@@ -8,7 +8,7 @@ All notable changes to this project are documented in this file.
 - _None._
 
 ### Changed
-- _None._
+- Synchronized `figma-mcp-0to1` with the current official Figma MCP tools, Figma Slides workflows, asset transfer, Code Connect context, supported clients, permissions, and rate limits.
 
 ### Fixed
 - _None._

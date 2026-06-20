@@ -90,10 +90,6 @@ claude mcp list
 /add-plugin figma
 ```
 
-## Gemini CLI
-
-Use the Figma MCP catalog/client instructions for the Gemini CLI extension. Figma currently lists Gemini CLI as a supported client for remote and desktop setup.
-
 ## Cursor MCP config (desktop)
 
 ```json
@@ -120,7 +116,6 @@ Use the Figma MCP catalog/client instructions for the Gemini CLI extension. Figm
 
 ## Agent Coverage Notes
 
-- Figma-supported and skilly-hand-supported: `codex`, `claude`, `cursor`, `copilot`.
-- Figma-supported and skilly-hand-supported via client docs/catalog: `gemini`.
-- Figma-supported but not skilly-hand-native: Amazon Q, Android Studio, VS Code, Warp, Augment, Factory, Firebender, Kiro, OpenHands, Replit.
-- skilly-hand-supported but not source-backed in current Figma docs: `antigravity`, `windsurf`, `trae`.
+- Figma-documented and skilly-hand-supported: `codex`, `claude`, `cursor`, `copilot`.
+- Figma-documented but not skilly-hand-native: VS Code, Xcode, Claude Desktop, Warp, Augment, Factory, Firebender.
+- skilly-hand-supported but not source-backed in current Figma docs: `gemini`, `antigravity`, `windsurf`, `trae`.

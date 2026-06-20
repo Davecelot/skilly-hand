@@ -3,10 +3,10 @@ name: "figma-mcp-0to1"
 description: "Guide users from Figma MCP installation and authentication through first canvas creation, with function-level tool coverage and operational recovery patterns."
 skillMetadata:
   author: "skilly-hand"
-  last-edit: "2026-05-09"
+  last-edit: "2026-06-20"
   license: "Apache-2.0"
-  version: "1.0.3"
-  changelog: "Updated Figma MCP guidance for current remote-first docs, supported-client coverage, Figma-provided skills, FigJam write workflows, code-to-canvas support, and access/rate-limit language; affects setup routing, tool selection, prompt assets, and official matrix"
+  version: "1.1.0"
+  changelog: "Synced the official Figma MCP surface for asset transfer, Code Connect context, library discovery, Figma Slides, current Figma-provided skills, and per-minute limits; affects tool routing, canvas workflows, prompts, troubleshooting, and the official matrix"
   auto-invoke: "Installing, configuring, or using Figma MCP from setup through first canvas creation"
   allowed-tools:
     - "Read"
@@ -73,7 +73,8 @@ Choose subskills by intent:
 - Use link-based node targeting for reliable design-context extraction.
 - Keep a clear distinction between read context tools and write/canvas tools.
 - For repeated team workflows, reuse prompts and config snippets from `assets/`, and prefer Figma-provided skills when they exist.
-- Use `figma-use` with `use_figma` for Figma Design writes and `figma-use-figjam` for FigJam writes when those skills are available.
+- Pair `use_figma` with the editor-specific skill: `figma-use` for Design, `figma-use-figjam` for FigJam, or `figma-use-slides` for Slides.
+- Use `download_assets` and `upload_assets` when the task requires asset delivery, non-PNG exports, original images, or cross-file image transfer.
 
 ---
 
@@ -83,9 +84,9 @@ Figma MCP support and skilly-hand installation support are related but not ident
 
 | Coverage | Agents or Clients | Guidance |
 | --- | --- | --- |
-| Figma-supported and skilly-hand-supported | `codex`, `claude`, `cursor`, `copilot`, `gemini` | Include concrete setup paths when Figma publishes them; otherwise point to client docs/catalog. |
-| Figma-supported but not skilly-hand-native | Amazon Q, Android Studio, VS Code, Warp, Augment, Factory, Firebender, Kiro, OpenHands, Replit | Mention as Figma-supported clients, but do not add skilly-hand install assumptions. |
-| skilly-hand-supported but not source-backed in current Figma docs | `antigravity`, `windsurf`, `trae` | Keep broad `agentSupport`; document that Figma-specific setup may require client documentation or manual MCP config. |
+| Figma-documented and skilly-hand-supported | `codex`, `claude`, `cursor`, `copilot` | Use concrete setup paths where published; Copilot support is currently documented for Copilot CLI write-to-canvas. |
+| Figma-documented but not skilly-hand-native | VS Code, Xcode, Claude Desktop, Warp, Augment, Factory, Firebender | Mention only for the workflows where Figma lists them; do not add skilly-hand install assumptions. |
+| skilly-hand-supported but not source-backed in current Figma docs | `gemini`, `antigravity`, `windsurf`, `trae` | Keep broad `agentSupport`; require verification in the Figma MCP Catalog or client documentation before setup. |
 
 ## Figma-Provided Skills
 
@@ -95,10 +96,11 @@ Prefer Figma-provided skills for workflows they cover:
 | --- | --- |
 | `figma-use` | Foundational Figma Design write-to-canvas workflow for frames, components, variables, styles, and auto layout. |
 | `figma-use-figjam` | Foundational FigJam write workflow for boards, stickies, sections, connectors, shapes, tables, and code blocks. |
-| `figma-create-new-file` | Create blank Figma Design or FigJam files before writing. |
-| `figma-implement-design` | Generate production code from a Figma design URL. |
-| `figma-code-connect-components` | Map published Figma components to code implementations. |
-| `figma-create-design-system-rules` | Generate reusable code-generation rules for a project. |
+| `figma-use-slides` | Foundational Slides write workflow for decks, sections, themes, and speaker notes. |
+| `figma-swiftui` | Translate between Figma designs and SwiftUI in both directions. |
+| `figma-code-connect` | Map published Figma components to code implementations. |
+| `figma-create-new-file` | Create blank Design, FigJam, or Slides files before writing. |
+| `figma-generate-diagram` | Create editable FigJam diagrams from descriptions or source material. |
 | `figma-generate-library` | Example workflow for creating or syncing a Figma design-system library from code. |
 | `figma-generate-design` | Example workflow for building screens/views in Figma from code or a design-system-aware brief. |
 
@@ -132,9 +134,6 @@ claude mcp add --transport http figma-desktop http://127.0.0.1:3845/mcp
 
 # Cursor plugin setup
 /add-plugin figma
-
-# Gemini CLI
-# Follow the Figma MCP catalog/client instructions for the Gemini CLI extension.
 
 # Verify catalog integrity in this repository
 npm run catalog:check

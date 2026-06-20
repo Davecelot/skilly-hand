@@ -33,7 +33,7 @@ Failure observed?
 1. Validate Figma URL format and node id.
 2. Run `whoami` to verify authenticated account.
 3. Confirm authenticated user belongs to correct plan and has file access.
-4. For write-to-canvas, confirm the user has edit access; Dev seats are read-only outside drafts.
+4. For `use_figma`, confirm the user has a Full seat and edit access; current write-to-canvas docs describe Dev seats as read-only.
 
 ### Rate limiting
 
@@ -42,7 +42,8 @@ Failure observed?
 - Dev/Full seats on Professional or Organization plans have higher daily usage.
 - Enterprise Dev/Full seats have the highest documented daily usage.
 - Officially documented exempt tools include `add_code_connect_map`, `generate_figma_design`, and `whoami`.
-- `use_figma` write tools may be documented outside standard read limits, but still require correct seat and edit permissions.
+- Professional Dev/Full seats allow up to 10 read calls per minute, Organization 15, and Enterprise 20.
+- Write tools are exempt from read rate limits, but still require correct seat and edit permissions.
 - Use smaller selections and fewer repeated reads.
 - Prefer `get_metadata` preflight before broad `get_design_context`.
 - Batch intent into fewer, targeted calls.
@@ -50,7 +51,7 @@ Failure observed?
 ### Missing expected tools
 
 - Official Figma MCP tools may not be exposed by every client plugin surface.
-- Client-specific helpers, such as Codex `get_libraries`, are not official substitutes for every client.
+- Official tools may still be absent from a particular client surface; verify the active tool list before choosing a fallback.
 - Prefer a documented fallback rather than forcing an unavailable tool.
 
 ### Write step errors
@@ -58,7 +59,9 @@ Failure observed?
 - Do not immediately retry the exact same large request.
 - Split into smaller write actions.
 - Verify partial outcomes using read tools before next step.
-- For `create_new_file`, ensure a plan/team context is available.
+- For `create_new_file`, handle the team or organization choice when the account belongs to multiple plans.
+- For Slides writes, use `figma-use-slides` rather than Design or FigJam assumptions.
+- `use_figma` currently has no image/video asset support; use `upload_assets` for supported image uploads instead.
 - For `generate_diagram`, do not pre-create a blank FigJam file unless adding to an existing file is the explicit goal.
 - For FigJam writes, use `figma-use-figjam` guidance where available instead of generic Figma Design assumptions.
 
@@ -66,6 +69,7 @@ Failure observed?
 
 - Figma-hosted image URLs returned by MCP can expire.
 - Refresh the design context to get new URLs, or download/save assets into the project and reference local files for durable implementation.
+- URLs returned by `download_assets` are also temporary; fetch them promptly before delivery or `upload_assets` transfer.
 
 ## Scoped Retry Pattern
 

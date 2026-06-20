@@ -10,10 +10,10 @@
   "agentSupport": ["codex", "claude", "cursor", "gemini", "copilot", "antigravity", "windsurf", "trae"],
   "skillMetadata": {
     "author": "skilly-hand",
-    "last-edit": "2026-05-09",
+    "last-edit": "2026-06-20",
     "license": "Apache-2.0",
-    "version": "1.0.3",
-    "changelog": "Updated Figma MCP guidance for current remote-first docs, supported-client coverage, Figma-provided skills, FigJam write workflows, code-to-canvas support, and access/rate-limit language; affects setup routing, tool selection, prompt assets, and official matrix",
+    "version": "1.1.0",
+    "changelog": "Synced the official Figma MCP surface for asset transfer, Code Connect context, library discovery, Figma Slides, current Figma-provided skills, and per-minute limits; affects tool routing, canvas workflows, prompts, troubleshooting, and the official matrix",
     "auto-invoke": "Installing, configuring, or using Figma MCP from setup through first canvas creation",
     "allowed-modes": [
       "install-auth",
