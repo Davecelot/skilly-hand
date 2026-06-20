@@ -9,6 +9,7 @@ const Dithering = lazy(() =>
 );
 
 const appBasePath = normalizeBasePath(import.meta.env.BASE_URL);
+const themeStorageKey = "skilly-hand-theme";
 
 const siteNavLinks = [
   ["Release", "#release", 60],
@@ -130,6 +131,28 @@ function useReducedMotion() {
   }, []);
 
   return shouldReduceMotion;
+}
+
+function getInitialTheme() {
+  const documentTheme = document.documentElement.dataset.theme;
+  return documentTheme === "light" ? "light" : "dark";
+}
+
+function useTheme() {
+  const [theme, setTheme] = useState(getInitialTheme);
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    document.documentElement.style.colorScheme = theme;
+
+    try {
+      window.localStorage.setItem(themeStorageKey, theme);
+    } catch {
+      // Theme switching remains available when browser storage is blocked.
+    }
+  }, [theme]);
+
+  return [theme, setTheme];
 }
 
 function useReveal({ threshold = 0.22, rootMargin = "0px 0px -8% 0px" } = {}) {
@@ -274,7 +297,30 @@ function CopyCommand({ command, label }) {
   );
 }
 
-function SiteNavbar({ onSectionLinkClick, useReveal = false }) {
+function ThemeToggle({ theme, onThemeChange }) {
+  const isLight = theme === "light";
+  const nextTheme = isLight ? "dark" : "light";
+
+  return (
+    <label className="toggle-container" title={`Switch to ${nextTheme} mode`}>
+      <span className="visually-hidden">{`Switch to ${nextTheme} mode`}</span>
+      <input
+        type="checkbox"
+        checked={isLight}
+        onChange={(event) => onThemeChange(event.target.checked ? "light" : "dark")}
+      />
+      <span className="toggle-handle" aria-hidden="true">
+        <span className="toggle-knob" />
+        <span className="toggle-bar" />
+      </span>
+      <span className="toggle-base" aria-hidden="true">
+        <span className="toggle-base-inside" />
+      </span>
+    </label>
+  );
+}
+
+function SiteNavbar({ onSectionLinkClick, onThemeChange, theme, useReveal = false }) {
   const LinkComponent = useReveal ? Reveal : "a";
   const linkProps = useReveal ? { as: "a" } : {};
 
@@ -288,7 +334,7 @@ function SiteNavbar({ onSectionLinkClick, useReveal = false }) {
       >
         skilly-hand
       </LinkComponent>
-      <div>
+      <div className="topbar-actions">
         {siteNavLinks.map(([label, hash, delay]) => (
           <LinkComponent
             {...linkProps}
@@ -300,6 +346,7 @@ function SiteNavbar({ onSectionLinkClick, useReveal = false }) {
             {label}
           </LinkComponent>
         ))}
+        <ThemeToggle theme={theme} onThemeChange={onThemeChange} />
       </div>
     </nav>
   );
@@ -550,7 +597,7 @@ function SkillDirectory({ filteredSkills, onDeepDive, query, onQueryChange }) {
   );
 }
 
-function SkillDetailPage({ skill, onNavigateHome }) {
+function SkillDetailPage({ skill, onNavigateHome, onThemeChange, theme }) {
   const metadataEntries = [
     ["Source", skill.sourcePath],
     ["Version", skill.metadata?.version],
@@ -563,7 +610,7 @@ function SkillDetailPage({ skill, onNavigateHome }) {
   return (
     <main className="skill-page">
       <div className="skill-page-inner">
-        <SiteNavbar onSectionLinkClick={onNavigateHome} />
+        <SiteNavbar onSectionLinkClick={onNavigateHome} onThemeChange={onThemeChange} theme={theme} />
 
         <a className="back-link" href={homePath("#catalog")} onClick={(event) => onNavigateHome(event, "#catalog")}>
           ← Back to catalog
@@ -634,11 +681,11 @@ function SkillDetailPage({ skill, onNavigateHome }) {
   );
 }
 
-function SkillNotFoundPage({ skillId, onNavigateHome }) {
+function SkillNotFoundPage({ skillId, onNavigateHome, onThemeChange, theme }) {
   return (
     <main className="skill-page not-found-page">
       <div className="skill-page-inner">
-        <SiteNavbar onSectionLinkClick={onNavigateHome} />
+        <SiteNavbar onSectionLinkClick={onNavigateHome} onThemeChange={onThemeChange} theme={theme} />
         <section className="not-found-panel" aria-labelledby="not-found-title">
           <p className="skill-breadcrumb">
             <a href={homePath("#catalog")} onClick={(event) => onNavigateHome(event, "#catalog")}>
@@ -662,6 +709,7 @@ function SkillNotFoundPage({ skillId, onNavigateHome }) {
 function App() {
   const [query, setQuery] = useState("");
   const [route, setRoute] = useState(parseAppRoute);
+  const [theme, setTheme] = useTheme();
   const shouldReduceMotion = useReducedMotion();
 
   useEffect(() => {
@@ -729,16 +777,35 @@ function App() {
 
   if (route.type === "skill") {
     if (!detailSkill) {
-      return <SkillNotFoundPage skillId={route.skillId} onNavigateHome={handleHomeNavigation} />;
+      return (
+        <SkillNotFoundPage
+          skillId={route.skillId}
+          onNavigateHome={handleHomeNavigation}
+          onThemeChange={setTheme}
+          theme={theme}
+        />
+      );
     }
 
-    return <SkillDetailPage skill={detailSkill} onNavigateHome={handleHomeNavigation} />;
+    return (
+      <SkillDetailPage
+        skill={detailSkill}
+        onNavigateHome={handleHomeNavigation}
+        onThemeChange={setTheme}
+        theme={theme}
+      />
+    );
   }
 
   return (
     <main>
       <section className="hero" aria-labelledby="hero-title">
-        <SiteNavbar onSectionLinkClick={handleSectionLinkClick} useReveal />
+        <SiteNavbar
+          onSectionLinkClick={handleSectionLinkClick}
+          onThemeChange={setTheme}
+          theme={theme}
+          useReveal
+        />
 
         <div className="hero-grid">
           <div className="hero-copy">

@@ -7,6 +7,24 @@
       name="description"
       content="skilly-hand installs portable AI agent skills into coding projects from one CLI."
     />
+    <script>
+      (() => {
+        const storageKey = "skilly-hand-theme";
+        let theme = "dark";
+
+        try {
+          const savedTheme = window.localStorage.getItem(storageKey);
+          if (savedTheme === "dark" || savedTheme === "light") {
+            theme = savedTheme;
+          }
+        } catch {
+          // Storage can be unavailable in privacy modes; dark remains deterministic.
+        }
+
+        document.documentElement.dataset.theme = theme;
+        document.documentElement.style.colorScheme = theme;
+      })();
+    </script>
     <title>skilly-hand</title>
   </head>
   <body>

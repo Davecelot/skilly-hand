@@ -1,4 +1,35 @@
 :root {
+  color-scheme: dark;
+  --ink: #f4f1ea;
+  --muted: #aaa9a3;
+  --paper: #101513;
+  --panel: #171d1b;
+  --line: #3d4844;
+  --strong-line: #f4f1ea;
+  --accent: #7ee0d4;
+  --accent-soft: #17433e;
+  --accent-wash: #142925;
+  --focus: #ffb37d;
+  --grid-line: rgba(126, 224, 212, 0.08);
+  --panel-fade: rgba(23, 29, 27, 0);
+  --quiet-surface: #1b211f;
+  --control-shadow: rgba(0, 0, 0, 0.42);
+  --inverse-surface: #080c0b;
+  --inverse-text: #f4f1ea;
+  --inverse-muted: #c8c5be;
+  --on-accent: #101513;
+  --shadow: 0 18px 60px rgba(0, 0, 0, 0.3);
+  --motion-ease: cubic-bezier(0.25, 1, 0.5, 1);
+  --motion-snap: cubic-bezier(0.37, 0, 0.63, 1);
+  --motion-fast: 300ms;
+  --motion-medium: 650ms;
+  --motion-slow: 1200ms;
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+:root[data-theme="light"] {
   color-scheme: light;
   --ink: #111111;
   --muted: #5b5f66;
@@ -10,15 +41,15 @@
   --accent-soft: #d8f3ee;
   --accent-wash: #eef8f5;
   --focus: #a54512;
+  --grid-line: rgba(17, 17, 17, 0.035);
+  --panel-fade: rgba(255, 255, 255, 0);
+  --quiet-surface: #f2efe8;
+  --control-shadow: rgba(17, 17, 17, 0.22);
+  --inverse-surface: #181818;
+  --inverse-text: #ffffff;
+  --inverse-muted: #d8d5ce;
+  --on-accent: #ffffff;
   --shadow: 0 18px 60px rgba(17, 17, 17, 0.08);
-  --motion-ease: cubic-bezier(0.25, 1, 0.5, 1);
-  --motion-snap: cubic-bezier(0.37, 0, 0.63, 1);
-  --motion-fast: 300ms;
-  --motion-medium: 650ms;
-  --motion-slow: 1200ms;
-  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background: var(--paper);
-  color: var(--ink);
 }
 
 * {
@@ -33,8 +64,8 @@ body {
   margin: 0;
   min-width: 320px;
   background:
-    linear-gradient(rgba(17, 17, 17, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(17, 17, 17, 0.035) 1px, transparent 1px),
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px),
     var(--paper);
   background-size: 32px 32px;
 }
@@ -42,6 +73,22 @@ body {
 button,
 input {
   font: inherit;
+}
+
+button,
+input,
+a,
+body,
+.bento-card,
+.skill-row,
+.skill-page-meta,
+.skill-page-content,
+.site-footer {
+  transition:
+    background-color var(--motion-fast) ease-out,
+    border-color var(--motion-fast) ease-out,
+    color var(--motion-fast) ease-out,
+    box-shadow var(--motion-fast) ease-out;
 }
 
 a {
@@ -118,10 +165,131 @@ main {
   transform: translateY(-1px);
 }
 
-.topbar div {
+.topbar-actions {
   display: flex;
+  align-items: center;
   gap: 18px;
   color: var(--muted);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.toggle-container {
+  position: relative;
+  display: inline-grid;
+  grid-template-columns: 28px 28px;
+  align-items: center;
+  width: 56px;
+  height: 30px;
+  color: var(--ink);
+  cursor: pointer;
+  isolation: isolate;
+}
+
+.toggle-container input {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.toggle-container input:focus-visible + .toggle-handle {
+  outline: 3px solid var(--focus);
+  outline-offset: 4px;
+}
+
+.toggle-handle,
+.toggle-base {
+  grid-area: 1 / 1;
+  width: 56px;
+  height: 30px;
+}
+
+.toggle-handle {
+  position: relative;
+  z-index: 2;
+  border: 1px solid var(--strong-line);
+  background: var(--panel);
+  box-shadow: 3px 3px 0 var(--control-shadow);
+  transition:
+    border-color var(--motion-fast) var(--motion-snap),
+    background-color var(--motion-fast) ease-out,
+    transform var(--motion-fast) var(--motion-snap);
+}
+
+.toggle-knob {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  width: 18px;
+  height: 18px;
+  background:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px),
+    var(--accent);
+  background-size: 5px 5px;
+  transition: transform var(--motion-fast) var(--motion-ease);
+}
+
+.toggle-bar {
+  position: absolute;
+  top: 14px;
+  left: 26px;
+  width: 23px;
+  height: 1px;
+  background: var(--line);
+}
+
+.toggle-base {
+  position: relative;
+  z-index: 1;
+  transform: translate(3px, 3px);
+  background: var(--accent-soft);
+}
+
+.toggle-base-inside {
+  position: absolute;
+  inset: 4px;
+  border: 1px dashed var(--accent);
+  opacity: 0.58;
+}
+
+.toggle-container input:checked + .toggle-handle .toggle-knob {
+  transform: translateX(27px);
+}
+
+.toggle-container input:checked + .toggle-handle .toggle-bar {
+  left: 7px;
+}
+
+.toggle-container:hover .toggle-handle {
+  transform: translate(-1px, -1px);
+}
+
+.toggle-container:active .toggle-handle {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0 var(--control-shadow);
+}
+
+.toggle-container:has(input:disabled) {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.toggle-container input:disabled {
+  cursor: not-allowed;
 }
 
 .brand {
@@ -262,7 +430,7 @@ h3 {
   min-width: 0;
   padding: 10px 14px;
   color: var(--ink);
-  background: #f2efe8;
+  background: var(--quiet-surface);
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size: 0.95rem;
   white-space: nowrap;
@@ -302,7 +470,7 @@ h3 {
 
 .command-row.copied button {
   background: var(--accent);
-  color: #ffffff;
+  color: var(--on-accent);
 }
 
 .hero-actions {
@@ -321,7 +489,7 @@ h3 {
 
 .button.primary {
   background: var(--accent);
-  color: #ffffff;
+  color: var(--on-accent);
 }
 
 .button:hover {
@@ -362,10 +530,10 @@ h3 {
   max-width: 1280px;
   margin: 0 auto;
   padding: clamp(22px, 4.5vw, 56px);
-  border: 1px solid var(--ink);
-  background: var(--ink);
-  box-shadow: 8px 8px 0 rgba(17, 17, 17, 0.22);
-  color: #ffffff;
+  border: 1px solid var(--strong-line);
+  background: var(--inverse-surface);
+  box-shadow: 8px 8px 0 var(--control-shadow);
+  color: var(--inverse-text);
   isolation: isolate;
   overflow: hidden;
 }
@@ -463,7 +631,7 @@ h3 {
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size: clamp(3rem, 5.9vw, 5.6rem);
   line-height: 0.92;
-  color: #ffffff;
+  color: var(--inverse-text);
   white-space: nowrap;
   overflow-wrap: normal;
 }
@@ -471,7 +639,7 @@ h3 {
 .release-summary p {
   max-width: 440px;
   margin: 0;
-  color: #d8d5ce;
+  color: var(--inverse-muted);
   font-size: 1rem;
   line-height: 1.55;
 }
@@ -508,9 +676,9 @@ h3 {
   justify-self: start;
   min-height: 42px;
   padding: 0 16px;
-  border: 1px solid #ffffff;
-  background: #ffffff;
-  color: var(--ink);
+  border: 1px solid var(--inverse-text);
+  background: var(--inverse-text);
+  color: var(--inverse-surface);
   font-weight: 790;
   text-decoration: none;
   transition:
@@ -522,7 +690,7 @@ h3 {
 
 .release-link:hover {
   background: #7ee0d4;
-  color: var(--ink);
+  color: #101513;
   box-shadow: 3px 3px 0 rgba(126, 224, 212, 0.42);
   transform: translate(-1px, -1px);
 }
@@ -551,7 +719,7 @@ h3 {
   padding: 18px;
   background:
     linear-gradient(135deg, rgba(216, 243, 238, 0.16), transparent 58%),
-    rgba(251, 250, 247, 0.94);
+    var(--panel);
   backdrop-filter: blur(2px);
 }
 
@@ -609,8 +777,8 @@ h3 {
 .bento-card {
   min-width: 0;
   border: 1px solid var(--ink);
-  background: rgba(255, 255, 255, 0.76);
-  box-shadow: 6px 6px 0 rgba(17, 17, 17, 0.9);
+  background: var(--panel);
+  box-shadow: 6px 6px 0 var(--control-shadow);
   padding: clamp(16px, 2.4vw, 24px);
   transition:
     border-color var(--motion-fast) ease-out,
@@ -620,7 +788,7 @@ h3 {
 
 .bento-card:hover {
   transform: translate(-1px, -1px);
-  box-shadow: 8px 8px 0 rgba(17, 17, 17, 0.86);
+  box-shadow: 8px 8px 0 var(--control-shadow);
 }
 
 .command-card {
@@ -641,8 +809,8 @@ h3 {
   display: grid;
   align-content: end;
   min-height: 190px;
-  background: var(--ink);
-  color: #ffffff;
+  background: var(--inverse-surface);
+  color: var(--inverse-text);
 }
 
 .impact-card span {
@@ -655,7 +823,7 @@ h3 {
 .impact-card p {
   max-width: 260px;
   margin: 14px 0 0;
-  color: #d8d5ce;
+  color: var(--inverse-muted);
   line-height: 1.45;
 }
 
@@ -703,8 +871,8 @@ h3 {
   margin: 0;
   padding: 12px;
   border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.9);
-  box-shadow: 3px 3px 0 rgba(17, 17, 17, 0.16);
+  background: var(--panel);
+  box-shadow: 3px 3px 0 var(--control-shadow);
 }
 
 .flow-node::before {
@@ -812,12 +980,12 @@ h3 {
 
 .target-marquee::before {
   left: 0;
-  background: linear-gradient(90deg, var(--panel), rgba(255, 255, 255, 0));
+  background: linear-gradient(90deg, var(--panel), var(--panel-fade));
 }
 
 .target-marquee::after {
   right: 0;
-  background: linear-gradient(270deg, var(--panel), rgba(255, 255, 255, 0));
+  background: linear-gradient(270deg, var(--panel), var(--panel-fade));
 }
 
 .target-track {
@@ -851,8 +1019,8 @@ h3 {
   border: 1px solid var(--line);
   background:
     linear-gradient(135deg, rgba(13, 118, 110, 0.08), transparent 58%),
-    #f7f4ef;
-  color: #353535;
+    var(--quiet-surface);
+  color: var(--ink);
   transition:
     border-color var(--motion-fast) ease-out,
     transform var(--motion-fast) ease-out;
@@ -874,8 +1042,8 @@ h3 {
   width: 62px;
   height: 62px;
   border: 1px solid var(--strong-line);
-  background: var(--ink);
-  color: #ffffff;
+  background: var(--inverse-surface);
+  color: var(--inverse-text);
 }
 
 .target-mark img {
@@ -914,8 +1082,8 @@ h3 {
   isolation: isolate;
   overflow: hidden;
   border-bottom: 1px solid var(--line);
-  background: var(--ink);
-  color: #ffffff;
+  background: var(--inverse-surface);
+  color: var(--inverse-text);
 }
 
 .install-setup > .section-heading,
@@ -1327,7 +1495,7 @@ h3 {
   min-height: 42px;
   border: 1px solid var(--ink);
   background: var(--ink);
-  color: #ffffff;
+  color: var(--panel);
   font-weight: 790;
   cursor: pointer;
   padding: 0 14px;
@@ -1340,6 +1508,7 @@ h3 {
 
 .skill-row button:hover {
   background: var(--accent);
+  color: var(--on-accent);
   transform: translate(-1px, -1px);
 }
 
@@ -1393,7 +1562,7 @@ h3 {
   margin: 0;
   padding: 18px;
   border: 1px solid var(--line);
-  background: #f7f4ef;
+  background: var(--quiet-surface);
   font-size: 0.84rem;
   line-height: 1.55;
   overflow: auto;
