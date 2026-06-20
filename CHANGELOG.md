@@ -8,7 +8,7 @@ All notable changes to this project are documented in this file.
 - _None._
 
 ### Changed
-- _None._
+- Expanded `review-rangers` with an approval-gated Mender remediation loop, independent re-review, critical-stop rules, bounded termination, repository-native verification, and automatic `test-driven-development` installation.
 
 ### Fixed
 - _None._

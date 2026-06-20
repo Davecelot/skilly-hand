@@ -242,6 +242,7 @@ async function scenarioInstallOneSkill({ repoRoot }) {
 async function scenarioInstallMultipleSkills({ repoRoot }) {
   const workspace = await ensureScenarioWorkspace({ repoRoot, scenarioName: "install-multiple-skills", fixtureName: "react-vite" });
   const selectedSkillIds = ["token-optimizer", "spec-driven-development", "review-rangers"];
+  const installedSkillIds = [...selectedSkillIds, "test-driven-development"];
 
   const installResult = await installProject({
     cwd: workspace,
@@ -252,8 +253,8 @@ async function scenarioInstallMultipleSkills({ repoRoot }) {
   assertCondition(installResult.applied === true, "multiple-skills install should apply changes");
 
   const lock = await readLock(workspace);
-  assertCondition(equalArrays([...lock.skills].sort(), [...selectedSkillIds].sort()), "multiple-skills lock should match requested skills");
-  assertCondition(lock.skills.length === selectedSkillIds.length, "multiple-skills lock should include only requested skills");
+  assertCondition(equalArrays([...lock.skills].sort(), [...installedSkillIds].sort()), "multiple-skills lock should include requested skills and dependencies");
+  assertCondition(lock.skills.length === installedSkillIds.length, "multiple-skills lock should contain the expanded skill selection");
   assertCondition(equalArrays(lock.agents, ["codex"]), "multiple-skills lock should include codex only");
 
   await assertAgentArtifacts({ workspace, agents: ["codex"] });

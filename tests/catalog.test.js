@@ -92,3 +92,32 @@ test("SDD and TDD guidance remains portable and self-contained", async () => {
   assert.match(tdd, /is not refactoring; start another RED cycle/i);
   assert.match(tdd, /Do not invent a universal percentage/i);
 });
+
+test("review-rangers ships a bounded and permission-safe remediation contract", async () => {
+  const skills = await loadAllSkills();
+  const reviewRangers = skills.find((skill) => skill.id === "review-rangers");
+  const skill = await readFile(new URL("../catalog/skills/review-rangers/SKILL.md", import.meta.url), "utf8");
+  const mender = await readFile(new URL("../catalog/skills/review-rangers/assets/mender-template.md", import.meta.url), "utf8");
+
+  assert.equal(reviewRangers.skillMetadata.version, "1.2.0");
+  assert.deepEqual(reviewRangers.dependencies, ["test-driven-development"]);
+  assert.equal(
+    reviewRangers.files.some((file) => file.path === "assets/mender-template.md" && file.kind === "asset"),
+    true
+  );
+
+  assert.match(skill, /only role allowed to modify/i);
+  assert.match(skill, /explicit approval/i);
+  assert.match(skill, /at most three remediation rounds/i);
+  assert.match(skill, /two consecutive rounds/i);
+  assert.match(skill, /breaking public API/i);
+  assert.match(skill, /repository-native verification/i);
+  assert.match(skill, /after the final `HIGH` report or terminal escalation/i);
+  assert.doesNotMatch(skill, /npx vitest|ScannLab/i);
+
+  assert.match(mender, /finding-to-fix/i);
+  assert.match(mender, /MUST NOT change confidence/i);
+  assert.match(mender, /repository-native/i);
+  assert.match(mender, /test-driven-development/i);
+  assert.doesNotMatch(mender, /npx vitest|ScannLab/i);
+});

@@ -30,7 +30,7 @@
 | `project-teacher` | Scan the active project and teach any concept, code path, or decision using verified information, interactive questions, and simple explanations. Trigger: user asks to explain, understand, clarify, or learn about anything in the project or codebase. | core, workflow, education |
 | `prompt-engineering` | Guide users in writing, improving, evaluating, and tuning prompts for LLMs across factual, creative, structured, grounded, coding, safety-sensitive, and production scenarios. Trigger: writing, improving, evaluating, or tuning prompts for LLMs. | prompting, llm, workflow, quality |
 | `react-guidelines` | Guide React and Next.js code generation, review, and performance tuning using latest stable React verification and modern framework best practices. Trigger: generating, reviewing, refactoring, or optimizing React code artifacts in React projects. | react, frontend, workflow, best-practices |
-| `review-rangers` | Review code, decisions, and artifacts through a multi-perspective committee and a domain expert safety guard, then synthesize a structured verdict. | core, workflow, review, quality |
+| `review-rangers` | Review code, decisions, and artifacts through an independent committee and safety guard, then optionally run bounded, approval-gated remediation. Trigger: reviewing risky artifacts or remediating structured review findings. | core, workflow, review, quality |
 | `roaster` | Challenge plans with constructive roast-style critique that exposes weak assumptions, missing angles, shallow sequencing, and unclear success criteria. Trigger: when the user proposes, requests, or evaluates a plan of any kind. | core, workflow, planning, quality |
 | `spec-driven-development` | Plan, execute, and verify multi-step work through versioned specs with small, testable tasks. Trigger: planning or executing feature work, bug fixes, and multi-phase implementation. | core, workflow, planning |
 | `test-driven-development` | Guide implementation through evidence-based RED, GREEN, and REFACTOR cycles without assuming a language, framework, or test runner. Trigger: implementing testable behavior or reproducing a regression with tests first. | testing, workflow, quality, core |
@@ -90,7 +90,7 @@ This gate is mandatory whenever the user proposes, requests, or evaluates a plan
 | User needs to understand, explain, or learn about any aspect of the project or codebase | `project-teacher` |
 | Writing, improving, evaluating, or tuning prompts for LLMs | `prompt-engineering` |
 | Generating, reviewing, refactoring, or optimizing React code artifacts in React projects | `react-guidelines` |
-| Reviewing code, decisions, or artifacts where adversarial multi-perspective evaluation adds value | `review-rangers` |
+| Reviewing risky code, decisions, or artifacts, or remediating structured review findings | `review-rangers` |
 | When the user proposes, requests, or evaluates a plan of any kind | `roaster` |
 | Planning or executing feature work, bug fixes, and multi-phase implementation | `spec-driven-development` |
 | Implementing testable behavior or reproducing a regression with tests first | `test-driven-development` |

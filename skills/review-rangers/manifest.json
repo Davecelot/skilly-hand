@@ -1,7 +1,7 @@
 {
   "id": "review-rangers",
   "title": "Review Rangers",
-  "description": "Review code, decisions, and artifacts through a multi-perspective committee and a domain expert safety guard, then synthesize a structured verdict.",
+  "description": "Review code, decisions, and artifacts through an independent committee and safety guard, then optionally run bounded, approval-gated remediation. Trigger: reviewing risky artifacts or remediating structured review findings.",
   "portable": true,
   "tags": ["core", "workflow", "review", "quality"],
   "detectors": ["always"],
@@ -10,11 +10,11 @@
   "agentSupport": ["codex", "claude", "cursor", "gemini", "copilot", "antigravity", "windsurf", "trae"],
   "skillMetadata": {
     "author": "skilly-hand",
-    "last-edit": "2026-04-26",
+    "last-edit": "2026-06-20",
     "license": "Apache-2.0",
-    "version": "1.1.0",
-    "changelog": "Added DECISIONS.md registry ownership guidance; preserves durable review insights and anti-slop decisions across sessions; affects review-rangers workflow, install scaffolding, and project memory usage",
-    "auto-invoke": "Reviewing code, decisions, or artifacts where adversarial multi-perspective evaluation adds value",
+    "version": "1.2.0",
+    "changelog": "Added approval-gated Mender remediation with bounded independent re-review; prevents unauthorized writes and unbounded fix loops; affects review orchestration, installation dependencies, and prompt assets",
+    "auto-invoke": "Reviewing risky code, decisions, or artifacts, or remediating structured review findings",
     "allowed-tools": [
       "Read",
       "Edit",
@@ -29,7 +29,8 @@
   "files": [
     { "path": "SKILL.md", "kind": "instruction" },
     { "path": "assets/committee-member-template.md", "kind": "asset" },
-    { "path": "assets/safety-guard-template.md", "kind": "asset" }
+    { "path": "assets/safety-guard-template.md", "kind": "asset" },
+    { "path": "assets/mender-template.md", "kind": "asset" }
   ],
-  "dependencies": []
+  "dependencies": ["test-driven-development"]
 }

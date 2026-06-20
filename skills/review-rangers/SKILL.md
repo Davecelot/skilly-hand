@@ -1,13 +1,13 @@
 ---
 name: "review-rangers"
-description: "Review code, decisions, and artifacts through a multi-perspective committee and a domain expert safety guard, then synthesize a structured verdict."
+description: "Review code, decisions, and artifacts through an independent committee and safety guard, then optionally run bounded, approval-gated remediation. Trigger: reviewing risky artifacts or remediating structured review findings."
 skillMetadata:
   author: "skilly-hand"
-  last-edit: "2026-04-26"
+  last-edit: "2026-06-20"
   license: "Apache-2.0"
-  version: "1.1.0"
-  changelog: "Added DECISIONS.md registry ownership guidance; preserves durable review insights and anti-slop decisions across sessions; affects review-rangers workflow, install scaffolding, and project memory usage"
-  auto-invoke: "Reviewing code, decisions, or artifacts where adversarial multi-perspective evaluation adds value"
+  version: "1.2.0"
+  changelog: "Added approval-gated Mender remediation with bounded independent re-review; prevents unauthorized writes and unbounded fix loops; affects review orchestration, installation dependencies, and prompt assets"
+  auto-invoke: "Reviewing risky code, decisions, or artifacts, or remediating structured review findings"
   allowed-tools:
     - "Read"
     - "Edit"
@@ -48,8 +48,13 @@ Do not use this skill for:
 7. Run the committee and safety guard in parallel.
 8. Collect all outputs.
 9. Synthesize a structured verdict following the Synthesis Rules.
-10. Emit the final verdict with confidence tier, top findings, and recommended action.
-11. Decide whether any insight qualifies for `.ai/DECISIONS.md`; if yes, update the registry and its changelog in the same edit.
+10. If the verdict is `HIGH`, emit the final report and stop. If it is `VETO` or any critical-stop condition applies, return control to a human without modifying the target.
+11. For `MEDIUM` or `LOW`, present the open findings and request explicit approval before the first mutation. Skip this checkpoint only when the caller explicitly requested unattended or autonomous remediation in the current task.
+12. After approval, invoke The Mender using `assets/mender-template.md`. Pass only the target context and open findings; do not pass intermediate reviewer discussion.
+13. Run repository-native verification, then send the changed target to a fresh independent committee and safety guard. Reviewers from every round remain read-only.
+14. Repeat only while progress is material and no termination rule applies. Allow at most three remediation rounds and stop when the same finding survives two consecutive rounds without material progress.
+15. Emit the final report with confidence tier, finding-to-fix evidence, unresolved items, stop reason when applicable, and recommended action.
+16. Evaluate durable `.ai/DECISIONS.md` updates after the final `HIGH` report or terminal escalation; if an insight qualifies, update the registry and its changelog in the same edit.
 
 ---
 
@@ -80,6 +85,7 @@ Never assign the same lens to two committee members. Each member evaluates indep
 - Spawn committee members in parallel.
 - Pass only the target artifact and the member's assigned lens as context.
 - Do not share intermediate findings between members before synthesis.
+- Committee members and the safety guard are read-only in every round. They MUST NOT modify the target, assign work, or reuse another reviewer's conclusions.
 
 ---
 
@@ -105,6 +111,66 @@ The safety guard:
 - Evaluates the target for correctness, safety, and conformance to domain standards.
 - Raises blockers, not suggestions. If the safety guard finds a structural flaw, it is a hard finding.
 - Runs in parallel with the committee, not after it.
+
+---
+
+## Remediation Protocol
+
+### Role Separation
+
+The Mender is the only role allowed to modify the target during a Review Rangers remediation cycle.
+
+- Committee members and the safety guard remain independent, read-only judges.
+- The Mender receives the synthesized open findings and target context, not reviewer identities or hidden reasoning.
+- The Mender MUST NOT assign, raise, lower, or otherwise edit confidence tiers.
+- The orchestrator owns approval, round counting, critical-stop evaluation, re-review, and the final verdict.
+- A Mender MUST NOT invoke Review Rangers recursively. Re-review returns to the orchestrator.
+
+### Approval Boundary
+
+Interactive review MUST pause before the first file mutation and obtain explicit approval.
+
+- A request to review, assess, audit, or invoke this skill is not write approval.
+- Skill invocation alone is not write approval.
+- The checkpoint may be skipped only when the caller explicitly asks for unattended or autonomous remediation in the current task.
+- Approval covers only the presented open findings and target. New scope or a critical-stop condition returns control to the caller.
+
+### Critical Stops
+
+Stop before another mutation or remediation round when any of these applies:
+
+- The verdict is `VETO`.
+- A security, privacy, accessibility, or data-integrity blocker requires human judgment.
+- A fix would cause a breaking public API change.
+- A fix would alter a broadly shared foundation, architecture, release policy, CI/CD policy, or security policy without explicit authority.
+- Required repository-native verification is unavailable or failing for reasons the remediation cannot safely resolve.
+- Product intent, ownership, migration policy, or another authoritative decision is required.
+- Three remediation rounds have completed.
+- The same finding survives two consecutive rounds without material progress.
+
+For every stop, report the unresolved finding, available evidence, stop reason, and required human decision. Do not broaden scope to conceal a failed check or force a higher confidence tier.
+
+### Repository-Native Verification
+
+The Mender MUST discover and run the narrowest relevant verification supported by the target repository.
+
+1. Read repository instructions and declared scripts or commands.
+2. Choose relevant lint, test, type-check, build, artifact, or deterministic document checks.
+3. When testable behavior changes, follow the installed `test-driven-development` guidance and record RED, GREEN, REFACTOR, and regression evidence.
+4. For non-code artifacts, use the narrowest deterministic structural or content check.
+5. Report exact commands, outcomes, failures, and checks that could not run.
+
+Never assume npm, a particular test runner, or a fixed toolchain. A failed required check blocks `HIGH` unless a human explicitly accepts the residual risk.
+
+### Re-review and Termination
+
+- Every remediation round receives a monotonically increasing round number from 1 through 3.
+- After verification, use a fresh committee and safety guard with the same independence rules as the initial review.
+- Compare findings by underlying issue, not wording alone.
+- Material progress means a finding is resolved, reduced in severity with evidence, or narrowed by a verified constraint.
+- `HIGH` ends the loop successfully.
+- `MEDIUM` or `LOW` may enter another approved round only when progress is material and no stop applies.
+- Any stop ends the loop with a terminal escalation report.
 
 ---
 
@@ -194,6 +260,8 @@ Every change to `.ai/DECISIONS.md` must update `## Changelog` in the same edit.
 
 If the changelog section is missing, add it as the final section before making any other registry change.
 
+Evaluate registry writes only after the final `HIGH` report or terminal escalation. Intermediate remediation rounds MUST NOT create duplicate or provisional decision entries.
+
 ---
 
 ## Decision Tree
@@ -215,6 +283,17 @@ Does any committee member flag a security or data-integrity risk?
 Does committee majority agree the target is sound?
   YES and safety guard passes -> HIGH or MEDIUM depending on split
   NO                          -> LOW
+
+Is the verdict MEDIUM or LOW without a critical stop?
+  YES -> obtain explicit mutation approval unless unattended remediation was explicitly requested
+
+Is remediation approved and within the termination bounds?
+  YES -> invoke The Mender, verify with repository-native checks, then run a fresh independent review
+  NO  -> emit a terminal escalation report
+
+Did the review reach HIGH, three rounds, or two stagnant rounds?
+  YES -> stop and emit the final report
+  NO  -> continue only when material progress is evidenced
 ```
 
 ---
@@ -227,6 +306,9 @@ cat .skilly-hand/catalog/review-rangers/assets/committee-member-template.md
 
 # Reference safety guard template when constructing agent prompts
 cat .skilly-hand/catalog/review-rangers/assets/safety-guard-template.md
+
+# Reference the only write-capable remediation template after approval
+cat .skilly-hand/catalog/review-rangers/assets/mender-template.md
 ```
 
 ---
@@ -235,3 +317,5 @@ cat .skilly-hand/catalog/review-rangers/assets/safety-guard-template.md
 
 - Committee member prompt template: [assets/committee-member-template.md](assets/committee-member-template.md)
 - Safety guard prompt template: [assets/safety-guard-template.md](assets/safety-guard-template.md)
+- Mender prompt template: [assets/mender-template.md](assets/mender-template.md)
+- Test-driven remediation guidance: [../test-driven-development/SKILL.md](../test-driven-development/SKILL.md)

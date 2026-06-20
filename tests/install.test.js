@@ -396,6 +396,25 @@ test("selectedSkillIds includes portable skill dependencies", async () => {
   assert.deepEqual(ids, ["frontend-design", "gsap-animation", "motion-animation"]);
 });
 
+test("review-rangers selection includes TDD and installs the Mender asset", async () => {
+  const projectDir = await makeFixtureCopy("no-stack");
+  const result = await installProject({
+    cwd: projectDir,
+    agents: ["standard"],
+    selectedSkillIds: ["review-rangers"]
+  });
+  const ids = result.plan.skills.map((skill) => skill.id);
+
+  assert.deepEqual(ids, ["review-rangers", "test-driven-development"]);
+
+  const installedAssetsDir = path.join(projectDir, ".skilly-hand", "catalog", "review-rangers", "assets");
+  const installedMender = await readFile(path.join(installedAssetsDir, "mender-template.md"), "utf8");
+  await access(path.join(installedAssetsDir, "committee-member-template.md"));
+  await access(path.join(installedAssetsDir, "safety-guard-template.md"));
+  assert.match(installedMender, /finding-to-fix/i);
+  assert.match(installedMender, /repository-native/i);
+});
+
 test("install rejects unknown selectedSkillIds", async () => {
   const projectDir = await makeFixtureCopy("react-vite");
   await assert.rejects(
