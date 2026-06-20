@@ -2,26 +2,28 @@
 
 ## Purpose
 
-Turn a request into an executable, reviewable spec before implementation starts.
-
-## Inputs
-
-- Goal or problem statement.
-- Known constraints.
-- Current state references (files, systems, behaviors).
+Turn a request into an executable spec without assuming a framework, toolchain, or external service.
 
 ## Procedure
 
-1. Clarify scope and success criteria.
-2. Decide full spec vs delta spec.
-3. Fill spec sections: Why, What, Constraints, Current State, Tasks, Validation.
-4. Break tasks into small units with explicit verify commands.
-5. Add `design.md` if architecture decisions or trade-offs are non-obvious.
-6. Return the spec summary for review and approval.
+1. Inspect the repository for applicable instructions, conventions, commands, and existing behavior.
+2. Clarify only missing information that cannot be discovered safely.
+3. Choose a full or delta spec.
+4. Define scope, constraints, non-goals, approval policy, and validation.
+5. Create tasks using the task contract from the parent skill.
+6. Add behavioral scenarios where outcomes can be observed.
+7. Describe required capabilities semantically and use `none` when no special capability is needed.
+8. Initialize one progress row per task with `TODO`.
+9. Self-review with the validation checklist and apply the approval policy.
 
 ## Quality Bar
 
-- Constraints are enforceable, not vague.
-- Every task has files and a verify step.
-- Out-of-scope items are explicit.
-- Another engineer can execute without guessing intent.
+- Another implementer can execute without guessing intent.
+- No task requires a named agent, skill, vendor, framework, or command that has not been discovered locally.
+- Tasks, progress rows, and validation are mutually consistent.
+- Risks and meaningful alternatives live in `design.md`; routine choices stay in the spec.
+- `spec.md` is the only task source of truth.
+
+## Blockers
+
+Mark planning `BLOCKED` only when a required decision or fact cannot be discovered and a reasonable assumption would create material risk. Record the missing input and its impact.

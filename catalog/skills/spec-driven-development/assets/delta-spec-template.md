@@ -1,51 +1,86 @@
-# [Feature Name] - Delta Spec
-
-Use this template when changing behavior in an existing feature.
+# [Work Name] - Delta Spec
 
 ## Why
 
-[Why this behavior change is needed now.]
+[Reason for changing established behavior.]
 
-## What
+## Baseline
 
-[Concrete behavior change and expected outcome.]
+[Maintained requirement source or a concise description of current behavior.]
 
 ## ADDED Requirements
 
 ### Requirement: [Name]
 
-[MUST/SHOULD/MAY statement]
+[MUST, SHOULD, or MAY statement.]
 
 #### Scenario: [Name]
 
 - GIVEN [initial state]
 - WHEN [action]
-- THEN [expected outcome]
+- THEN [observable result]
 
 ## MODIFIED Requirements
 
 ### Requirement: [Name]
 
-[New requirement text]
+[Complete replacement requirement.]
 
-(Previously: [old requirement text])
+Previously: [Previous requirement or behavior.]
 
 ## REMOVED Requirements
 
 ### Requirement: [Name]
 
-(Reason: [why removed])
+Reason: [Why it is removed.]
+
+## Constraints
+
+### Must
+
+- [Enforceable requirement]
+
+### Must Not
+
+- [Disallowed behavior]
+
+### Out of Scope
+
+- [Boundary]
+
+## Approval Policy
+
+- Mode: [explicit checkpoint | self-review]
+- Trigger for reapproval: [change condition]
 
 ## Tasks
 
 ### T1: [Title]
 
-**What:** [Specific implementation]
+**What:** [Observable outcome]
+**Required Capabilities:** [Semantic capabilities, or `none`]
+**Files:** [Expected files, or `discover`]
+**Scenario:** [GIVEN / WHEN / THEN, when behavioral]
+**Verify:** [Project-discovered command or concrete manual check]
+**Done:** [One-sentence completion condition]
 
-**Files:** `path/to/file`, `path/to/test`
+## Progress
 
-**Verify:** [Command or manual check]
+| Task | Status | Evidence |
+| --- | --- | --- |
+| T1 | TODO | |
 
 ## Validation
 
-- [Checks that prove the delta behavior is correct]
+- [Checks that prove the behavior delta]
+- [Regression checks for retained behavior]
+
+## Reconciliation
+
+- Baseline update required: [yes | no]
+- Reconciliation result: [pending | complete | not applicable]
+
+## Change Log
+
+| Date | Change | Affected Tasks | Approval |
+| --- | --- | --- | --- |

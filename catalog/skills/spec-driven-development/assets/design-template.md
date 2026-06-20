@@ -1,31 +1,37 @@
-# Design: [Feature Name]
+# Design: [Work Name]
 
-Use with `spec.md` when implementation includes meaningful architectural decisions.
+Use this artifact only for decisions whose rationale or trade-offs will matter after implementation.
 
 ## Context
 
-[Current system state, constraints, and why a decision is needed now.]
+[Verified system state and reason a decision is needed.]
 
 ## Goals
 
-- [Primary outcome]
-- [Secondary outcome]
+- [Desired outcome]
 
 ## Non-Goals
 
-- [Explicitly excluded area]
-- [Another excluded area]
+- [Explicit exclusion]
 
-## Decisions
+## Decision
 
-### Decision: [Name]
+### [Decision Name]
 
-[What was chosen and why]
+- Choice: [Selected approach]
+- Rationale: [Why it fits the constraints]
+- Required capabilities: [Semantic capabilities, or `none`]
 
-### Alternatives Considered
+## Alternatives Considered
 
-- [Alternative option and why not chosen]
+| Alternative | Benefit | Cost | Reason Not Selected |
+| --- | --- | --- | --- |
 
-## Risks / Trade-offs
+## Risks and Mitigations
 
-- **[Risk]:** [Impact + mitigation or acceptance rationale]
+| Risk | Impact | Mitigation | Verification |
+| --- | --- | --- | --- |
+
+## Revisit Conditions
+
+- [Evidence or change that should reopen this decision]

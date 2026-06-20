@@ -8,7 +8,8 @@ All notable changes to this project are documented in this file.
 - _None._
 
 ### Changed
-- _None._
+- Reworked `spec-driven-development` around a portable lifecycle with repository-native capability discovery, evidence-backed task state, explicit change control, and archive invariants.
+- Rebuilt `test-driven-development` guidance around evidence-based RED, GREEN, and REFACTOR cycles without fixed framework or test-runner assumptions.
 
 ### Fixed
 - _None._

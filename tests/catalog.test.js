@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import { loadAllSkills, verifyCatalogFiles } from "../packages/catalog/src/index.js";
 
 test("catalog manifests are portable and complete", async () => {
@@ -45,4 +46,49 @@ test("catalog manifests are portable and complete", async () => {
   assert.equal(Array.isArray(roaster.nativeHooks), true);
   assert.deepEqual(roaster.nativeHooks.map((hook) => hook.id), ["plan-challenge"]);
   assert.equal(roaster.nativeHooks[0].enforcement, "required");
+});
+
+test("SDD and TDD guidance remains portable and self-contained", async () => {
+  const skillIds = ["spec-driven-development", "test-driven-development"];
+  const forbiddenContextReferences = [
+    /\bAngular\b/i,
+    /\bFigma\b/i,
+    /\bGitHub\b/i,
+    /\bGitLab\b/i,
+    /\bJira\b/i,
+    /\bnpm\b/i,
+    /\bOpenSpec\b/i,
+    /\bpnpm\b/i,
+    /\breview-rangers\b/i,
+    /\bScannLab\b/i,
+    /\bStorybook\b/i,
+    /\bVitest\b/i,
+    /\byarn\b/i
+  ];
+
+  for (const skillId of skillIds) {
+    const manifestUrl = new URL(`../catalog/skills/${skillId}/manifest.json`, import.meta.url);
+    const manifest = JSON.parse(await readFile(manifestUrl, "utf8"));
+    const markdownFiles = manifest.files.filter((file) => file.path.endsWith(".md"));
+
+    for (const file of markdownFiles) {
+      const fileUrl = new URL(`../catalog/skills/${skillId}/${file.path}`, import.meta.url);
+      const content = await readFile(fileUrl, "utf8");
+
+      assert.doesNotMatch(content, /[^\x00-\x7F]/, `${skillId}/${file.path} should use ASCII protocol text`);
+      for (const pattern of forbiddenContextReferences) {
+        assert.doesNotMatch(content, pattern, `${skillId}/${file.path} contains fixed context reference ${pattern}`);
+      }
+    }
+  }
+
+  const sdd = await readFile(new URL("../catalog/skills/spec-driven-development/SKILL.md", import.meta.url), "utf8");
+  assert.match(sdd, /single source of truth/i);
+  assert.match(sdd, /local structured fallback/i);
+  assert.doesNotMatch(sdd, /tasks\.md/i);
+
+  const tdd = await readFile(new URL("../catalog/skills/test-driven-development/SKILL.md", import.meta.url), "utf8");
+  assert.match(tdd, /failure is caused by the missing or incorrect target behavior/i);
+  assert.match(tdd, /is not refactoring; start another RED cycle/i);
+  assert.match(tdd, /Do not invent a universal percentage/i);
 });

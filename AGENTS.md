@@ -32,8 +32,8 @@
 | `react-guidelines` | Guide React and Next.js code generation, review, and performance tuning using latest stable React verification and modern framework best practices. Trigger: generating, reviewing, refactoring, or optimizing React code artifacts in React projects. | react, frontend, workflow, best-practices |
 | `review-rangers` | Review code, decisions, and artifacts through a multi-perspective committee and a domain expert safety guard, then synthesize a structured verdict. | core, workflow, review, quality |
 | `roaster` | Challenge plans with constructive roast-style critique that exposes weak assumptions, missing angles, shallow sequencing, and unclear success criteria. Trigger: when the user proposes, requests, or evaluates a plan of any kind. | core, workflow, planning, quality |
-| `spec-driven-development` | Plan, execute, and verify multi-step work through versioned specs with small, testable tasks. | core, workflow, planning |
-| `test-driven-development` | Guide implementation using the RED → GREEN → REFACTOR TDD cycle: write a failing test first, write the minimum code to pass, then refactor while tests stay green. | testing, workflow, quality, core |
+| `spec-driven-development` | Plan, execute, and verify multi-step work through versioned specs with small, testable tasks. Trigger: planning or executing feature work, bug fixes, and multi-phase implementation. | core, workflow, planning |
+| `test-driven-development` | Guide implementation through evidence-based RED, GREEN, and REFACTOR cycles without assuming a language, framework, or test runner. Trigger: implementing testable behavior or reproducing a regression with tests first. | testing, workflow, quality, core |
 | `token-optimizer` | Classify task complexity and right-size reasoning depth, context gathering, and response detail to reduce wasted tokens. | core, workflow, efficiency |
 | `user-story-crafting` | Create and refine user stories with structured quality gates, splitting heuristics, and lightweight story mapping for release slicing. Trigger: writing, restructuring, splitting, or sequencing user stories for delivery-ready backlog work. | product, workflow, planning, quality |
 
@@ -93,7 +93,7 @@ This gate is mandatory whenever the user proposes, requests, or evaluates a plan
 | Reviewing code, decisions, or artifacts where adversarial multi-perspective evaluation adds value | `review-rangers` |
 | When the user proposes, requests, or evaluates a plan of any kind | `roaster` |
 | Planning or executing feature work, bug fixes, and multi-phase implementation | `spec-driven-development` |
-| Implementing features, services, or components using test-driven development (TDD) or RED→GREEN→REFACTOR cycles | `test-driven-development` |
+| Implementing testable behavior or reproducing a regression with tests first | `test-driven-development` |
 | Classifying task complexity and choosing reasoning depth/token budget | `token-optimizer` |
 | Writing, restructuring, splitting, or sequencing user stories into delivery-ready backlog items | `user-story-crafting` |
 

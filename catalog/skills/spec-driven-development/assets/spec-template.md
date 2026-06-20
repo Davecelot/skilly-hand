@@ -1,56 +1,77 @@
-# [Feature Name]
+# [Work Name]
 
 ## Why
 
-[1-2 sentences on the problem and why it matters now.]
+[Problem, value, and why it matters now.]
 
 ## What
 
-[Concrete, testable deliverable.]
+[Concrete and testable deliverable.]
 
 ## Constraints
 
 ### Must
 
-- [Required patterns, architecture, or conventions]
-- [Required dependency or existing system usage]
+- [Enforceable requirement]
+
+### Should
+
+- [Preferred outcome; deviations require a reason]
 
 ### Must Not
 
-- [Disallowed approaches]
-- [Disallowed dependencies or behavioral changes]
+- [Disallowed behavior or approach]
 
 ### Out of Scope
 
-- [Adjacent but excluded features]
+- [Explicit boundary]
 
 ## Current State
 
-- [Relevant existing files and behavior]
-- [Known dependencies and integration points]
+- [Verified files, behavior, dependencies, and conventions]
+
+## Approval Policy
+
+- Mode: [explicit checkpoint | self-review]
+- Trigger for reapproval: [scope, constraint, risk, or design change]
 
 ## Tasks
 
 ### T1: [Title]
 
-**What:** [Specific implementation change]
+**What:** [Observable outcome]
 
-**Files:** `path/to/file`, `path/to/test`
+**Required Capabilities:** [Semantic capabilities, or `none`]
 
-**Verify:** [Command or manual check]
+**Files:** [Expected files, or `discover`]
 
----
+**Scenario:**
 
-### T2: [Title]
+- GIVEN [initial state]
+- WHEN [action]
+- THEN [observable result]
 
-**What:** [Specific implementation change]
+**Verify:** [Project-discovered command or concrete manual check]
 
-**Files:** `path/to/file`
+**Done:** [One-sentence completion condition]
 
-**Verify:** [Command or manual check]
+## Progress
+
+| Task | Status | Evidence |
+| --- | --- | --- |
+| T1 | TODO | |
+
+Valid states: `TODO`, `IN_PROGRESS`, `BLOCKED`, `DONE`.
 
 ## Validation
 
 - [Feature-level automated check]
-- [Feature-level manual scenario]
-- [Additional release-specific verification]
+- [Feature-level manual scenario, if needed]
+- [Constraint or regression check]
+
+## Change Log
+
+Record requirement, scope, or design changes. Do not log routine progress.
+
+| Date | Change | Affected Tasks | Approval |
+| --- | --- | --- | --- |

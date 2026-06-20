@@ -1,12 +1,12 @@
 ---
 name: "spec-driven-development"
-description: "Plan, execute, and verify multi-step work through versioned specs with small, testable tasks."
+description: "Plan, execute, and verify multi-step work through versioned specs with small, testable tasks. Trigger: planning or executing feature work, bug fixes, and multi-phase implementation."
 skillMetadata:
   author: "skilly-hand"
-  last-edit: "2026-04-03"
+  last-edit: "2026-06-20"
   license: "Apache-2.0"
-  version: "1.0.3"
-  changelog: "Added OpenSpec complementary support routing guidance to spec-driven-development instructions; improves planning continuity and review clarity when local SDD needs reinforcement; affects spec-driven-development SKILL guidance and manifest metadata"
+  version: "1.1.0"
+  changelog: "Added a portable SDD lifecycle with capability-based routing, task evidence, change control, and archive invariants; prevents fixed tool dependencies and duplicated task state; affects planning, apply, verify, orchestrate, and spec templates"
   auto-invoke: "Planning or executing feature work, bug fixes, and multi-phase implementation"
   allowed-tools:
     - "Read"
@@ -22,192 +22,143 @@ skillMetadata:
 
 ## When to Use
 
-Use this skill when:
+Use this skill when work spans multiple steps, requirements need written boundaries, or progress must survive across contributors or sessions.
 
-- Work spans multiple commits or phases.
-- Requirements are easy to misinterpret without written constraints.
-- You need a repeatable plan that can be reviewed before coding.
-- Several contributors or sessions may touch the same feature.
+Skip it for trivial edits, urgent recovery work, and tasks with no meaningful verification path.
 
-Do not use this skill for:
+## Portable Contract
 
-- Trivial one-file edits.
-- Emergency fixes where immediate response matters more than process.
-- Tasks with no meaningful verification path.
+The workflow MUST remain executable with this skill alone.
 
----
+- Treat integrations as optional capabilities, never required product names.
+- Discover available tools, commands, and repository conventions before selecting them.
+- When a capability is unavailable, use a local structured fallback or record a blocker.
+- Keep requirements, tasks, progress, evidence, and changes in `spec.md` as the single source of truth.
+- Do not create a second task list that can drift from the spec.
 
-## Core Workflow
+## Lifecycle
 
-1. Define the spec in `.sdd/active/<feature-name>/spec.md`.
-2. Review and refine scope, constraints, and tasks.
-3. Execute one small task at a time.
-4. Verify each task and the end-to-end outcome, ending with a required `review-rangers` final gate.
-5. Archive to `.sdd/archive/` when complete.
+```text
+DRAFT -> APPROVED -> IN_PROGRESS -> VERIFYING -> COMPLETE -> ARCHIVED
+             |             |            |
+             +----------> BLOCKED <------+
+```
 
-Recommended task size:
+Rules:
 
-- Up to 3 files per task.
-- Around 30 minutes of implementation effort.
-- Clear, concrete verify step.
+1. Planning creates or updates `.sdd/active/<work-name>/spec.md`.
+2. Implementation begins after the approval policy is satisfied.
+3. Only one task should normally be `IN_PROGRESS` at a time.
+4. A task becomes `DONE` only after its verify step passes and evidence is recorded.
+5. Changed requirements return affected tasks to planning before implementation continues.
+6. Archive only after feature validation passes and no task remains open or blocked.
 
----
+Valid task states: `TODO`, `IN_PROGRESS`, `BLOCKED`, `DONE`.
 
-## OpenSpec Complementary Support
+## Approval Policy
 
-Default execution SHOULD remain the local `.sdd` workflow.
+Use an explicit human checkpoint when the user requests one, requirements remain ambiguous, risk is material, or the next action is difficult to reverse. Otherwise, a documented self-review may satisfy approval.
 
-Recur to OpenSpec support when the task needs complementary structure for:
-
-- Multi-session continuity where planning context must persist across chats.
-- Shareable planning artifacts for review before implementation.
-- Requirement-delta clarity that benefits from explicit change proposals.
-
-Routing rules:
-
-- Keep the local `.sdd/active/<feature-name>/spec.md` as the execution source of truth unless the team explicitly standardizes on OpenSpec paths.
-- If OpenSpec is unavailable, continue in `.sdd` and document assumptions directly in the active spec.
-
-| Use local SDD only | Use OpenSpec support |
-| --- | --- |
-| Single-session or straightforward work with clear requirements | Work spans multiple sessions and needs persistent planning context |
-| Existing `.sdd` artifacts already provide enough review clarity | Team needs proposal/design/tasks artifacts for async review |
-| Requirement changes are small and easy to track in-place | Requirement deltas are complex and need explicit change framing |
-
-Reference (informational): [https://openspec.dev/](https://openspec.dev/)
-
----
+Record the chosen approval policy in the spec. Do not assume every environment supports interactive checkpoints.
 
 ## Spec Structure
 
-A practical spec includes:
+A practical spec contains:
 
-- `Why`: problem and urgency.
-- `What`: concrete deliverable.
-- `Constraints`: `MUST`, `MUST NOT`, out-of-scope boundaries.
-- `Current State`: relevant code context.
-- `Tasks`: small implementation units with verify steps.
-- `Validation`: full feature checks after all tasks.
+- `Why`: problem and value.
+- `What`: concrete, testable deliverable.
+- `Constraints`: enforceable `MUST`, `SHOULD`, `MAY`, and `MUST NOT` statements.
+- `Out of Scope`: explicit boundaries.
+- `Current State`: verified context and integration points.
+- `Approval Policy`: checkpoint or self-review rule.
+- `Tasks`: small units with scenarios, capabilities, files, verify steps, and done definitions.
+- `Progress`: task state and evidence.
+- `Validation`: end-to-end checks.
+- `Change Log`: requirement or scope changes that affect execution.
 
-For existing features with behavior changes, use a delta format (`ADDED`, `MODIFIED`, `REMOVED`) instead of rewriting everything.
+### Task Contract
 
----
+Each task MUST define:
 
-## When to Use Delta vs Full Spec
+```markdown
+### T1: Title
 
-| Use Full Spec | Use Delta Spec |
-| --- | --- |
-| New feature with no previous spec | Behavior change to an existing feature |
-| Greenfield implementation | Bug fix or requirement adjustment |
-| No requirement baseline exists | Existing requirements already exist |
-
-## Archive Behavior
-
-When archiving a delta spec, apply changes to the base specification:
-
-- `ADDED`: append new requirements.
-- `MODIFIED`: replace the previous requirement text.
-- `REMOVED`: delete the requirement and keep a short reason in commit history.
-
-Then move work from `.sdd/active/<feature-name>/` to `.sdd/archive/<feature-name>/`.
-
-## Task Design Principles
-
-- Keep task scope small: if a task touches more than 3 files or needs more than about 30 minutes, split it.
-- Keep verification fast: each task should be verifiable in 2 minutes or less.
-- Keep completion explicit: each task must have a one-sentence definition of done.
-
-## Decision Tree: When to Break Tasks Smaller
-
-```text
-Does the task touch > 3 files?
-  YES -> split it
-
-Will the task take > 30 minutes?
-  YES -> split it
-
-Can the task be verified in <= 2 minutes?
-  NO -> add a tighter verify step
-
-Can "done" be described in one sentence?
-  NO -> task is too vague; split it
+**What:** Observable outcome.
+**Required Capabilities:** Semantic needs, or `none`.
+**Files:** Expected scope, or `discover` when not yet known.
+**Scenario:** GIVEN / WHEN / THEN, when behavior is involved.
+**Verify:** Project-discovered command or concrete manual check.
+**Done:** One sentence describing completion.
 ```
 
-## Common Mistakes to Avoid
+Capabilities describe needs such as test design, accessibility review, or security analysis. They MUST NOT require a particular skill, agent, vendor, or service. Resolve them against what is actually available at execution time.
 
-### 1) Vague Constraints
+## Full vs Delta Spec
 
-```text
-WRONG:
-Must use best practices.
+Use a full spec for new work without an existing requirement baseline. Use a delta spec for changes to established behavior.
 
-RIGHT:
-MUST use existing auth middleware.
-MUST NOT add new runtime dependencies.
-```
+- `ADDED`: new requirement and scenarios.
+- `MODIFIED`: complete replacement requirement plus previous behavior reference.
+- `REMOVED`: removed requirement plus reason.
 
-### 2) Oversized Tasks
+Before archiving a delta, reconcile it with the maintained requirement baseline when one exists. If no baseline exists, archive the delta as the historical record.
 
-```text
-WRONG:
-T1: Build the whole authentication feature.
+## Task Sizing
 
-RIGHT:
-T1: Add token verification middleware.
-T2: Add login endpoint behavior.
-T3: Add integration test for login flow.
-```
+Prefer tasks that:
 
-### 3) Missing Verification
+- Have one observable outcome.
+- Touch a small, related file set.
+- Can be completed without hidden dependencies.
+- Have a fast, deterministic verify step.
+- Have a one-sentence definition of done.
 
-```text
-WRONG:
-Verify: It works.
+Split a task when its concerns, dependencies, or verification cannot be explained independently. File counts and time estimates are heuristics, not universal gates.
 
-RIGHT:
-Verify: npm test -- src/auth/login.test.ts
-```
+## Change Control
 
-### 4) Mixed Concerns in One Task
+When requirements change during execution:
 
-```text
-WRONG:
-T1: Create component and migrate all pages to it.
+1. Stop the affected task at a stable point.
+2. Record the change and reason in `Change Log`.
+3. Update affected constraints, scenarios, tasks, and validation.
+4. Mark invalidated evidence as superseded.
+5. Reapply the approval policy before continuing.
 
-RIGHT:
-T1: Create component.
-T2: Migrate page A.
-T3: Migrate page B.
-```
+Do not silently stretch a task to absorb new behavior.
 
-Use the full preflight and pre-archive checks in [assets/validation-checklist.md](assets/validation-checklist.md).
+## Verification and Review
 
----
+Verification checks behavior against the spec, not against implementation intent.
+
+- Run every task verify step using project-discovered commands.
+- Check every `MUST` and `MUST NOT` constraint explicitly.
+- Separate automated evidence, manual evidence, warnings, and blockers.
+- Perform a final structured review using an available review capability or the fallback checklist in `agents/verify.md`.
+- A missing optional integration is not a failure when the local fallback was completed.
+
+## Archive Invariants
+
+Archive to `.sdd/archive/<YYYY-MM-DD>-<work-name>/` only when:
+
+- All tasks are `DONE`.
+- Validation passes or approved manual checks are recorded.
+- No blocker is unresolved.
+- Constraint and final-review evidence is present.
+- Delta reconciliation is complete when applicable.
+
+Generate the ISO date from the current environment; do not assume a particular shell command or VCS.
 
 ## Modes
 
-Use these mode guides for role-focused execution:
-
-- Planning mode: [agents/plan.md](agents/plan.md)
-- Implementation mode: [agents/apply.md](agents/apply.md)
-- Verification mode: [agents/verify.md](agents/verify.md)
-- Orchestrator mode: [agents/orchestrate.md](agents/orchestrate.md)
-
----
+- Planning: [agents/plan.md](agents/plan.md)
+- Implementation: [agents/apply.md](agents/apply.md)
+- Verification: [agents/verify.md](agents/verify.md)
+- Orchestration: [agents/orchestrate.md](agents/orchestrate.md)
 
 ## Templates
 
-- Feature spec: [assets/spec-template.md](assets/spec-template.md)
+- Full spec: [assets/spec-template.md](assets/spec-template.md)
 - Delta spec: [assets/delta-spec-template.md](assets/delta-spec-template.md)
 - Design decisions: [assets/design-template.md](assets/design-template.md)
 - Validation checklist: [assets/validation-checklist.md](assets/validation-checklist.md)
-
----
-
-## Commands
-
-```bash
-mkdir -p .sdd/active/<feature-name>
-cp .skilly-hand/catalog/spec-driven-development/assets/spec-template.md .sdd/active/<feature-name>/spec.md
-cp .skilly-hand/catalog/spec-driven-development/assets/design-template.md .sdd/active/<feature-name>/design.md
-```

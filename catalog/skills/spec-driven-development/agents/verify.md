@@ -2,31 +2,52 @@
 
 ## Purpose
 
-Validate that implementation matches the approved spec and passes quality checks.
-
-## Inputs
-
-- Spec path.
-- Implementation result from apply mode.
+Validate implementation against the approved spec using reproducible evidence and a portable final review.
 
 ## Procedure
 
-1. Read acceptance intent from `spec.md` and `design.md` (if present).
-2. Run task-level verification evidence checks.
-3. Run feature-level validation commands.
-4. Confirm constraints (`MUST`, `MUST NOT`) were respected.
-5. Run a final structured `review-rangers` pass over the full change set.
-6. Report pass/fail per area with concrete evidence.
+1. Read the complete spec and relevant design decisions.
+2. Confirm every task has a terminal state and `DONE` tasks have evidence.
+3. Run or inspect each task verify step.
+4. Run feature-level validation discovered from the repository and listed in the spec.
+5. Evaluate every `MUST` and `MUST NOT` constraint independently.
+6. Identify manual checks that still require human confirmation.
+7. Perform the final review gate below.
+8. Report blockers, warnings, and evidence separately.
 
-### Required Final Gate (`review-rangers`)
+## Portable Final Review Gate
 
-- Validate selected agent targets vs actual instruction files/symlinks written.
-- Validate stale managed target cleanup after re-install/reselection.
-- Validate backup and restore safety (including uninstall restore behavior).
-- Any unresolved `review-rangers` blocker keeps verification in failed state.
+Use an installed review capability when one is available and applicable. Otherwise perform this local review:
+
+- Correctness: implementation satisfies every scenario and constraint.
+- Regression risk: affected existing behavior has appropriate checks.
+- Scope: no unapproved behavior or dependency was introduced.
+- Maintainability: changes follow discovered project conventions.
+- Safety: security, privacy, accessibility, data, and destructive-operation risks were considered when relevant.
+- Evidence: results are reproducible and unsupported claims are absent.
+
+Any unresolved correctness, constraint, or safety blocker fails verification. Missing optional tooling does not fail verification when this fallback is completed.
+
+## Report Contract
+
+```markdown
+## Verification Report
+
+### Task Evidence
+| Task | Check | Result | Evidence |
+
+### Constraints
+| Constraint | Result | Evidence |
+
+### Final Review
+- Result: PASS | FAIL
+- Blockers: none | list
+- Warnings: none | list
+- Manual checks: none | list
+```
 
 ## Quality Bar
 
-- End-to-end validation is explicit.
-- Gaps are tied to exact tasks or constraints.
-- Report separates blockers from non-blocking warnings.
+- Results distinguish `PASS`, `FAIL`, and `NOT_RUN`.
+- Manual validation is never reported as automated evidence.
+- Archive readiness is an explicit conclusion, not an implication.
