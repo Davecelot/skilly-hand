@@ -8,6 +8,21 @@ All notable changes to this project are documented in this file.
 - _None._
 
 ### Changed
+- _None._
+
+### Fixed
+- _None._
+
+### Removed
+- _None._
+
+## [0.29.2] - 2026-06-20
+[View on npm](https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.29.2)
+
+### Added
+- _None._
+
+### Changed
 - Synchronized `figma-mcp-0to1` with the current official Figma MCP tools, Figma Slides workflows, asset transfer, Code Connect context, supported clients, permissions, and rate limits.
 
 ### Fixed
