@@ -8,6 +8,21 @@ All notable changes to this project are documented in this file.
 - _None._
 
 ### Changed
+- _None._
+
+### Fixed
+- _None._
+
+### Removed
+- _None._
+
+## [0.30.0] - 2026-06-20
+[View on npm](https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.30.0)
+
+### Added
+- _None._
+
+### Changed
 - Expanded `review-rangers` with an approval-gated Mender remediation loop, independent re-review, critical-stop rules, bounded termination, repository-native verification, and automatic `test-driven-development` installation.
 
 ### Fixed

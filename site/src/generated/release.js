@@ -1,12 +1,12 @@
 export const release = {
-  "version": "0.29.3",
+  "version": "0.30.0",
   "date": "2026-06-20",
-  "npmUrl": "https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.29.3",
+  "npmUrl": "https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.30.0",
   "sections": [
     {
       "title": "Changed",
       "items": [
-        "Reworked `spec-driven-development` around a portable lifecycle with repository-native capability discovery, evidence-backed task state, explicit change control, and archive invariants."
+        "Expanded `review-rangers` with an approval-gated Mender remediation loop, independent re-review, critical-stop rules, bounded termination, repository-native verification, and automatic `test-driven-development` installation."
       ]
     }
   ]
