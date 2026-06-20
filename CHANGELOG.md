@@ -8,6 +8,21 @@ All notable changes to this project are documented in this file.
 - _None._
 
 ### Changed
+- _None._
+
+### Fixed
+- _None._
+
+### Removed
+- _None._
+
+## [0.29.3] - 2026-06-20
+[View on npm](https://www.npmjs.com/package/@skilly-hand/skilly-hand/v/0.29.3)
+
+### Added
+- _None._
+
+### Changed
 - Reworked `spec-driven-development` around a portable lifecycle with repository-native capability discovery, evidence-backed task state, explicit change control, and archive invariants.
 - Rebuilt `test-driven-development` guidance around evidence-based RED, GREEN, and REFACTOR cycles without fixed framework or test-runner assumptions.
 
