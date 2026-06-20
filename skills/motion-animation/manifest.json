@@ -1,0 +1,28 @@
+{
+  "id": "motion-animation",
+  "title": "Motion Animation",
+  "description": "Guide Motion, formerly Framer Motion, animation implementation using only official Motion documentation. Trigger: implementing, reviewing, or choosing Motion for JavaScript animation, React motion components, gestures, scroll animation, layout animation, exit animation, or framework-agnostic UI motion.",
+  "portable": true,
+  "tags": ["frontend", "animation", "motion", "framer-motion", "workflow"],
+  "detectors": ["react", "nextjs", "angular", "vue", "vite", "tailwindcss", "storybook"],
+  "detectionTriggers": ["auto"],
+  "installsFor": ["all"],
+  "agentSupport": ["codex", "claude", "cursor", "gemini", "copilot", "antigravity", "windsurf", "trae"],
+  "skillMetadata": {
+    "author": "skilly-hand",
+    "last-edit": "2026-05-03",
+    "license": "Apache-2.0",
+    "version": "1.0.0",
+    "changelog": "Added official-source Motion animation guidance for JavaScript and React; improves framework-agnostic and React-native motion implementation with verified Motion APIs; affects frontend animation routing and catalog discovery",
+    "auto-invoke": "Implementing, reviewing, or choosing Motion for JavaScript animation, React motion components, gestures, scroll animation, layout animation, exit animation, or framework-agnostic UI motion",
+    "allowed-tools": ["Read", "Edit", "Write", "Glob", "Grep", "Bash", "WebFetch", "WebSearch", "Task", "SubAgent"]
+  },
+  "files": [
+    { "path": "SKILL.md", "kind": "instruction" },
+    { "path": "references/official-source-map.md", "kind": "reference" },
+    { "path": "references/js-patterns.md", "kind": "reference" },
+    { "path": "references/react-patterns.md", "kind": "reference" },
+    { "path": "references/performance-accessibility.md", "kind": "reference" }
+  ],
+  "dependencies": []
+}

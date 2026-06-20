@@ -47,9 +47,9 @@ The full skill catalog is also discoverable through the [skills.sh](https://www.
 npx skills add Davecelot/skilly-hand --skill '*'
 ```
 
-Use `npx skills add Davecelot/skilly-hand --list` to inspect the available skills before installing. The `skills/` directory is a GitHub-facing overlay made of symlinks to `catalog/skills/`; it helps skills.sh discover the catalog without changing the regular `npx skilly-hand` npm package contents or CLI flow.
+Use `npx skills add Davecelot/skilly-hand --list` to inspect the available skills before installing. The `skills/` directory is a generated GitHub-facing mirror of `catalog/skills/`, using real files because skills.sh discovers `SKILL.md` entries from GitHub's repository tree. Run `npm run skills:sync` after catalog changes; `npm run catalog:check` rejects mirror drift.
 
-Windows contributors who clone the repo locally should enable symlink support before checkout, for example with `git config --global core.symlinks true`, and may also need Developer Mode or elevated symlink privileges. If the repo was already checked out without symlinks, re-check out or reclone after enabling support.
+skills.sh adds a repository to its public catalog after a skill is installed through the official CLI with telemetry enabled. The public page and automated security audits may take a few minutes to appear after the first installation.
 
 ---
 

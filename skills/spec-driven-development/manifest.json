@@ -1,0 +1,47 @@
+{
+  "id": "spec-driven-development",
+  "title": "Spec-Driven Development",
+  "description": "Plan, execute, and verify multi-step work through versioned specs with small, testable tasks. Trigger: planning or executing feature work, bug fixes, and multi-phase implementation.",
+  "portable": true,
+  "tags": ["core", "workflow", "planning"],
+  "detectors": ["always"],
+  "detectionTriggers": ["always"],
+  "installsFor": ["all"],
+  "agentSupport": ["codex", "claude", "cursor", "gemini", "copilot", "antigravity", "windsurf", "trae"],
+  "skillMetadata": {
+    "author": "skilly-hand",
+    "last-edit": "2026-06-20",
+    "license": "Apache-2.0",
+    "version": "1.1.0",
+    "changelog": "Added a portable SDD lifecycle with capability-based routing, task evidence, change control, and archive invariants; prevents fixed tool dependencies and duplicated task state; affects planning, apply, verify, orchestrate, and spec templates",
+    "auto-invoke": "Planning or executing feature work, bug fixes, and multi-phase implementation",
+    "allowed-modes": [
+      "plan",
+      "apply",
+      "verify",
+      "orchestrate"
+    ],
+    "allowed-tools": [
+      "Read",
+      "Edit",
+      "Write",
+      "Glob",
+      "Grep",
+      "Bash",
+      "Task",
+      "SubAgent"
+    ]
+  },
+  "files": [
+    { "path": "SKILL.md", "kind": "instruction" },
+    { "path": "agents/plan.md", "kind": "instruction" },
+    { "path": "agents/apply.md", "kind": "instruction" },
+    { "path": "agents/verify.md", "kind": "instruction" },
+    { "path": "agents/orchestrate.md", "kind": "instruction" },
+    { "path": "assets/spec-template.md", "kind": "asset" },
+    { "path": "assets/delta-spec-template.md", "kind": "asset" },
+    { "path": "assets/design-template.md", "kind": "asset" },
+    { "path": "assets/validation-checklist.md", "kind": "asset" }
+  ],
+  "dependencies": []
+}

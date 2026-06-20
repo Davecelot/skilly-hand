@@ -1,0 +1,41 @@
+{
+  "id": "frontend-design",
+  "title": "Frontend Design",
+  "description": "Project-aware frontend design skill that detects the existing tech stack, UI libraries, CSS variables, and design tokens before proposing any UI work. Supports greenfield projects via DESIGN.md context setup, taste-reference extraction, post-generation critique, visual refinement, and Motion/GSAP-aware motion polish.",
+  "portable": true,
+  "tags": ["frontend", "design", "workflow", "ui", "motion", "greenfield"],
+  "detectors": ["always"],
+  "detectionTriggers": ["manual"],
+  "installsFor": ["all"],
+  "agentSupport": ["codex", "claude", "cursor", "gemini", "copilot", "antigravity", "windsurf", "trae"],
+  "skillMetadata": {
+    "author": "skilly-hand",
+    "last-edit": "2026-05-09",
+    "license": "Apache-2.0",
+    "version": "1.5.0",
+    "changelog": "Added taste-reference extraction guidance sourced from Refero Styles and Impeccable; improves how agents translate visual references, anti-references, and register into DESIGN.md-ready language; affects greenfield design setup, critique, refinement, and resource routing",
+    "auto-invoke": "Designing or generating UI components, pages, or layouts in a web or mobile project; setting up visual direction for a greenfield project; critiquing generated UI for AI slop; adding motion or micro-interactions to existing UI; refining or polishing generated UI output",
+    "allowed-modes": [
+      "stack-detector",
+      "design-context-setter",
+      "component-designer",
+      "critique",
+      "visual-refiner",
+      "motion-designer"
+    ],
+    "allowed-tools": ["Read", "Grep", "Glob", "Bash", "Edit", "Write", "Task", "SubAgent"]
+  },
+  "files": [
+    { "path": "SKILL.md", "kind": "instruction" },
+    { "path": "agents/stack-detector.md", "kind": "asset" },
+    { "path": "agents/design-context-setter.md", "kind": "asset" },
+    { "path": "agents/component-designer.md", "kind": "asset" },
+    { "path": "agents/critique.md", "kind": "asset" },
+    { "path": "agents/visual-refiner.md", "kind": "asset" },
+    { "path": "agents/motion-designer.md", "kind": "asset" },
+    { "path": "assets/stack-scan-checklist.md", "kind": "asset" },
+    { "path": "assets/aesthetic-archetypes.md", "kind": "asset" },
+    { "path": "assets/taste-reference-extraction.md", "kind": "asset" }
+  ],
+  "dependencies": ["motion-animation", "gsap-animation"]
+}

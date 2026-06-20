@@ -1,0 +1,48 @@
+{
+  "id": "figma-mcp-0to1",
+  "title": "Figma MCP 0-to-1 Guide",
+  "description": "Guide users from Figma MCP installation and authentication through first canvas creation, with function-level tool coverage and operational recovery patterns.",
+  "portable": true,
+  "tags": ["figma", "mcp", "workflow", "design"],
+  "detectors": ["figma"],
+  "detectionTriggers": ["manual"],
+  "installsFor": ["all"],
+  "agentSupport": ["codex", "claude", "cursor", "gemini", "copilot", "antigravity", "windsurf", "trae"],
+  "skillMetadata": {
+    "author": "skilly-hand",
+    "last-edit": "2026-06-20",
+    "license": "Apache-2.0",
+    "version": "1.1.0",
+    "changelog": "Synced the official Figma MCP surface for asset transfer, Code Connect context, library discovery, Figma Slides, current Figma-provided skills, and per-minute limits; affects tool routing, canvas workflows, prompts, troubleshooting, and the official matrix",
+    "auto-invoke": "Installing, configuring, or using Figma MCP from setup through first canvas creation",
+    "allowed-modes": [
+      "install-auth",
+      "tool-function-catalog",
+      "canvas-creation-playbook",
+      "troubleshooting-ops"
+    ],
+    "allowed-tools": [
+      "Read",
+      "Edit",
+      "Write",
+      "Glob",
+      "Grep",
+      "Bash",
+      "WebFetch",
+      "WebSearch",
+      "Task",
+      "SubAgent"
+    ]
+  },
+  "files": [
+    { "path": "SKILL.md", "kind": "instruction" },
+    { "path": "agents/install-auth.md", "kind": "instruction" },
+    { "path": "agents/tool-function-catalog.md", "kind": "instruction" },
+    { "path": "agents/canvas-creation-playbook.md", "kind": "instruction" },
+    { "path": "agents/troubleshooting-ops.md", "kind": "instruction" },
+    { "path": "assets/client-config-snippets.md", "kind": "asset" },
+    { "path": "assets/prompt-recipes.md", "kind": "asset" },
+    { "path": "references/official-tools-matrix.md", "kind": "reference" }
+  ],
+  "dependencies": []
+}

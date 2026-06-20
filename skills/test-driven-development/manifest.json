@@ -1,0 +1,25 @@
+{
+  "id": "test-driven-development",
+  "title": "Test-Driven Development",
+  "description": "Guide implementation through evidence-based RED, GREEN, and REFACTOR cycles without assuming a language, framework, or test runner. Trigger: implementing testable behavior or reproducing a regression with tests first.",
+  "portable": true,
+  "tags": ["testing", "workflow", "quality", "core"],
+  "detectors": ["always"],
+  "detectionTriggers": ["manual"],
+  "installsFor": ["all"],
+  "agentSupport": ["codex", "claude", "cursor", "gemini", "copilot", "antigravity", "windsurf", "trae"],
+  "skillMetadata": {
+    "author": "skilly-hand",
+    "last-edit": "2026-06-20",
+    "license": "Apache-2.0",
+    "version": "1.1.0",
+    "changelog": "Rebuilt TDD guidance around portable cycle evidence, expected RED failures, behavior-preserving refactors, and project-discovered test conventions; prevents framework assumptions and untested behavior during refactor; affects core workflow, examples, and verification guidance",
+    "auto-invoke": "Implementing testable behavior or reproducing a regression with tests first",
+    "allowed-tools": ["Read", "Edit", "Write", "Glob", "Grep", "Bash"]
+  },
+  "files": [
+    { "path": "SKILL.md", "kind": "instruction" },
+    { "path": "assets/tdd-cycle.md", "kind": "asset" }
+  ],
+  "dependencies": []
+}

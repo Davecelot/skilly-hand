@@ -1,0 +1,43 @@
+{
+  "id": "angular-guidelines",
+  "title": "Angular Guidelines",
+  "description": "Guide Angular code generation, review, and performance tuning using latest stable Angular verification, official Angular skill guidance, and modern framework best practices. Trigger: generating, reviewing, refactoring, or optimizing Angular code artifacts in Angular projects.",
+  "portable": true,
+  "tags": ["angular", "frontend", "workflow", "best-practices"],
+  "detectors": ["angular"],
+  "detectionTriggers": ["auto"],
+  "installsFor": ["all"],
+  "agentSupport": ["codex", "claude", "cursor", "gemini", "copilot", "antigravity", "windsurf", "trae"],
+  "skillMetadata": {
+    "author": "skilly-hand",
+    "last-edit": "2026-05-01",
+    "license": "Apache-2.0",
+    "version": "1.2.0",
+    "changelog": "Added curated official Angular skill and performance guidance with a dedicated performance-reviewer mode; improves SSR, hydration, reactivity, testing, and runtime optimization coverage; affects angular-guidelines routing, review checklists, and catalog discovery",
+    "auto-invoke": "Generating, reviewing, refactoring, or optimizing Angular code artifacts in Angular projects",
+    "allowed-modes": [
+      "component-creator",
+      "angular-tester",
+      "performance-reviewer"
+    ],
+    "allowed-tools": [
+      "Read",
+      "Edit",
+      "Write",
+      "Glob",
+      "Grep",
+      "Bash",
+      "WebFetch",
+      "WebSearch",
+      "Task",
+      "SubAgent"
+    ]
+  },
+  "files": [
+    { "path": "SKILL.md", "kind": "instruction" },
+    { "path": "agents/component-creator.md", "kind": "instruction" },
+    { "path": "agents/angular-tester.md", "kind": "instruction" },
+    { "path": "agents/performance-reviewer.md", "kind": "instruction" }
+  ],
+  "dependencies": []
+}
