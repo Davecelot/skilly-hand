@@ -60,6 +60,30 @@ test("dependency check blocks in strict mode for high vulnerabilities", async ()
   assert.equal(result.issues.some((issue) => /high\/critical/.test(issue)), true);
 });
 
+test("pnpm strict checks include vulnerable development dependencies", async () => {
+  const cwd = await makeProject({ lockfile: "pnpm-lock.yaml" });
+
+  const result = await runDependencySecurityCheck({
+    cwd,
+    strict: true,
+    runCommandImpl: async (command, args) => {
+      if (command === "pnpm" && args[0] === "audit") {
+        // A production-only audit hides this development-server vulnerability.
+        const vulnerabilities = args.includes("--prod")
+          ? {}
+          : { vite: { severity: "high" } };
+        return { exitCode: Object.keys(vulnerabilities).length ? 1 : 0,
+          stdout: JSON.stringify({ vulnerabilities }), stderr: "" };
+      }
+      return { exitCode: 0, stdout: "{}", stderr: "" };
+    }
+  });
+
+  assert.equal(result.valid, false);
+  assert.equal(result.checks.audit.severity.high, 1);
+  assert.equal(result.checks.audit.blocked, true);
+});
+
 test("dependency check fails closed in strict mode when lockfile is missing", async () => {
   const cwd = await makeProject({ lockfile: null });
 

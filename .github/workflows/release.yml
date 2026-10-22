@@ -28,15 +28,15 @@ jobs:
       contents: read
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
 
       - name: Enable Corepack
         run: corepack enable
 
       - name: Setup Node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
-          node-version: 24
+          node-version: "24.22.1"
           cache: pnpm
 
       - name: Install dependencies
@@ -80,7 +80,7 @@ jobs:
       changelog_notes: ${{ steps.extract.outputs.notes }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           # Use a PAT instead of GITHUB_TOKEN if you need the release commit
           # to trigger ci.yml (GITHUB_TOKEN pushes do not re-trigger workflows).
@@ -88,9 +88,9 @@ jobs:
           fetch-depth: 0
 
       - name: Setup Node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
-          node-version: 24
+          node-version: "24.22.1"
           cache: npm
 
       - name: Install dependencies
@@ -130,9 +130,11 @@ jobs:
           echo "tag=v$NEW" >> "$GITHUB_OUTPUT"
 
       - name: Rotate changelog
+        env:
+          RELEASE_VERSION: ${{ steps.version.outputs.version }}
         run: |
           node scripts/release-changelog.mjs \
-            --version "${{ steps.version.outputs.version }}" \
+            --version "$RELEASE_VERSION" \
             --date "$(date -u +%Y-%m-%d)" \
             --no-stage
 
@@ -141,18 +143,21 @@ jobs:
 
       - name: Extract changelog notes
         id: extract
+        env:
+          RELEASE_VERSION: ${{ steps.version.outputs.version }}
         run: |
           {
             echo 'notes<<EOF_CHANGELOG_NOTES'
             node scripts/extract-changelog-section.mjs \
-              --version "${{ steps.version.outputs.version }}" \
+              --version "$RELEASE_VERSION" \
               --raw
             echo 'EOF_CHANGELOG_NOTES'
           } >> "$GITHUB_OUTPUT"
 
       - name: Commit, tag, and push
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
         run: |
-          VERSION="${{ steps.version.outputs.version }}"
           git add package.json packages/*/package.json package-lock.json npm-shrinkwrap.json pnpm-lock.yaml CHANGELOG.md site/src/generated/release.js site/src/generated/skills.js
           git commit -m "chore(release): v$VERSION"
           git tag -a "v$VERSION" -m "Release v$VERSION"
@@ -168,14 +173,14 @@ jobs:
       id-token: write
     steps:
       - name: Checkout at release tag
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           ref: ${{ needs.bump.outputs.tag }}
 
       - name: Setup Node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
-          node-version: 24
+          node-version: "24.22.1"
           registry-url: https://registry.npmjs.org
           cache: npm
 
@@ -192,8 +197,9 @@ jobs:
 
       - name: Check if version already published
         id: check_npm
+        env:
+          VERSION: ${{ needs.bump.outputs.version }}
         run: |
-          VERSION="${{ needs.bump.outputs.version }}"
           PUBLISHED=$(npm view "@skilly-hand/skilly-hand@$VERSION" version 2>/dev/null || true)
           if [ "$PUBLISHED" = "$VERSION" ]; then
             echo "Version $VERSION is already on npm — skipping publish."
@@ -209,7 +215,7 @@ jobs:
           NO_COLOR: '1'
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v3
+        uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3
         with:
           tag_name: ${{ needs.bump.outputs.tag }}
           name: v${{ needs.bump.outputs.version }}
@@ -231,7 +237,7 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout release
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           ref: ${{ needs.bump.outputs.tag }}
 
@@ -239,16 +245,16 @@ jobs:
         run: corepack enable
 
       - name: Setup Node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
-          node-version: 24
+          node-version: "24.22.1"
           cache: pnpm
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
       - name: Configure Pages
-        uses: actions/configure-pages@v6
+        uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6
 
       - name: Build site
         run: pnpm site:build
@@ -256,13 +262,13 @@ jobs:
           GITHUB_PAGES: "true"
 
       - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v5
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5
         with:
           path: site/dist
 
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v5
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5
 
   publish_existing:
     name: Publish existing release to npm
@@ -273,21 +279,23 @@ jobs:
       id-token: write
     steps:
       - name: Validate version input
+        env:
+          VERSION_INPUT: ${{ inputs.version }}
         run: |
-          if ! echo "${{ inputs.version }}" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+          if [[ ! "$VERSION_INPUT" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo "version input must be a semantic version like 0.24.0"
             exit 1
           fi
 
       - name: Checkout at release tag
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           ref: v${{ inputs.version }}
 
       - name: Setup Node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
-          node-version: 24
+          node-version: "24.22.1"
           registry-url: https://registry.npmjs.org
           cache: npm
 
@@ -304,8 +312,9 @@ jobs:
 
       - name: Check if version already published
         id: check_npm
+        env:
+          VERSION: ${{ inputs.version }}
         run: |
-          VERSION="${{ inputs.version }}"
           PUBLISHED=$(npm view "@skilly-hand/skilly-hand@$VERSION" version 2>/dev/null || true)
           if [ "$PUBLISHED" = "$VERSION" ]; then
             echo "Version $VERSION is already on npm — skipping publish."
@@ -322,17 +331,19 @@ jobs:
 
       - name: Extract changelog notes
         id: extract
+        env:
+          RELEASE_VERSION: ${{ inputs.version }}
         run: |
           {
             echo 'notes<<EOF_CHANGELOG_NOTES'
             node scripts/extract-changelog-section.mjs \
-              --version "${{ inputs.version }}" \
+              --version "$RELEASE_VERSION" \
               --raw
             echo 'EOF_CHANGELOG_NOTES'
           } >> "$GITHUB_OUTPUT"
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v3
+        uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3
         with:
           tag_name: v${{ inputs.version }}
           name: v${{ inputs.version }}

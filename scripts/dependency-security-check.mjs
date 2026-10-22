@@ -9,7 +9,7 @@ const renderer = createTerminalRenderer();
 const PACKAGE_MANAGERS = {
   pnpm: {
     lockfile: "pnpm-lock.yaml",
-    auditCmd: ["pnpm", ["audit", "--json", "--prod"]],
+    auditCmd: ["pnpm", ["audit", "--json"]],
     outdatedCmd: ["pnpm", ["outdated", "--format", "json"]]
   },
   yarn: {
