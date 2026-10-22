@@ -32,6 +32,8 @@
 
 ## Quick Start
 
+Use a patched Node release: **22.23.4**, **24.22.1** (the version pinned by `.node-version`), or **26.12.1** and later in the corresponding supported release line.
+
 ```bash
 npx skilly-hand
 ```

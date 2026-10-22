@@ -87,5 +87,5 @@ test("runtime dependencies use direct inquirer prompts without react, ink, or le
   assert.equal(Boolean(deps.react), false);
   assert.equal(Boolean(deps.ink), false);
   assert.equal(Boolean(deps.inquirer), false);
-  assert.equal(deps["@inquirer/prompts"], "8.4.3");
+  assert.equal(deps["@inquirer/prompts"], "8.7.4");
 });
